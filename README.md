@@ -1,3 +1,3 @@
-# SIT ORIGIN 3 (API)
+# SIT ORIGIN 3 (WEB)
 
-Siblings Repo (Webpage): https://github.com/hxpehophopv2/sit-origin-3-web
+Siblings Repo (API): https://github.com/hxpehophopv2/sit-origin-3-api

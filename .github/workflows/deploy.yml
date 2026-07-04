@@ -8,24 +8,15 @@ on:
 jobs:
   deploy:
 
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
 
     steps:
+      - name: Pull latest frontend
+        run: |
+          cd /opt/project/frontend
+          git pull origin main
 
-      - name: Deploy
-
-        uses: appleboy/ssh-action@v1.2.0
-
-        with:
-          host: ${{ secrets.SSH_HOST }}
-          username: ${{ secrets.SSH_USER }}
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
-
-          script: |
-            cd /opt/project/frontend
-
-            git pull origin main
-
-            cd /opt/project/deployment
-
-            docker compose up -d --build frontend
+      - name: Build frontend
+        run: |
+          cd /opt/project/deployment
+          docker compose up -d --build frontend

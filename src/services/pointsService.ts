@@ -19,7 +19,7 @@ export interface ReceiverProfile {
 }
 
 export interface GivePointsPayload {
-  receiverCode: string[];
+  receiverCodes: string[];
   amount: number;
 }
 

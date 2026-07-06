@@ -17,7 +17,13 @@ export default function PointHistoryPreview({
 
   // If no transactions, we can hide the preview block entirely or show a mini empty state
   if (!transactions || transactions.length === 0) {
-    return null;
+    return (
+      <div className="mt-4 rounded-[32px] border-2 border-white/60 bg-white/20 p-6 text-center shadow-cartoon backdrop-blur-md">
+        <p className="text-body-lg font-bold text-neutral-500 drop-shadow-md">
+          {t("history.emptyPoints")}
+        </p>
+      </div>
+    );
   }
 
   // Take up to 4 items to demonstrate the fade effect on the last one

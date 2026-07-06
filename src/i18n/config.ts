@@ -35,6 +35,7 @@ const resources = {
           "กระดานผู้นำแบบไม่ระบุตัวตน — มีเพียงผู้ดูแลระบบเท่านั้นที่จะเห็นข้อมูลทั้งหมด",
         loading: "กำลังโหลดอันดับ...",
         offlineData: "การเชื่อมต่อขาดหาย กำลังแสดงข้อมูลล่าสุด",
+        emptyPoints: "ยังไม่มีอันดับเลย",
       },
       transfer: {
         title: "โอนคะแนน",
@@ -79,6 +80,7 @@ const resources = {
         unknownStation: "ไม่ระบุสถานี",
         emptyTitle: "ยังไม่มีประวัติการรับคะแนน",
         emptyDesc: "แวะไปที่ฐานกิจกรรมเพื่อเริ่มสะสม!",
+        emptyPoints: "น้อง ๆ ยังไม่มีแต้มเลยย",
       },
       modals: {
         manualInputTitle: "กรอกรหัสผู้ใช้",
@@ -130,6 +132,7 @@ const resources = {
           "Anonymous Leaderboard — Only Admins can see full details.",
         loading: "Loading rankings...",
         offlineData: "Connection lost. Showing latest data.",
+        emptyPoints: "No rankings yet.",
       },
       transfer: {
         title: "Transfer Points",
@@ -174,6 +177,7 @@ const resources = {
         unknownStation: "Unknown Station",
         emptyTitle: "No point history yet",
         emptyDesc: "Visit an activity station to start earning!",
+        emptyPoints: "No points recorded yet!",
       },
       modals: {
         manualInputTitle: "Enter User Code",

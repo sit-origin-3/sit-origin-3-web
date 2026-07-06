@@ -1,13 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import gsap from "gsap";
 import { Flip } from "gsap/Flip";
-import {
-  Trophy,
-  Star,
-  Loader2,
-  WifiOff,
-  RefreshCw,
-} from "lucide-react";
+import { Trophy, Star, Loader2, WifiOff, RefreshCw } from "lucide-react";
 import { streamLeaderboard } from "../services/leaderboardService";
 import { getMe } from "../services/userService";
 import { useAuthStore } from "../store/useAuthStore";
@@ -159,11 +153,10 @@ export default function Leaderboard() {
   const listRef = useRef<HTMLDivElement>(null);
   const isFirstRender = useRef(true);
 
-  const connect = useCallback((token: string | null, adminFlag: boolean) => {
+  const connect = useCallback((adminFlag: boolean) => {
     setError(null);
 
     const controller = streamLeaderboard(
-      token,
       adminFlag,
       (data) => {
         if (!isFirstRender.current && listRef.current) {
@@ -192,7 +185,7 @@ export default function Leaderboard() {
           isFirstRender.current = false;
         }
       },
-      (err) => {
+      (err: Error) => {
         setIsConnected(false);
         setError(err.message);
       },
@@ -216,7 +209,7 @@ export default function Leaderboard() {
         }
       }
       if (!cancelled) {
-        controller = connect(token, isAdmin);
+        controller = connect(isAdmin);
       }
     };
 
@@ -237,7 +230,7 @@ export default function Leaderboard() {
             type="button"
             onClick={() => {
               isFirstRender.current = true;
-              connect(accessToken, isAdmin);
+              connect(isAdmin);
             }}
             className="flex min-h-[44px] items-center gap-2 rounded-2xl bg-zpd-500 px-6 py-3 text-body-lg font-bold text-white shadow-hard transition-all hover:bg-zpd-600 active:translate-y-0.5 active:shadow-none"
           >

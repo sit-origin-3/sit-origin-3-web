@@ -3,24 +3,10 @@ import { useAuthStore } from "../store/useAuthStore";
 
 // 1. สร้าง Instance ของ Axios
 export const api = axios.create({
-  // Vite จะดึงค่า URL จากไฟล์ .env มาใช้ ถ้าไม่มีจะใช้ localhost เป็นค่าสำรอง
   baseURL: import.meta.env.VITE_API_URL || "http://localhost:3000/api",
-  timeout: 5000, // ถ้าเซิร์ฟเวอร์เพื่อนตายใน 5 วินาที ให้ตัดจบเลย ไม่ต้องรอให้แอปค้าง
+  timeout: 5000,
+  withCredentials: true,
 });
 
-// 2. Interceptor: ดักจับ "ก่อน" ที่ Request จะพุ่งออกจาก Frontend
-api.interceptors.request.use(
-  (config) => {
-    const accessToken = useAuthStore.getState().accessToken;
+// cookie-based auth — ไม่ต้องใส่ Authorization header เพราะ backend อ่านจาก cookie
 
-    // ถ้ามี Token ให้ยัดใส่ Header Authorization อัตโนมัติในทุกๆ Request
-    if (accessToken) {
-      config.headers.Authorization = `Bearer ${accessToken}`;
-    }
-
-    return config;
-  },
-  (error) => {
-    return Promise.reject(error);
-  },
-);

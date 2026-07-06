@@ -58,11 +58,11 @@ export default function Login() {
 
       setIsLoading(true);
       try {
-        const { accessToken, user } = await loginApi({
+        const { user } = await loginApi({
           identifier: identifier.trim(),
           password,
         });
-        setAuth(accessToken, user);
+        setAuth("cookie", user as any);
         navigate("/", { replace: true });
       } catch (err) {
         if (err instanceof AxiosError && err.response) {

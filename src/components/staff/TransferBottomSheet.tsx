@@ -54,7 +54,7 @@ export default function TransferBottomSheet({
     setError(null);
 
     const payload = {
-      receiverCode: receivers.map((user) => user.userCode),
+      receiverCodes: receivers.map((user) => user.userCode),
       amount: parsedAmount,
     };
 

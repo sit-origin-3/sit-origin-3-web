@@ -1,0 +1,61 @@
+@import "tailwindcss";
+@config "../../tailwind.config.ts";
+
+@layer base {
+  @font-face {
+    font-family: "Lato";
+    font-display: swap;
+    src: local("Lato");
+  }
+
+  @font-face {
+    font-family: "Noto Sans Thai";
+    font-display: swap;
+    src: local("Noto Sans Thai");
+  }
+
+  @font-face {
+    font-family: "JetBrains Mono";
+    font-display: swap;
+    src: local("JetBrains Mono");
+  }
+
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  html {
+    font-size: 16px;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+
+  body {
+    font-family: "Lato", "Noto Sans Thai", sans-serif;
+    font-weight: 500;
+    line-height: 1.5;
+    min-height: 100dvh;
+    background: linear-gradient(
+      135deg,
+      #95d0bf 0%,
+      #c2e4db 25%,
+      #f6aa85 50%,
+      #fbcab3 75%,
+      #fb7185 100%
+    );
+    background-attachment: fixed;
+    color: #244239;
+  }
+
+  #root {
+    display: flex;
+    flex-direction: column;
+    min-height: 100dvh;
+    isolation: isolate;
+  }
+}

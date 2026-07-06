@@ -10,20 +10,15 @@ export function streamLeaderboard(
 ): AbortController {
   const controller = new AbortController();
 
-  const headers: Record<string, string> = {
-    Accept: "text/event-stream",
-  };
-  if (token) {
-    headers["Authorization"] = `Bearer ${token}`;
-  }
-
   (async () => {
     try {
-      const endpoint = isAdmin ? "/leaderboard/stream" : "/leaderboard/stream/anonymous";
+      const endpoint = isAdmin
+        ? "/leaderboard/stream"
+        : "/leaderboard/stream/anonymous";
       const response = await fetch(`${BASE_URL}${endpoint}`, {
         method: "GET",
         credentials: "include",
-        headers,
+        headers: { Accept: "text/event-stream" },
         signal: controller.signal,
       });
 

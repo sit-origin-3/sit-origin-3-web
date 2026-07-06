@@ -189,7 +189,7 @@ export default function Profile() {
 
             <div className="text-center">
               <h1 className="text-h2 text-zpd-900">
-                {profile.firstname} ({profile.nickname})
+                {profile.firstname} {profile.lastname} ({profile.nickname})
               </h1>
             </div>
 
@@ -206,23 +206,29 @@ export default function Profile() {
               <p className="text-caption font-semibold uppercase tracking-wider text-neutral-500">
                 {t("profile.groupLabel")}
               </p>
-              <p className="font-mono text-h2 font-black text-zpd-900">
-                {groupName}
-              </p>
+              <p className="text-h2 font-black text-zpd-900">{groupName}</p>
             </div>
 
             {/* ROW 2: Points & Rank */}
             <div className="flex gap-3">
               <div className="flex flex-1 flex-col items-center justify-center rounded-2xl border border-white/40 bg-white/40 px-4 py-3 shadow-inner backdrop-blur-sm text-center">
                 <p className="text-caption font-semibold text-neutral-500">
-                  {profile.role === "FRESHY" ? t("profile.pointsLabel") : t("profile.remainingGroupPoints")}
+                  {profile.role === "FRESHY"
+                    ? t("profile.pointsLabel")
+                    : t("profile.remainingGroupPoints")}
                 </p>
-                <p className="font-mono text-h3 font-black text-fox-500">{profile.points.toLocaleString()}</p>
+                <p className="font-mono text-h3 font-black text-fox-500">
+                  {profile.points.toLocaleString()}
+                </p>
               </div>
               {profile.role === "FRESHY" && (
                 <div className="flex flex-1 flex-col items-center justify-center rounded-2xl border border-white/40 bg-white/40 px-4 py-3 shadow-inner backdrop-blur-sm text-center">
-                  <p className="text-caption font-semibold text-neutral-500">{t("profile.rankLabel")}</p>
-                  <p className="font-mono text-h3 font-black text-zpd-900">#{profile.rank}</p>
+                  <p className="text-caption font-semibold text-neutral-500">
+                    {t("profile.rankLabel")}
+                  </p>
+                  <p className="font-mono text-h3 font-black text-zpd-900">
+                    #{profile.rank}
+                  </p>
                 </div>
               )}
             </div>

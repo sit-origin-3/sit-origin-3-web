@@ -2,6 +2,7 @@ import { useEffect, useRef, useCallback } from "react";
 import { createPortal } from "react-dom";
 import { Loader2 } from "lucide-react";
 import type { ReactNode, MouseEvent } from "react";
+import { useTranslation } from "react-i18next";
 
 interface ConfirmModalProps {
   isOpen: boolean;
@@ -22,10 +23,14 @@ export default function ConfirmModal({
   isLoading = false,
   title,
   description,
-  confirmLabel = "ยืนยัน",
-  cancelLabel = "ยกเลิก",
+  confirmLabel,
+  cancelLabel,
   variant = "destructive",
 }: ConfirmModalProps) {
+  const { t } = useTranslation();
+  const resolvedConfirmLabel = confirmLabel ?? t("common.confirm");
+  const resolvedCancelLabel = cancelLabel ?? t("common.cancel");
+
   const confirmRef = useRef<HTMLButtonElement>(null);
   const previousFocusRef = useRef<HTMLElement | null>(null);
 
@@ -64,13 +69,13 @@ export default function ConfirmModal({
 
   return createPortal(
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4 backdrop-blur-sm"
+      className="fixed inset-0 z-[60] flex items-center justify-center bg-black/50 px-4 backdrop-blur-sm"
       onClick={handleBackdropClick}
       role="dialog"
       aria-modal="true"
       aria-labelledby="confirm-modal-title"
     >
-      <div className="w-full max-w-sm rounded-3xl border-2 border-white/60 bg-white/40 p-6 shadow-cartoon backdrop-blur-lg">
+      <div className="w-full max-w-sm rounded-3xl border-2 border-white/60 bg-white/80 p-6 shadow-cartoon backdrop-blur-lg">
         <h2
           id="confirm-modal-title"
           className="text-center text-h3 text-zpd-900"
@@ -91,7 +96,7 @@ export default function ConfirmModal({
             disabled={isLoading}
             className="flex min-h-[44px] flex-1 items-center justify-center rounded-2xl border-2 border-white/60 bg-white/50 px-4 py-3 text-body-lg font-bold text-zpd-800 transition-all hover:bg-white/70 active:translate-y-0.5 active:shadow-none disabled:cursor-not-allowed disabled:opacity-60"
           >
-            {cancelLabel}
+            {resolvedCancelLabel}
           </button>
           <button
             ref={confirmRef}
@@ -103,7 +108,7 @@ export default function ConfirmModal({
             {isLoading ? (
               <Loader2 className="h-5 w-5 animate-spin" />
             ) : (
-              confirmLabel
+              resolvedConfirmLabel
             )}
           </button>
         </div>

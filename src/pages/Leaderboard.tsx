@@ -3,17 +3,15 @@ import gsap from "gsap";
 import { Flip } from "gsap/Flip";
 import {
   Trophy,
-  Crown,
-  Medal,
   Star,
   Loader2,
   WifiOff,
   RefreshCw,
-  CircleHelp,
 } from "lucide-react";
 import { streamLeaderboard } from "../services/leaderboardService";
 import { getMe } from "../services/userService";
 import { useAuthStore } from "../store/useAuthStore";
+import { useTranslation } from "react-i18next";
 import type { LeaderboardEntry } from "../types/leaderboard";
 
 gsap.registerPlugin(Flip);
@@ -30,20 +28,26 @@ const PODIUM_BG = [
   "bg-gradient-to-br from-orange-200/40 to-orange-400/20",
 ] as const;
 
-const PODIUM_BADGE_BG = [
-  "bg-amber-400 text-amber-900",
-  "bg-neutral-400 text-white",
-  "bg-orange-600 text-white",
-] as const;
-
 function PodiumIcon({ rank }: { rank: number }) {
   switch (rank) {
     case 1:
-      return <Crown className="h-5 w-5 text-amber-500" fill="currentColor" />;
+      return (
+        <span className="font-mono text-h3 font-bold text-amber-500">
+          {rank}
+        </span>
+      );
     case 2:
-      return <Medal className="h-5 w-5 text-neutral-400" />;
+      return (
+        <span className="font-mono text-h3 font-bold text-neutral-500">
+          {rank}
+        </span>
+      );
     case 3:
-      return <Medal className="h-5 w-5 text-orange-600" />;
+      return (
+        <span className="font-mono text-h3 font-bold text-orange-600">
+          {rank}
+        </span>
+      );
     default:
       return null;
   }
@@ -56,6 +60,7 @@ function PodiumCard({
   entry: LeaderboardEntry;
   isAdmin: boolean;
 }) {
+  const { t } = useTranslation();
   const idx = entry.rank - 1;
   return (
     <div
@@ -64,26 +69,17 @@ function PodiumCard({
       <div
         className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-full ${PODIUM_RING[idx]} bg-white/60`}
       >
-        {isAdmin ? (
-          <PodiumIcon rank={entry.rank} />
-        ) : (
-          <CircleHelp className="h-5 w-5 text-neutral-400" />
-        )}
+        <PodiumIcon rank={entry.rank} />
       </div>
       <div className="min-w-0 flex-1">
         <div className="flex items-center gap-2">
-          <span
-            className={`inline-flex h-6 w-6 items-center justify-center rounded-full text-caption font-black ${PODIUM_BADGE_BG[idx]}`}
-          >
-            {entry.rank}
-          </span>
           {isAdmin && entry.nickname ? (
             <p className="truncate text-body-lg text-zpd-900">
               {entry.nickname}
             </p>
           ) : (
             <p className="text-body-lg italic text-neutral-400">
-              ??? Mystery Student
+              {t("leaderboard.anonymousUser")}
             </p>
           )}
         </div>
@@ -92,7 +88,9 @@ function PodiumCard({
             {entry.firstname} {entry.lastname} · {entry.group}
           </p>
         ) : (
-          <p className="text-caption text-neutral-400/60">ข้อมูลถูกซ่อน</p>
+          <p className="text-caption text-neutral-400/60">
+            {t("leaderboard.hiddenData")}
+          </p>
         )}
       </div>
       <div className="flex shrink-0 items-center gap-1">
@@ -112,6 +110,7 @@ function RankRow({
   entry: LeaderboardEntry;
   isAdmin: boolean;
 }) {
+  const { t } = useTranslation();
   return (
     <div className="flex items-center gap-3 rounded-2xl border-2 border-white/60 bg-white/40 px-4 py-3 backdrop-blur-md">
       <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-zpd-500/10 font-mono text-caption font-bold text-zpd-700">
@@ -130,9 +129,11 @@ function RankRow({
         ) : (
           <>
             <p className="text-body font-semibold italic text-neutral-400">
-              ??? Mystery Student
+              {t("leaderboard.anonymousUser")}
             </p>
-            <p className="text-caption text-neutral-400/60">ข้อมูลถูกซ่อน</p>
+            <p className="text-caption text-neutral-400/60">
+              {t("leaderboard.hiddenData")}
+            </p>
           </>
         )}
       </div>
@@ -147,6 +148,7 @@ function RankRow({
 }
 
 export default function Leaderboard() {
+  const { t } = useTranslation();
   const accessToken = useAuthStore((s) => s.accessToken);
   const userRole = useAuthStore((s) => s.user?.role);
   const isAdmin = userRole?.toUpperCase() === "ADMIN";
@@ -157,50 +159,47 @@ export default function Leaderboard() {
   const listRef = useRef<HTMLDivElement>(null);
   const isFirstRender = useRef(true);
 
-  const connect = useCallback(
-    (token: string | null, adminFlag: boolean) => {
-      setError(null);
+  const connect = useCallback((token: string | null, adminFlag: boolean) => {
+    setError(null);
 
-      const controller = streamLeaderboard(
-        token,
-        adminFlag,
-        (data) => {
-          if (!isFirstRender.current && listRef.current) {
-            const state = Flip.getState(
-              listRef.current.querySelectorAll("[data-flip-id]"),
-            );
-            setEntries(data);
-            setIsConnected(true);
-            requestAnimationFrame(() => {
-              Flip.from(state, {
-                duration: 0.5,
-                ease: "power2.inOut",
-                stagger: 0.02,
-                absolute: true,
-                onEnter: (elements) =>
-                  gsap.fromTo(
-                    elements,
-                    { opacity: 0, scale: 0.95 },
-                    { opacity: 1, scale: 1, duration: 0.3 },
-                  ),
-              });
+    const controller = streamLeaderboard(
+      token,
+      adminFlag,
+      (data) => {
+        if (!isFirstRender.current && listRef.current) {
+          const state = Flip.getState(
+            listRef.current.querySelectorAll("[data-flip-id]"),
+          );
+          setEntries(data);
+          setIsConnected(true);
+          requestAnimationFrame(() => {
+            Flip.from(state, {
+              duration: 0.5,
+              ease: "power2.inOut",
+              stagger: 0.02,
+              absolute: true,
+              onEnter: (elements) =>
+                gsap.fromTo(
+                  elements,
+                  { opacity: 0, scale: 0.95 },
+                  { opacity: 1, scale: 1, duration: 0.3 },
+                ),
             });
-          } else {
-            setEntries(data);
-            setIsConnected(true);
-            isFirstRender.current = false;
-          }
-        },
-        (err) => {
-          setIsConnected(false);
-          setError(err.message);
-        },
-      );
+          });
+        } else {
+          setEntries(data);
+          setIsConnected(true);
+          isFirstRender.current = false;
+        }
+      },
+      (err) => {
+        setIsConnected(false);
+        setError(err.message);
+      },
+    );
 
-      return controller;
-    },
-    [],
-  );
+    return controller;
+  }, []);
 
   useEffect(() => {
     let controller: AbortController | undefined;
@@ -243,7 +242,7 @@ export default function Leaderboard() {
             className="flex min-h-[44px] items-center gap-2 rounded-2xl bg-zpd-500 px-6 py-3 text-body-lg font-bold text-white shadow-hard transition-all hover:bg-zpd-600 active:translate-y-0.5 active:shadow-none"
           >
             <RefreshCw className="h-4 w-4" />
-            ลองใหม่
+            {t("common.retry")}
           </button>
         </div>
       </main>
@@ -255,7 +254,7 @@ export default function Leaderboard() {
       <main className="flex min-h-[calc(100dvh-6rem)] items-center justify-center px-4 py-8">
         <div className="flex flex-col items-center gap-3">
           <Loader2 className="h-10 w-10 animate-spin text-zpd-500" />
-          <p className="text-body text-zpd-700">กำลังโหลดอันดับ...</p>
+          <p className="text-body text-zpd-700">{t("leaderboard.loading")}</p>
         </div>
       </main>
     );
@@ -265,11 +264,11 @@ export default function Leaderboard() {
   const rest = entries.slice(3);
 
   return (
-    <main className="mx-auto w-full max-w-lg px-4 py-6">
+    <main className="mx-auto w-full max-w-lg px-4 pt-6 pb-32">
       <div className="mb-5 flex items-center justify-between">
         <div className="flex items-center gap-2">
           <Trophy className="h-6 w-6 text-fox-500" />
-          <h1 className="text-h2 text-zpd-900">อันดับ</h1>
+          <h1 className="text-h2 text-zpd-900">{t("leaderboard.title")}</h1>
         </div>
         <div className="flex items-center gap-1.5">
           <span
@@ -283,7 +282,7 @@ export default function Leaderboard() {
 
       {!isAdmin && (
         <div className="mb-4 rounded-2xl border border-zpd-400/30 bg-zpd-400/10 px-4 py-2.5 text-center text-caption font-semibold text-zpd-700">
-          กระดานผู้นำแบบไม่ระบุตัวตน — มีเพียงผู้ดูแลระบบเท่านั้นที่จะเห็นข้อมูลทั้งหมด
+          {t("leaderboard.anonymousWarning")}
         </div>
       )}
 
@@ -309,7 +308,7 @@ export default function Leaderboard() {
 
       {error && entries.length > 0 && (
         <div className="mt-4 rounded-2xl border border-pawp-500/30 bg-pawp-400/10 px-4 py-3 text-center text-caption font-semibold text-pawp-500">
-          การเชื่อมต่อขาดหาย กำลังแสดงข้อมูลล่าสุด
+          {t("leaderboard.offlineData")}
         </div>
       )}
     </main>

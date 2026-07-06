@@ -20,6 +20,6 @@ export async function getMe(): Promise<{
     token = authHeader.replace(/^Bearer\s+/i, "");
   }
 
-  console.log(response.data);
+  // console.log(response.data);
   return { user: response.data, token };
 }

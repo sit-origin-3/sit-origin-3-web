@@ -21,4 +21,5 @@ export interface UserProfile {
   points: number;
   group: UserGroup;
   receivedPoints: ReceivedPoint[];
+  rank: number;
 }

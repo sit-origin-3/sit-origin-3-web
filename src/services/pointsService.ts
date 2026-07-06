@@ -24,9 +24,9 @@ export interface GivePointsPayload {
 }
 
 export interface GivePointsResponse {
-  success: boolean;
-  receiverCode: string;
-  amount: number;
+  successful: number;
+  failed: number;
+  total: number;
 }
 
 export async function getUserByCode(code: string): Promise<ReceiverProfile> {
@@ -35,7 +35,7 @@ export async function getUserByCode(code: string): Promise<ReceiverProfile> {
 }
 
 export async function givePoints(
-  payload: GivePointsPayload,
+  payload: GivePointsPayload[],
 ): Promise<GivePointsResponse> {
   const { data } = await api.post<GivePointsResponse>(
     "/points/give",

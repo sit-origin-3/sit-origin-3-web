@@ -3,7 +3,6 @@ import gsap from "gsap";
 import { Flip } from "gsap/Flip";
 import { Trophy, Star, Loader2, WifiOff, RefreshCw } from "lucide-react";
 import { streamLeaderboard } from "../services/leaderboardService";
-import { getMe } from "../services/userService";
 import { useAuthStore } from "../store/useAuthStore";
 import { useTranslation } from "react-i18next";
 import type { LeaderboardEntry } from "../types/leaderboard";
@@ -143,7 +142,6 @@ function RankRow({
 
 export default function Leaderboard() {
   const { t } = useTranslation();
-  const accessToken = useAuthStore((s) => s.accessToken);
   const userRole = useAuthStore((s) => s.user?.role);
   const isAdmin = userRole?.toUpperCase() === "ADMIN";
 
@@ -158,7 +156,7 @@ export default function Leaderboard() {
 
     const controller = streamLeaderboard(
       adminFlag,
-      (data) => {
+      (data: LeaderboardEntry[]) => {
         if (!isFirstRender.current && listRef.current) {
           const state = Flip.getState(
             listRef.current.querySelectorAll("[data-flip-id]"),
@@ -199,15 +197,6 @@ export default function Leaderboard() {
     let cancelled = false;
 
     const init = async () => {
-      let token = accessToken;
-      if (!token) {
-        try {
-          const { token: freshToken } = await getMe();
-          token = freshToken;
-        } catch {
-          /* cookie-only fallback */
-        }
-      }
       if (!cancelled) {
         controller = connect(isAdmin);
       }
@@ -218,7 +207,7 @@ export default function Leaderboard() {
       cancelled = true;
       controller?.abort();
     };
-  }, [accessToken, isAdmin, connect]);
+  }, [isAdmin, connect]);
 
   if (error && entries.length === 0) {
     return (

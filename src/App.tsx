@@ -1,4 +1,9 @@
-import { createBrowserRouter, RouterProvider, Navigate, Outlet } from "react-router-dom";
+import {
+  createBrowserRouter,
+  RouterProvider,
+  Navigate,
+  Outlet,
+} from "react-router-dom";
 import { Construction, Loader2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import Login from "./pages/Login";
@@ -45,8 +50,8 @@ function AuthInitializer({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     const initAuth = async () => {
       try {
-        const { user, token } = await getMe();
-        setAuth(token ?? "", user as any); // Use empty string if null, as setAuth expects string for token (or adjust if it expects string|null, wait useAuthStore expects string. We can pass empty string if no token but session is valid via cookie)
+        const { user } = await getMe();
+        setAuth("cookie", user as any); // Use empty string if null, as setAuth expects string for token (or adjust if it expects string|null, wait useAuthStore expects string. We can pass empty string if no token but session is valid via cookie)
       } catch (err) {
         clearAuth();
       } finally {

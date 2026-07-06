@@ -60,11 +60,11 @@ export default function Login() {
 
       setIsLoading(true);
       try {
-        const { accessToken, user } = await loginApi({
+        const { user } = await loginApi({
           identifier: identifier.trim(),
           password,
         });
-        setAuth(accessToken, user);
+        setAuth("cookie", user as any);
         navigate("/", { replace: true });
       } catch (err) {
         if (err instanceof AxiosError && err.response) {
@@ -111,9 +111,7 @@ export default function Login() {
             <Shield className="h-8 w-8 text-white" strokeWidth={2.5} />
           </div>
           <h1 className="text-h1 text-zpd-900">SIT Origin</h1>
-          <p className="text-caption text-neutral-500">
-            {t("login.title")}
-          </p>
+          <p className="text-caption text-neutral-500">{t("login.title")}</p>
         </div>
 
         <form
@@ -151,9 +149,7 @@ export default function Login() {
                   errors.identifier ? "identifier-error" : undefined
                 }
                 className={`block w-full rounded-2xl border-2 bg-white/60 px-4 py-3 text-body text-zpd-900 outline-none transition-colors placeholder:text-neutral-400 focus:border-zpd-500 focus:ring-2 focus:ring-zpd-500/30 ${
-                  errors.identifier
-                    ? "border-pawp-500"
-                    : "border-white/60"
+                  errors.identifier ? "border-pawp-500" : "border-white/60"
                 }`}
                 placeholder="email@sit.kmutt.ac.th"
               />
@@ -188,9 +184,7 @@ export default function Login() {
                     errors.password ? "password-error" : undefined
                   }
                   className={`block w-full rounded-2xl border-2 bg-white/60 px-4 py-3 pr-12 text-body text-zpd-900 outline-none transition-colors placeholder:text-neutral-400 focus:border-zpd-500 focus:ring-2 focus:ring-zpd-500/30 ${
-                    errors.password
-                      ? "border-pawp-500"
-                      : "border-white/60"
+                    errors.password ? "border-pawp-500" : "border-white/60"
                   }`}
                   placeholder="••••••••"
                 />

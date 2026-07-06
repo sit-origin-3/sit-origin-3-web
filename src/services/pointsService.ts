@@ -1,5 +1,4 @@
 import axios from "axios";
-import { getMe } from "./userService";
 
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL,
@@ -38,17 +37,9 @@ export async function getUserByCode(code: string): Promise<ReceiverProfile> {
 export async function givePoints(
   payload: GivePointsPayload,
 ): Promise<GivePointsResponse> {
-  const { token } = await getMe();
-
-  const headers: Record<string, string> = {};
-  if (token) {
-    headers["Authorization"] = `Bearer ${token}`;
-  }
-
   const { data } = await api.post<GivePointsResponse>(
     "/points/give",
     payload,
-    { headers },
   );
   return data;
 }

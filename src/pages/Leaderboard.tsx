@@ -242,12 +242,24 @@ export default function Leaderboard() {
     );
   }
 
-  if (entries.length === 0) {
+  if (!isConnected && entries.length === 0 && !error) {
     return (
       <main className="flex min-h-[calc(100dvh-6rem)] items-center justify-center px-4 py-8">
         <div className="flex flex-col items-center gap-3">
           <Loader2 className="h-10 w-10 animate-spin text-zpd-500" />
           <p className="text-body text-zpd-700">{t("leaderboard.loading")}</p>
+        </div>
+      </main>
+    );
+  }
+
+  if (isConnected && entries.length === 0) {
+    return (
+      <main className="flex min-h-[calc(100dvh-6rem)] items-center justify-center px-4 py-8">
+        <div className="w-full max-w-sm rounded-[32px] border-2 border-white/60 bg-white/20 p-8 text-center shadow-cartoon backdrop-blur-md">
+          <p className="text-h3 text-white drop-shadow-md">
+            {t("leaderboard.emptyPoints")}
+          </p>
         </div>
       </main>
     );

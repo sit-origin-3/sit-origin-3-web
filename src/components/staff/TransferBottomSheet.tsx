@@ -53,20 +53,24 @@ export default function TransferBottomSheet({
     setIsSending(true);
     setError(null);
 
-    const promises = receivers.map((receiver) =>
-      givePoints({
-        receiverCode: receiver.userCode,
-        amount: parsedAmount,
-      }),
-    );
+    const payload = receivers.map((receiver) => ({
+      receiverCode: receiver.userCode,
+      amount: parsedAmount,
+    }));
 
-    const results = await Promise.allSettled(promises);
-
-    const successful = results.filter((r) => r.status === "fulfilled").length;
-    const failed = results.filter((r) => r.status === "rejected").length;
-
-    setIsSending(false);
-    onTransferComplete({ successful, failed, total: receivers.length });
+    try {
+      const results = await givePoints(payload);
+      
+      onTransferComplete({ 
+        successful: results.successful ?? receivers.length, 
+        failed: results.failed ?? 0, 
+        total: receivers.length 
+      });
+    } catch (err: any) {
+      setError(err.response?.data?.message || err.message || t("common.error"));
+    } finally {
+      setIsSending(false);
+    }
   };
 
   return (

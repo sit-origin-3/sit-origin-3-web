@@ -3,6 +3,7 @@ import type { FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import { AxiosError } from "axios";
 import { Shield, LogIn, Eye, EyeOff, Loader2 } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import { login as loginApi } from "../services/authService";
 import { useAuthStore } from "../store/useAuthStore";
 
@@ -18,15 +19,15 @@ const EMPTY_ERRORS: FormErrors = {
   general: null,
 };
 
-function validate(identifier: string, password: string): FormErrors {
+function validate(identifier: string, password: string, t: any): FormErrors {
   const errors: FormErrors = { ...EMPTY_ERRORS };
   if (!identifier.trim()) {
-    errors.identifier = "กรุณากรอกอีเมลหรือรหัสนักศึกษา";
+    errors.identifier = t("login.errorEmpty");
   }
   if (!password) {
-    errors.password = "กรุณากรอกรหัสผ่าน";
+    errors.password = t("login.errorEmpty");
   } else if (password.length < 6) {
-    errors.password = "รหัสผ่านต้องมีอย่างน้อย 6 ตัวอักษร";
+    errors.password = t("login.errorInvalid");
   }
   return errors;
 }
@@ -36,6 +37,7 @@ function hasErrors(errors: FormErrors): boolean {
 }
 
 export default function Login() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const setAuth = useAuthStore((s) => s.setAuth);
 
@@ -50,7 +52,7 @@ export default function Login() {
       e.preventDefault();
       setErrors(EMPTY_ERRORS);
 
-      const validationErrors = validate(identifier, password);
+      const validationErrors = validate(identifier, password, t);
       if (hasErrors(validationErrors)) {
         setErrors(validationErrors);
         return;
@@ -58,11 +60,11 @@ export default function Login() {
 
       setIsLoading(true);
       try {
-        const { accessToken, user } = await loginApi({
+        const { user } = await loginApi({
           identifier: identifier.trim(),
           password,
         });
-        setAuth(accessToken, user);
+        setAuth("cookie", user as any);
         navigate("/", { replace: true });
       } catch (err) {
         if (err instanceof AxiosError && err.response) {
@@ -75,30 +77,30 @@ export default function Login() {
           if (status === 401) {
             setErrors({
               ...EMPTY_ERRORS,
-              general: message ?? "อีเมล/รหัสนักศึกษา หรือรหัสผ่านไม่ถูกต้อง",
+              general: message ?? t("login.errorInvalid"),
             });
           } else if (status === 429) {
             setErrors({
               ...EMPTY_ERRORS,
-              general: "คำขอมากเกินไป กรุณารอสักครู่",
+              general: t("common.retry") || "คำขอมากเกินไป กรุณารอสักครู่",
             });
           } else {
             setErrors({
               ...EMPTY_ERRORS,
-              general: message ?? "เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง",
+              general: message ?? t("common.offline"),
             });
           }
         } else {
           setErrors({
             ...EMPTY_ERRORS,
-            general: "ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้",
+            general: t("common.offline"),
           });
         }
       } finally {
         setIsLoading(false);
       }
     },
-    [identifier, password, setAuth, navigate],
+    [identifier, password, setAuth, navigate, t],
   );
 
   return (
@@ -109,9 +111,7 @@ export default function Login() {
             <Shield className="h-8 w-8 text-white" strokeWidth={2.5} />
           </div>
           <h1 className="text-h1 text-zpd-900">SIT Origin</h1>
-          <p className="text-caption text-neutral-500">
-            เข้าสู่ระบบด้วยบัญชีของคุณ
-          </p>
+          <p className="text-caption text-neutral-500">{t("login.title")}</p>
         </div>
 
         <form
@@ -134,7 +134,7 @@ export default function Login() {
                 htmlFor="login-identifier"
                 className="mb-1 block text-caption font-semibold text-zpd-800"
               >
-                อีเมล หรือ รหัสนักศึกษา
+                {t("login.emailOrIdPlaceholder")}
               </label>
               <input
                 id="login-identifier"
@@ -149,9 +149,7 @@ export default function Login() {
                   errors.identifier ? "identifier-error" : undefined
                 }
                 className={`block w-full rounded-2xl border-2 bg-white/60 px-4 py-3 text-body text-zpd-900 outline-none transition-colors placeholder:text-neutral-400 focus:border-zpd-500 focus:ring-2 focus:ring-zpd-500/30 ${
-                  errors.identifier
-                    ? "border-pawp-500"
-                    : "border-white/60"
+                  errors.identifier ? "border-pawp-500" : "border-white/60"
                 }`}
                 placeholder="email@sit.kmutt.ac.th"
               />
@@ -170,7 +168,7 @@ export default function Login() {
                 htmlFor="login-password"
                 className="mb-1 block text-caption font-semibold text-zpd-800"
               >
-                รหัสผ่าน
+                {t("login.passwordPlaceholder")}
               </label>
               <div className="relative">
                 <input
@@ -186,9 +184,7 @@ export default function Login() {
                     errors.password ? "password-error" : undefined
                   }
                   className={`block w-full rounded-2xl border-2 bg-white/60 px-4 py-3 pr-12 text-body text-zpd-900 outline-none transition-colors placeholder:text-neutral-400 focus:border-zpd-500 focus:ring-2 focus:ring-zpd-500/30 ${
-                    errors.password
-                      ? "border-pawp-500"
-                      : "border-white/60"
+                    errors.password ? "border-pawp-500" : "border-white/60"
                   }`}
                   placeholder="••••••••"
                 />
@@ -225,7 +221,7 @@ export default function Login() {
               ) : (
                 <>
                   <LogIn className="h-5 w-5" strokeWidth={2.5} />
-                  เข้าสู่ระบบ
+                  {t("login.loginButton")}
                 </>
               )}
             </button>

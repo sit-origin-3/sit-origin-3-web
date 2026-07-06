@@ -50,11 +50,13 @@ export default function Navbar() {
 
   useEffect(() => {
     if (!containerRef.current) return;
-    
+
     // Give DOM a tick to paint correctly
     const timeout = setTimeout(() => {
-      const activeLink = containerRef.current?.querySelector(".nav-item-active") as HTMLElement;
-      
+      const activeLink = containerRef.current?.querySelector(
+        ".nav-item-active",
+      ) as HTMLElement;
+
       if (activeLink) {
         setIndicatorStyle({
           left: activeLink.offsetLeft,
@@ -70,7 +72,7 @@ export default function Navbar() {
 
   return (
     <nav className="fixed inset-x-0 bottom-6 z-50 flex justify-center px-4">
-      <div 
+      <div
         ref={containerRef}
         className="relative flex items-center gap-1 rounded-full border-2 border-white/60 bg-white/40 p-1.5 shadow-cartoon backdrop-blur-lg"
       >
@@ -90,8 +92,10 @@ export default function Navbar() {
             <NavLink
               key={item.path}
               to={item.path}
-              className={`relative z-10 flex min-h-[44px] items-center gap-2 rounded-full px-5 py-2 text-body font-bold transition-colors ${
-                isActive ? "nav-item-active text-zpd-600" : "text-neutral-500 hover:text-zpd-700"
+              className={`relative z-10 flex min-h-[48px] items-center gap-2 rounded-full px-8 py-2 text-body font-bold transition-colors ${
+                isActive
+                  ? "nav-item-active text-zpd-600"
+                  : "text-neutral-500 hover:text-zpd-700"
               }`}
             >
               <item.icon className="h-5 w-5" strokeWidth={2.5} />

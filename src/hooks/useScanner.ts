@@ -3,6 +3,7 @@ import { Html5Qrcode } from "html5-qrcode";
 
 interface ScannerState {
   isScanning: boolean;
+  isInitializing: boolean;
   isFlashOn: boolean;
   isFlashSupported: boolean;
   cameraError: string | null;
@@ -23,6 +24,7 @@ export function useScanner(): UseScannerReturn {
 
   const [state, setState] = useState<ScannerState>({
     isScanning: false,
+    isInitializing: true,
     isFlashOn: false,
     isFlashSupported: false,
     cameraError: null,
@@ -41,6 +43,7 @@ export function useScanner(): UseScannerReturn {
     setState((s) => ({
       ...s,
       isScanning: false,
+      isInitializing: false,
       isFlashOn: false,
       isFlashSupported: false,
     }));
@@ -49,7 +52,7 @@ export function useScanner(): UseScannerReturn {
   const startScan = useCallback(
     async (onResult: (code: string) => void) => {
       callbackRef.current = onResult;
-      setState((s) => ({ ...s, cameraError: null }));
+      setState((s) => ({ ...s, cameraError: null, isInitializing: true }));
 
       if (!scannerRef.current) {
         scannerRef.current = new Html5Qrcode(ELEMENT_ID);
@@ -81,6 +84,7 @@ export function useScanner(): UseScannerReturn {
 
         setState({
           isScanning: true,
+          isInitializing: false,
           isFlashOn: false,
           isFlashSupported: flashSupported,
           cameraError: null,
@@ -88,7 +92,7 @@ export function useScanner(): UseScannerReturn {
       } catch (err: unknown) {
         const message =
           err instanceof Error ? err.message : "ไม่สามารถเปิดกล้องได้";
-        setState((s) => ({ ...s, cameraError: message, isScanning: false }));
+        setState((s) => ({ ...s, cameraError: message, isScanning: false, isInitializing: false }));
       }
     },
     [stopScan],

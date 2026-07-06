@@ -3,7 +3,6 @@ import type { LeaderboardEntry } from "../types/leaderboard";
 const BASE_URL = import.meta.env.VITE_API_URL;
 
 export function streamLeaderboard(
-  token: string | null,
   isAdmin: boolean,
   onData: (entries: LeaderboardEntry[]) => void,
   onError: (error: Error) => void,

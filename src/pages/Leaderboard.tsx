@@ -1,8 +1,8 @@
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef } from "react";
 import gsap from "gsap";
 import { Flip } from "gsap/Flip";
-import { Trophy, Star, Loader2, WifiOff, RefreshCw } from "lucide-react";
-import { streamLeaderboard } from "../services/leaderboardService";
+import { Trophy, Star, Loader2, WifiOff } from "lucide-react";
+import { fetchLeaderboard } from "../services/leaderboardService";
 import { useAuthStore } from "../store/useAuthStore";
 import { useTranslation } from "react-i18next";
 import type { LeaderboardEntry } from "../types/leaderboard";
@@ -146,24 +146,35 @@ export default function Leaderboard() {
   const isAdmin = userRole?.toUpperCase() === "ADMIN";
 
   const [entries, setEntries] = useState<LeaderboardEntry[]>([]);
-  const [isConnected, setIsConnected] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const listRef = useRef<HTMLDivElement>(null);
   const isFirstRender = useRef(true);
+  const lastDataRef = useRef<string>("");
 
-  const connect = useCallback((adminFlag: boolean) => {
-    setError(null);
+  useEffect(() => {
+    let cancelled = false;
 
-    const controller = streamLeaderboard(
-      adminFlag,
-      (data: LeaderboardEntry[]) => {
+    const load = async () => {
+      try {
+        const data = await fetchLeaderboard(isAdmin);
+        if (cancelled) return;
+
+        const dataStr = JSON.stringify(data);
+        if (dataStr === lastDataRef.current) {
+          setError(null);
+          setIsLoading(false);
+          return;
+        }
+        lastDataRef.current = dataStr;
+
         if (!isFirstRender.current && listRef.current) {
           const state = Flip.getState(
             listRef.current.querySelectorAll("[data-flip-id]"),
           );
           setEntries(data);
-          setIsConnected(true);
           requestAnimationFrame(() => {
+            if (!listRef.current) return;
             Flip.from(state, {
               duration: 0.5,
               ease: "power2.inOut",
@@ -179,59 +190,28 @@ export default function Leaderboard() {
           });
         } else {
           setEntries(data);
-          setIsConnected(true);
           isFirstRender.current = false;
         }
-      },
-      (err: Error) => {
-        setIsConnected(false);
-        setError(err.message);
-      },
-    );
 
-    return controller;
-  }, []);
-
-  useEffect(() => {
-    let controller: AbortController | undefined;
-    let cancelled = false;
-
-    const init = async () => {
-      if (!cancelled) {
-        controller = connect(isAdmin);
+        setError(null);
+        setIsLoading(false);
+      } catch {
+        if (cancelled) return;
+        setError(t("leaderboard.offlineData"));
+        setIsLoading(false);
       }
     };
 
-    init();
+    load();
+    const interval = setInterval(load, 5000);
+
     return () => {
       cancelled = true;
-      controller?.abort();
+      clearInterval(interval);
     };
-  }, [isAdmin, connect]);
+  }, [isAdmin, t]);
 
-  if (error && entries.length === 0) {
-    return (
-      <main className="flex min-h-[calc(100dvh-6rem)] items-center justify-center px-4 py-8">
-        <div className="flex max-w-xs flex-col items-center gap-4 rounded-3xl border-2 border-white/60 bg-white/40 p-8 text-center shadow-cartoon backdrop-blur-lg">
-          <WifiOff className="h-10 w-10 text-pawp-500" />
-          <p className="text-body font-semibold text-pawp-500">{error}</p>
-          <button
-            type="button"
-            onClick={() => {
-              isFirstRender.current = true;
-              connect(isAdmin);
-            }}
-            className="flex min-h-[44px] items-center gap-2 rounded-2xl bg-zpd-500 px-6 py-3 text-body-lg font-bold text-white shadow-hard transition-all hover:bg-zpd-600 active:translate-y-0.5 active:shadow-none"
-          >
-            <RefreshCw className="h-4 w-4" />
-            {t("common.retry")}
-          </button>
-        </div>
-      </main>
-    );
-  }
-
-  if (!isConnected && entries.length === 0 && !error) {
+  if (isLoading) {
     return (
       <main className="flex min-h-[calc(100dvh-6rem)] items-center justify-center px-4 py-8">
         <div className="flex flex-col items-center gap-3">
@@ -242,7 +222,18 @@ export default function Leaderboard() {
     );
   }
 
-  if (isConnected && entries.length === 0) {
+  if (error && entries.length === 0) {
+    return (
+      <main className="flex min-h-[calc(100dvh-6rem)] items-center justify-center px-4 py-8">
+        <div className="flex max-w-xs flex-col items-center gap-4 rounded-3xl border-2 border-white/60 bg-white/40 p-8 text-center shadow-cartoon backdrop-blur-lg">
+          <WifiOff className="h-10 w-10 text-pawp-500" />
+          <p className="text-body font-semibold text-pawp-500">{error}</p>
+        </div>
+      </main>
+    );
+  }
+
+  if (!isLoading && entries.length === 0) {
     return (
       <main className="flex min-h-[calc(100dvh-6rem)] items-center justify-center px-4 py-8">
         <div className="w-full max-w-sm rounded-[32px] border-2 border-white/60 bg-white/20 p-8 text-center shadow-cartoon backdrop-blur-md">
@@ -264,14 +255,6 @@ export default function Leaderboard() {
           <Trophy className="h-6 w-6 text-fox-500" />
           <h1 className="text-h2 text-zpd-900">{t("leaderboard.title")}</h1>
         </div>
-        <div className="flex items-center gap-1.5">
-          <span
-            className={`h-2 w-2 rounded-full ${isConnected ? "bg-jungle-500 animate-pulse" : "bg-pawp-500"}`}
-          />
-          <span className="text-caption text-neutral-400">
-            {isConnected ? "Live" : "Offline"}
-          </span>
-        </div>
       </div>
 
       {!isAdmin && (
@@ -281,11 +264,14 @@ export default function Leaderboard() {
       )}
 
       <div ref={listRef} className="space-y-2">
-        {podium.map((entry) => (
-          <div key={`rank-${entry.rank}`} data-flip-id={`lb-${entry.rank}`}>
-            <PodiumCard entry={entry} isAdmin={isAdmin} />
-          </div>
-        ))}
+        {podium.map((entry) => {
+          const key = entry.id ? `user-${entry.id}` : `rank-${entry.rank}`;
+          return (
+            <div key={key} data-flip-id={`lb-${key}`}>
+              <PodiumCard entry={entry} isAdmin={isAdmin} />
+            </div>
+          );
+        })}
 
         {rest.length > 0 && (
           <div className="pb-1 pt-2">
@@ -293,11 +279,14 @@ export default function Leaderboard() {
           </div>
         )}
 
-        {rest.map((entry) => (
-          <div key={`rank-${entry.rank}`} data-flip-id={`lb-${entry.rank}`}>
-            <RankRow entry={entry} isAdmin={isAdmin} />
-          </div>
-        ))}
+        {rest.map((entry) => {
+          const key = entry.id ? `user-${entry.id}` : `rank-${entry.rank}`;
+          return (
+            <div key={key} data-flip-id={`lb-${key}`}>
+              <RankRow entry={entry} isAdmin={isAdmin} />
+            </div>
+          );
+        })}
       </div>
 
       {error && entries.length > 0 && (

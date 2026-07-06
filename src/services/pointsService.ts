@@ -19,7 +19,7 @@ export interface ReceiverProfile {
 }
 
 export interface GivePointsPayload {
-  receiverCode: string;
+  receiverCode: string[];
   amount: number;
 }
 
@@ -35,11 +35,8 @@ export async function getUserByCode(code: string): Promise<ReceiverProfile> {
 }
 
 export async function givePoints(
-  payload: GivePointsPayload[],
+  payload: GivePointsPayload,
 ): Promise<GivePointsResponse> {
-  const { data } = await api.post<GivePointsResponse>(
-    "/points/give",
-    payload,
-  );
+  const { data } = await api.post<GivePointsResponse>("/points/give", payload);
   return data;
 }

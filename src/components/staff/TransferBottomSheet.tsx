@@ -53,18 +53,18 @@ export default function TransferBottomSheet({
     setIsSending(true);
     setError(null);
 
-    const payload = receivers.map((receiver) => ({
-      receiverCode: receiver.userCode,
+    const payload = {
+      receiverCode: receivers.map((user) => user.userCode),
       amount: parsedAmount,
-    }));
+    };
 
     try {
       const results = await givePoints(payload);
-      
-      onTransferComplete({ 
-        successful: results.successful ?? receivers.length, 
-        failed: results.failed ?? 0, 
-        total: receivers.length 
+
+      onTransferComplete({
+        successful: results.successful ?? receivers.length,
+        failed: results.failed ?? 0,
+        total: receivers.length,
       });
     } catch (err: any) {
       setError(err.response?.data?.message || err.message || t("common.error"));
@@ -85,7 +85,9 @@ export default function TransferBottomSheet({
       <div className="relative flex max-h-[85vh] flex-col overflow-hidden rounded-t-[32px] border-t-2 border-white/60 bg-white/70 shadow-[0_-10px_40px_rgba(0,0,0,0.1)] backdrop-blur-2xl">
         <div className="flex items-center justify-between border-b border-white/40 px-6 py-4">
           <div>
-            <h2 className="text-h3 text-zpd-900">{t("modals.transferConfirmTitle")}</h2>
+            <h2 className="text-h3 text-zpd-900">
+              {t("modals.transferConfirmTitle")}
+            </h2>
             <p className="text-caption text-neutral-500">
               {t("modals.transferConfirmItems", { count: receivers.length })}
             </p>
@@ -198,7 +200,11 @@ export default function TransferBottomSheet({
           }
         }}
         title={t("modals.removeStudentTitle")}
-        description={t("modals.removeStudentBody", { name: receivers.find((r) => r.userCode === receiverToRemove)?.nickname ?? "" })}
+        description={t("modals.removeStudentBody", {
+          name:
+            receivers.find((r) => r.userCode === receiverToRemove)?.nickname ??
+            "",
+        })}
         confirmLabel={t("modals.removeBtn")}
         cancelLabel={t("common.cancel")}
         variant="destructive"

@@ -1,36 +1,25 @@
 import { create } from "zustand";
-
-// 1. กำหนด Type ให้ชัดเจน (TS)
-interface User {
-  uid: string;
-  name: string;
-  role: "admin" | "staff" | "freshy"; // บังคับว่าต้องเป็น 3 ค่านึ้เท่านั้น
-  token: string;
-}
+import type { User } from "../types/auth";
 
 interface AuthState {
-  user: User | null; // สถานะตอนแรกยังไม่ล็อกอินให้เป็น null
+  accessToken: string | null;
+  user: User | null;
   isAuthenticated: boolean;
-  login: (userData: User) => void;
-  logout: () => void;
+  setAuth: (token: string, user: User) => void;
+  clearAuth: () => void;
 }
 
-// 2. สร้าง Store
-export const useAuthStore = create<AuthState>((set) => ({
+const INITIAL_STATE = {
+  accessToken: null,
   user: null,
   isAuthenticated: false,
+} as const;
 
-  // Action สำหรับ Login
-  login: (userData) => {
-    // กฎ Immutability ยังคงอยู่: เราใช้ set() เพื่ออัปเดต State
-    set({ user: userData, isAuthenticated: true });
-    // คุณสามารถเก็บ Token ลง localStorage ต่อได้เลยตรงนี้
-    localStorage.setItem("token", userData.token);
-  },
+export const useAuthStore = create<AuthState>((set) => ({
+  ...INITIAL_STATE,
 
-  // Action สำหรับ Logout
-  logout: () => {
-    set({ user: null, isAuthenticated: false });
-    localStorage.removeItem("token");
-  },
+  setAuth: (token, user) =>
+    set({ accessToken: token, user, isAuthenticated: true }),
+
+  clearAuth: () => set({ ...INITIAL_STATE }),
 }));

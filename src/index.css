@@ -21,7 +21,6 @@
   letter-spacing: 0.18px;
   color-scheme: light dark;
   color: var(--text);
-  background: var(--bg);
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
@@ -53,19 +52,14 @@
 }
 
 #root {
-  width: 1126px;
-  max-width: 100%;
-  margin: 0 auto;
-  text-align: center;
-  border-inline: 1px solid var(--border);
-  min-height: 100svh;
+  min-height: 100dvh;
   display: flex;
   flex-direction: column;
-  box-sizing: border-box;
 }
 
 body {
   margin: 0;
+  @apply bg-gradient-to-br from-zpd-100 to-zpd-200 min-h-dvh antialiased selection:bg-zpd-500/30;
 }
 
 h1,
@@ -110,4 +104,31 @@ code {
   line-height: 135%;
   padding: 4px 8px;
   background: var(--code-bg);
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translate(0, 0);
+    opacity: 0.5;
+  }
+  33% {
+    transform: translate(30px, -50px);
+    opacity: 0.8;
+  }
+  66% {
+    transform: translate(-20px, 20px);
+    opacity: 0.4;
+  }
+}
+
+.animate-float {
+  animation: float 12s ease-in-out infinite;
+}
+
+.animate-float-delayed {
+  animation: float 14s ease-in-out infinite 2s;
+}
+
+.animate-float-slow {
+  animation: float 18s ease-in-out infinite 4s;
 }

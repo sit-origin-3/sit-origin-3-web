@@ -1,91 +1,38 @@
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useCallback, useRef, useEffect } from "react";
+import { useBlocker } from "react-router-dom";
 import { AxiosError } from "axios";
 import {
   ScanLine,
   Flashlight,
   FlashlightOff,
   Keyboard,
-  X,
   User,
   Star,
   Users,
-  Loader2,
   CheckCircle2,
-  Send,
   AlertTriangle,
-  ArrowLeft,
+  ShoppingCart,
+  Plus,
+  Send,
+  Camera,
 } from "lucide-react";
 import { useScanner } from "../../hooks/useScanner";
+import { useTransferCart } from "../../hooks/useTransferCart";
 import {
   getUserByCode,
-  givePoints,
   type ReceiverProfile,
 } from "../../services/pointsService";
+import ManualCodeModal from "../../components/staff/ManualCodeModal";
+import TransferBottomSheet from "../../components/staff/TransferBottomSheet";
+import ConfirmModal from "../../components/common/ConfirmModal";
+import { useTranslation } from "react-i18next";
 
-type Phase = "SCANNING" | "VERIFYING" | "AMOUNT" | "SENDING" | "SUCCESS";
-
-function ReceiverCard({
-  receiver,
-  onCancel,
-  onConfirm,
-}: {
-  receiver: ReceiverProfile;
-  onCancel: () => void;
-  onConfirm: () => void;
-}) {
-  return (
-    <div className="rounded-3xl border-2 border-white/60 bg-white/40 p-6 shadow-cartoon backdrop-blur-lg">
-      <div className="flex flex-col items-center gap-3">
-        <div className="flex h-16 w-16 items-center justify-center rounded-full border-4 border-white/70 bg-zpd-500 shadow-hard">
-          <User className="h-8 w-8 text-white" strokeWidth={2} />
-        </div>
-
-        <div className="text-center">
-          <h2 className="text-h3 text-zpd-900">
-            {receiver.firstname} {receiver.lastname}
-          </h2>
-          <p className="text-body text-neutral-500">"{receiver.nickname}"</p>
-        </div>
-
-        <div className="flex flex-wrap items-center justify-center gap-2">
-          <span className="inline-flex items-center gap-1 rounded-full border border-zpd-400/40 bg-zpd-400/20 px-3 py-1 text-caption font-bold text-zpd-700">
-            <Users className="h-3 w-3" />
-            {receiver.group}
-          </span>
-          <span className="inline-flex items-center gap-1 rounded-full border border-fox-400/40 bg-fox-400/20 px-3 py-1 text-caption font-bold text-fox-700">
-            <Star className="h-3 w-3" />
-            {receiver.points.toLocaleString()} คะแนน
-          </span>
-        </div>
-
-        <p className="font-mono text-caption tracking-widest text-neutral-400">
-          {receiver.userCode}
-        </p>
-      </div>
-
-      <div className="mt-5 flex gap-3">
-        <button
-          type="button"
-          onClick={onCancel}
-          className="flex min-h-[44px] flex-1 items-center justify-center rounded-2xl border-2 border-white/60 bg-white/50 px-4 py-3 text-body-lg font-bold text-zpd-800 transition-all hover:bg-white/70 active:translate-y-0.5 active:shadow-none"
-        >
-          ยกเลิก
-        </button>
-        <button
-          type="button"
-          onClick={onConfirm}
-          className="flex min-h-[44px] flex-1 items-center justify-center gap-2 rounded-2xl bg-zpd-500 px-4 py-3 text-body-lg font-bold text-white shadow-hard transition-all hover:bg-zpd-600 active:translate-y-0.5 active:shadow-none"
-        >
-          <Send className="h-4 w-4" />
-          ให้คะแนน
-        </button>
-      </div>
-    </div>
-  );
-}
+type Phase = "SCANNING" | "SCANNED" | "RESULTS";
 
 export default function TransferPoints() {
+  const { t } = useTranslation();
   const {
+    isInitializing,
     isFlashOn,
     isFlashSupported,
     cameraError,
@@ -95,53 +42,71 @@ export default function TransferPoints() {
     scannerElementId,
   } = useScanner();
 
+  const { receivers, addReceiver, removeReceiver, clearReceivers } =
+    useTransferCart();
+
   const [phase, setPhase] = useState<Phase>("SCANNING");
-  const [receiver, setReceiver] = useState<ReceiverProfile | null>(null);
-  const [amount, setAmount] = useState("");
-  const [error, setError] = useState<string | null>(null);
-  const [showManualInput, setShowManualInput] = useState(false);
-  const [manualCode, setManualCode] = useState("");
+  const [currentReceiver, setCurrentReceiver] =
+    useState<ReceiverProfile | null>(null);
+
+  const blocker = useBlocker(
+    ({ currentLocation, nextLocation }) =>
+      receivers.length > 0 &&
+      currentLocation.pathname !== nextLocation.pathname,
+  );
+
+  const [showManualModal, setShowManualModal] = useState(false);
+  const [showCartSheet, setShowCartSheet] = useState(false);
+
   const [isLookingUp, setIsLookingUp] = useState(false);
-  const [isSending, setIsSending] = useState(false);
+  const [globalError, setGlobalError] = useState<string | null>(null);
+  const [manualError, setManualError] = useState<string | null>(null);
+
+  const [transferResults, setTransferResults] = useState<{
+    successful: number;
+    failed: number;
+    total: number;
+  } | null>(null);
+
   const processedRef = useRef(false);
 
-  const resetToScanner = useCallback(() => {
-    setPhase("SCANNING");
-    setReceiver(null);
-    setAmount("");
-    setError(null);
-    setShowManualInput(false);
-    setManualCode("");
-    setIsLookingUp(false);
-    setIsSending(false);
-    processedRef.current = false;
-  }, []);
-
   const lookupUser = useCallback(
-    async (code: string) => {
+    async (code: string, isManual: boolean = false) => {
       const trimmed = code.trim().toUpperCase();
       if (!trimmed) return;
 
       setIsLookingUp(true);
-      setError(null);
+      if (isManual) setManualError(null);
+      else setGlobalError(null);
 
       try {
         await stopScan();
         const user = await getUserByCode(trimmed);
-        setReceiver(user);
-        setPhase("VERIFYING");
+        setCurrentReceiver(user);
+
+        if (isManual) setShowManualModal(false);
+        setPhase("SCANNED");
       } catch (err: unknown) {
         const msg =
           err instanceof AxiosError && err.response?.status === 404
-            ? `ไม่พบผู้ใช้รหัส "${trimmed}"`
+            ? t("transfer.notFoundError", { code: trimmed })
             : err instanceof AxiosError &&
-                (typeof err.response?.data?.message === "string"
-                  ? err.response.data.message
-                  : typeof err.response?.data?.error === "string"
-                    ? err.response.data.error
-                    : "เกิดข้อผิดพลาดในการค้นหาผู้ใช้")
-        setError(msg);
-        processedRef.current = false;
+              (typeof err.response?.data?.message === "string"
+                ? err.response.data.message
+                : typeof err.response?.data?.error === "string"
+                  ? err.response.data.error
+                  : t("common.error"));
+
+        if (isManual) {
+          setManualError(msg);
+        } else {
+          setGlobalError(msg);
+          // Resume scanning after 3 seconds on scan error
+          setTimeout(() => {
+            processedRef.current = false;
+            setPhase("SCANNING");
+          }, 3000);
+        }
       } finally {
         setIsLookingUp(false);
       }
@@ -153,307 +118,321 @@ export default function TransferPoints() {
     (decodedText: string) => {
       if (processedRef.current) return;
       processedRef.current = true;
-      lookupUser(decodedText);
+      lookupUser(decodedText, false);
     },
     [lookupUser],
   );
 
   useEffect(() => {
-    if (phase === "SCANNING" && !showManualInput && !processedRef.current) {
+    if (
+      phase === "SCANNING" &&
+      !showManualModal &&
+      !showCartSheet &&
+      !processedRef.current
+    ) {
       startScan(handleScanResult);
     }
-  }, [phase, showManualInput, startScan, handleScanResult]);
+  }, [phase, showManualModal, showCartSheet, startScan, handleScanResult]);
 
-  const handleManualSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (manualCode.trim().length < 2) return;
-    processedRef.current = true;
-    lookupUser(manualCode);
+  const resumeScanning = () => {
+    setPhase("SCANNING");
+    setCurrentReceiver(null);
+    setGlobalError(null);
+    processedRef.current = false;
   };
 
-  const handleConfirmReceiver = () => {
-    setPhase("AMOUNT");
-    setError(null);
-  };
-
-  const handleTransfer = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!receiver) return;
-
-    const parsedAmount = parseInt(amount, 10);
-    if (!parsedAmount || parsedAmount <= 0) {
-      setError("กรุณากรอกจำนวนคะแนนที่ถูกต้อง");
-      return;
+  const handleScanMore = () => {
+    if (currentReceiver) {
+      addReceiver(currentReceiver);
     }
-
-    setIsSending(true);
-    setError(null);
-
-    try {
-      await givePoints({
-        receiverCode: receiver.userCode,
-        amount: parsedAmount,
-      });
-      setPhase("SUCCESS");
-    } catch (err: unknown) {
-      const msg =
-        err instanceof AxiosError &&
-        (typeof err.response?.data?.message === "string"
-          ? err.response.data.message
-          : typeof err.response?.data?.error === "string"
-            ? err.response.data.error
-            : "การโอนคะแนนล้มเหลว")
-      setError(msg);
-    } finally {
-      setIsSending(false);
-    }
+    resumeScanning();
   };
 
-  if (phase === "SUCCESS") {
+  const handleTransferNow = () => {
+    if (currentReceiver) {
+      addReceiver(currentReceiver);
+    }
+    setCurrentReceiver(null);
+    setShowCartSheet(true);
+  };
+
+  const handleTransferComplete = (results: {
+    successful: number;
+    failed: number;
+    total: number;
+  }) => {
+    setShowCartSheet(false);
+    clearReceivers();
+    setTransferResults(results);
+    setPhase("RESULTS");
+  };
+
+  if (phase === "RESULTS" && transferResults) {
+    const isPartial =
+      transferResults.failed > 0 && transferResults.successful > 0;
+    const isFail = transferResults.successful === 0;
+
     return (
-      <main className="flex min-h-[calc(100dvh-6rem)] items-center justify-center px-4 py-8">
+      <main className="flex min-h-dvh flex-col items-center justify-center bg-zpd-50 p-4">
         <div className="flex w-full max-w-sm flex-col items-center gap-5 rounded-[32px] border-2 border-white/60 bg-white/40 p-8 shadow-cartoon backdrop-blur-lg">
-          <div className="flex h-20 w-20 items-center justify-center rounded-full bg-jungle-500/20">
-            <CheckCircle2
-              className="h-10 w-10 text-jungle-500"
-              strokeWidth={2.5}
-            />
+          <div
+            className={`flex h-20 w-20 items-center justify-center rounded-full ${isFail ? "bg-pawp-500/20" : isPartial ? "bg-fox-500/20" : "bg-jungle-500/20"}`}
+          >
+            {isFail ? (
+              <AlertTriangle
+                className="h-10 w-10 text-pawp-500"
+                strokeWidth={2.5}
+              />
+            ) : (
+              <CheckCircle2
+                className={`h-10 w-10 ${isPartial ? "text-fox-500" : "text-jungle-500"}`}
+                strokeWidth={2.5}
+              />
+            )}
           </div>
           <div className="text-center">
-            <h1 className="text-h2 text-zpd-900">โอนสำเร็จ!</h1>
-            <p className="mt-1 text-body text-neutral-500">
-              ให้{" "}
-              <span className="font-bold text-fox-500">
-                {parseInt(amount, 10).toLocaleString()}
-              </span>{" "}
-              คะแนนแก่{" "}
-              <span className="font-bold text-zpd-700">
-                {receiver?.nickname}
+            <h1 className="text-h2 text-zpd-900">
+              {isFail
+                ? t("transfer.fail")
+                : isPartial
+                  ? t("transfer.partialSuccess")
+                  : t("transfer.success")}
+            </h1>
+            <p className="mt-2 text-body text-neutral-500">
+              {t("transfer.successCount")}{" "}
+              <span className="font-bold text-jungle-500">
+                {transferResults.successful}
               </span>
             </p>
+            {transferResults.failed > 0 && (
+              <p className="text-body text-neutral-500">
+                {t("transfer.failCount")}{" "}
+                <span className="font-bold text-pawp-500">
+                  {transferResults.failed}
+                </span>
+              </p>
+            )}
           </div>
           <button
             type="button"
-            onClick={resetToScanner}
-            className="flex min-h-[44px] w-full items-center justify-center gap-2 rounded-2xl bg-zpd-500 px-6 py-3 text-body-lg font-bold text-white shadow-hard transition-all hover:bg-zpd-600 active:translate-y-0.5 active:shadow-none"
+            onClick={() => {
+              setTransferResults(null);
+              resumeScanning();
+            }}
+            className="mt-2 flex min-h-[44px] w-full items-center justify-center gap-2 rounded-2xl bg-zpd-500 px-6 py-3 text-body-lg font-bold text-white shadow-hard transition-all hover:bg-zpd-600 active:translate-y-0.5 active:shadow-none"
           >
             <ScanLine className="h-5 w-5" />
-            สแกนต่อ
+            {t("transfer.backToScan")}
           </button>
-        </div>
-      </main>
-    );
-  }
-
-  if (phase === "VERIFYING" && receiver) {
-    return (
-      <main className="flex min-h-[calc(100dvh-6rem)] items-center justify-center px-4 py-8">
-        <div className="w-full max-w-sm">
-          <h1 className="mb-4 text-center text-h2 text-zpd-900">
-            ยืนยันผู้รับ
-          </h1>
-          <ReceiverCard
-            receiver={receiver}
-            onCancel={resetToScanner}
-            onConfirm={handleConfirmReceiver}
-          />
-        </div>
-      </main>
-    );
-  }
-
-  if (phase === "AMOUNT" && receiver) {
-    return (
-      <main className="flex min-h-[calc(100dvh-6rem)] items-center justify-center px-4 py-8">
-        <div className="w-full max-w-sm space-y-4">
-          <button
-            type="button"
-            onClick={() => setPhase("VERIFYING")}
-            className="flex min-h-[44px] items-center gap-1 rounded-2xl px-3 py-2 text-body font-semibold text-zpd-700 transition-colors hover:bg-white/30"
-          >
-            <ArrowLeft className="h-4 w-4" />
-            กลับ
-          </button>
-
-          <div className="rounded-3xl border-2 border-white/60 bg-white/40 p-6 shadow-cartoon backdrop-blur-lg">
-            <div className="mb-4 flex items-center gap-3">
-              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-zpd-500/10">
-                <User className="h-5 w-5 text-zpd-600" />
-              </div>
-              <div className="min-w-0">
-                <p className="truncate text-body font-bold text-zpd-900">
-                  {receiver.nickname}
-                </p>
-                <p className="text-caption text-neutral-400">
-                  {receiver.firstname} {receiver.lastname}
-                </p>
-              </div>
-            </div>
-
-            <form onSubmit={handleTransfer} className="space-y-4">
-              <div>
-                <label
-                  htmlFor="amount-input"
-                  className="mb-1 block text-caption font-semibold text-zpd-700"
-                >
-                  จำนวนคะแนน
-                </label>
-                <input
-                  id="amount-input"
-                  type="number"
-                  inputMode="numeric"
-                  min={1}
-                  value={amount}
-                  onChange={(e) => {
-                    setError(null);
-                    setAmount(e.target.value.replace(/\D/g, ""));
-                  }}
-                  placeholder="0"
-                  autoFocus
-                  className="h-14 w-full rounded-2xl border-2 border-white/60 bg-white/50 px-4 text-center font-mono text-h1 text-zpd-900 shadow-cartoon backdrop-blur-md outline-none transition-all focus:border-zpd-400 focus:ring-2 focus:ring-zpd-400/30"
-                />
-              </div>
-
-              {error && (
-                <div className="flex items-center gap-2 rounded-2xl border border-pawp-500/30 bg-pawp-400/10 px-4 py-3 text-caption font-semibold text-pawp-500">
-                  <AlertTriangle className="h-4 w-4 shrink-0" />
-                  {error}
-                </div>
-              )}
-
-              <button
-                type="submit"
-                disabled={isSending || !amount || parseInt(amount, 10) <= 0}
-                className="flex min-h-[44px] w-full items-center justify-center gap-2 rounded-2xl bg-zpd-500 px-6 py-3 text-body-lg font-bold text-white shadow-hard transition-all hover:bg-zpd-600 active:translate-y-0.5 active:shadow-none disabled:cursor-not-allowed disabled:opacity-60"
-              >
-                {isSending ? (
-                  <Loader2 className="h-5 w-5 animate-spin" />
-                ) : (
-                  <>
-                    <Send className="h-5 w-5" />
-                    ยืนยันโอน {amount ? parseInt(amount, 10).toLocaleString() : 0}{" "}
-                    คะแนน
-                  </>
-                )}
-              </button>
-            </form>
-          </div>
         </div>
       </main>
     );
   }
 
   return (
-    <main className="flex min-h-[calc(100dvh-6rem)] flex-col items-center justify-start px-4 py-6">
-      <div className="w-full max-w-sm space-y-4">
-        <h1 className="text-center text-h2 text-zpd-900">
-          <ScanLine className="mr-2 inline-block h-6 w-6 text-fox-500" />
-          โอนคะแนน
-        </h1>
+    <div className="fixed inset-0 z-0 h-full w-full overflow-hidden bg-black">
+      {/* FULL SCREEN CAMERA */}
+      <div
+        id={scannerElementId}
+        className={`absolute inset-0 z-0 h-full w-full object-cover [&_video]:h-full [&_video]:w-full [&_video]:object-cover ${isInitializing ? "opacity-0" : "opacity-100"}`}
+      />
 
-        {error && (
-          <div className="flex items-center gap-2 rounded-2xl border border-pawp-500/30 bg-pawp-400/10 px-4 py-3 text-caption font-semibold text-pawp-500">
-            <AlertTriangle className="h-4 w-4 shrink-0" />
-            {error}
+      {/* Skeleton Loading State */}
+      {isInitializing && phase === "SCANNING" && (
+        <div className="absolute inset-0 z-40 flex flex-col items-center justify-center bg-black/60 backdrop-blur-md">
+          <div className="flex animate-pulse flex-col items-center gap-4">
+            <div className="flex h-24 w-24 items-center justify-center rounded-full border-4 border-white/60 bg-white/20 shadow-cartoon">
+              <Camera className="h-10 w-10 text-white" />
+            </div>
+            <p className="text-h3 text-white drop-shadow-md">
+              {t("transfer.initializingCamera")}
+            </p>
           </div>
-        )}
+        </div>
+      )}
 
-        {!showManualInput && (
-          <div className="overflow-hidden rounded-3xl border-2 border-white/60 bg-white/40 shadow-cartoon backdrop-blur-lg">
-            <div
-              id={scannerElementId}
-              className="relative aspect-square w-full bg-neutral-900"
-            />
-
-            <div className="flex items-center justify-center gap-3 p-3">
-              {isFlashSupported && (
-                <button
-                  type="button"
-                  onClick={toggleFlash}
-                  className="flex min-h-[44px] items-center gap-2 rounded-2xl border-2 border-white/60 bg-white/50 px-4 py-2.5 text-body font-bold text-zpd-800 transition-all hover:bg-white/70 active:translate-y-0.5"
-                >
-                  {isFlashOn ? (
-                    <FlashlightOff className="h-5 w-5" />
-                  ) : (
-                    <Flashlight className="h-5 w-5" />
-                  )}
-                  {isFlashOn ? "ปิดแฟลช" : "เปิดแฟลช"}
-                </button>
-              )}
+      {/* Floating Top Bar (Idle/Scanning) */}
+      {(phase === "SCANNING" || phase === "SCANNED") && (
+        <div className="absolute inset-x-0 top-0 z-10 flex items-center justify-between p-4 bg-gradient-to-b from-black/50 to-transparent pt-safe">
+          <h1 className="text-h3 text-white drop-shadow-md">
+            {t("transfer.title")}
+          </h1>
+          <div className="flex gap-2">
+            {isFlashSupported && (
               <button
                 type="button"
-                onClick={() => {
-                  stopScan();
-                  setShowManualInput(true);
-                }}
-                className="flex min-h-[44px] items-center gap-2 rounded-2xl border-2 border-white/60 bg-white/50 px-4 py-2.5 text-body font-bold text-zpd-800 transition-all hover:bg-white/70 active:translate-y-0.5"
+                onClick={toggleFlash}
+                className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white/20 text-white shadow-cartoon backdrop-blur-md transition-colors hover:bg-white/30"
               >
-                <Keyboard className="h-5 w-5" />
-                กรอกรหัส
+                {isFlashOn ? (
+                  <FlashlightOff className="h-5 w-5" />
+                ) : (
+                  <Flashlight className="h-5 w-5" />
+                )}
               </button>
-            </div>
+            )}
           </div>
-        )}
+        </div>
+      )}
 
-        {cameraError && !showManualInput && (
-          <div className="rounded-2xl border border-pawp-500/30 bg-pawp-400/10 px-4 py-3 text-center text-caption font-semibold text-pawp-500">
+      {/* Floating Manual Input Button (Center) */}
+      {(phase === "SCANNING" || phase === "SCANNED") && (
+        <div className="absolute left-1/2 top-1/2 z-10 -translate-x-1/2 translate-y-32">
+          <button
+            type="button"
+            onClick={() => {
+              stopScan();
+              setShowManualModal(true);
+            }}
+            className="flex min-h-[44px] items-center gap-2 rounded-full border border-white/60 bg-white/40 px-6 py-2.5 text-body font-bold text-white shadow-cartoon backdrop-blur-md transition-all hover:bg-white/50 active:scale-95"
+          >
+            <Keyboard className="h-5 w-5" />
+            <span>{t("transfer.manualInputBtn")}</span>
+          </button>
+        </div>
+      )}
+
+      {/* Global Error Overlay */}
+      {globalError && phase === "SCANNING" && (
+        <div className="absolute inset-x-4 top-24 z-20 rounded-2xl border border-pawp-500/50 bg-black/60 p-4 text-center text-body font-semibold text-pawp-400 backdrop-blur-md shadow-lg">
+          <AlertTriangle className="mx-auto mb-1 h-6 w-6" />
+          {globalError}
+        </div>
+      )}
+
+      {cameraError &&
+        !isInitializing &&
+        phase === "SCANNING" &&
+        !showManualModal && (
+          <div className="absolute inset-x-4 top-1/2 z-20 -translate-y-1/2 rounded-2xl border border-pawp-500/50 bg-black/80 p-6 text-center text-body font-semibold text-pawp-400 backdrop-blur-md shadow-lg">
+            <AlertTriangle className="mx-auto mb-2 h-8 w-8" />
             {cameraError}
           </div>
         )}
 
-        {showManualInput && (
-          <div className="rounded-3xl border-2 border-white/60 bg-white/40 p-6 shadow-cartoon backdrop-blur-lg">
-            <div className="mb-4 flex items-center justify-between">
-              <h2 className="text-h3 text-zpd-900">กรอกรหัสผู้ใช้</h2>
-              <button
-                type="button"
-                onClick={() => {
-                  setShowManualInput(false);
-                  setManualCode("");
-                  setError(null);
-                  processedRef.current = false;
-                }}
-                className="flex h-10 w-10 items-center justify-center rounded-xl text-neutral-500 transition-colors hover:bg-white/40"
-              >
-                <X className="h-5 w-5" />
-              </button>
+      {/* SCANNED SUCCESS OVERLAY */}
+      {phase === "SCANNED" && currentReceiver && (
+        <div className="absolute inset-0 z-30 flex flex-col items-center justify-center bg-black/60 p-4 backdrop-blur-sm">
+          <div className="w-full max-w-sm rounded-[32px] border-2 border-white/60 bg-white/20 p-6 shadow-cartoon backdrop-blur-xl">
+            <div className="flex flex-col items-center gap-3">
+              <div className="flex h-16 w-16 items-center justify-center rounded-full border-4 border-white/70 bg-zpd-500 shadow-hard">
+                <User className="h-8 w-8 text-white" strokeWidth={2} />
+              </div>
+              <div className="text-center text-white">
+                <h2 className="text-h2 drop-shadow-md">
+                  {currentReceiver.firstname} {currentReceiver.lastname}
+                </h2>
+                <p className="text-body-lg text-white/80">
+                  "{currentReceiver.nickname}"
+                </p>
+              </div>
+              <div className="flex flex-wrap items-center justify-center gap-2">
+                <span className="inline-flex items-center gap-1 rounded-full border border-white/40 bg-white/20 px-3 py-1 text-caption font-bold text-white shadow-sm">
+                  <Users className="h-3 w-3" />
+                  {currentReceiver.group}
+                </span>
+                <span className="inline-flex items-center gap-1 rounded-full border border-white/40 bg-white/20 px-3 py-1 text-caption font-bold text-white shadow-sm">
+                  <Star className="h-3 w-3" />
+                  {currentReceiver.points.toLocaleString()}{" "}
+                  {t("leaderboard.points")}
+                </span>
+              </div>
             </div>
 
-            <form onSubmit={handleManualSubmit} className="space-y-3">
-              <input
-                type="text"
-                value={manualCode}
-                onChange={(e) => {
-                  setError(null);
-                  setManualCode(e.target.value.toUpperCase());
-                }}
-                placeholder="เช่น FL72"
-                maxLength={6}
-                autoFocus
-                className="h-14 w-full rounded-2xl border-2 border-white/60 bg-white/50 px-4 text-center font-mono text-h2 uppercase tracking-[0.3em] text-zpd-900 shadow-cartoon backdrop-blur-md outline-none transition-all focus:border-zpd-400 focus:ring-2 focus:ring-zpd-400/30"
-              />
+            <div className="mt-8 flex flex-col gap-3 sm:flex-row">
               <button
-                type="submit"
-                disabled={isLookingUp || manualCode.trim().length < 2}
-                className="flex min-h-[44px] w-full items-center justify-center gap-2 rounded-2xl bg-zpd-500 px-6 py-3 text-body-lg font-bold text-white shadow-hard transition-all hover:bg-zpd-600 active:translate-y-0.5 active:shadow-none disabled:cursor-not-allowed disabled:opacity-60"
+                type="button"
+                onClick={handleScanMore}
+                className="flex min-h-[44px] flex-1 items-center justify-center gap-2 rounded-2xl border-2 border-white/60 bg-white/30 px-4 py-3 text-body-lg font-bold text-white transition-all hover:bg-white/40 active:translate-y-0.5 active:shadow-none"
               >
-                {isLookingUp ? (
-                  <Loader2 className="h-5 w-5 animate-spin" />
-                ) : (
-                  "ค้นหา"
-                )}
+                <Plus className="h-5 w-5" />
+                {t("transfer.scanMoreBtn")}
               </button>
-            </form>
+              <button
+                type="button"
+                onClick={handleTransferNow}
+                className="flex min-h-[44px] flex-1 items-center justify-center gap-2 rounded-2xl bg-zpd-500 px-4 py-3 text-body-lg font-bold text-white shadow-hard transition-all hover:bg-zpd-600 active:translate-y-0.5 active:shadow-none"
+              >
+                <Send className="h-5 w-5" />
+                {t("transfer.transferNowBtn")}
+              </button>
+            </div>
+            <button
+              type="button"
+              onClick={resumeScanning}
+              className="mt-4 block w-full text-center text-body text-white/60 hover:text-white"
+            >
+              {t("transfer.cancel")}
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Floating Cart Pill (Bottom) */}
+      {(phase === "SCANNING" || phase === "SCANNED") &&
+        receivers.length > 0 && (
+          <div className="absolute inset-x-0 bottom-24 z-20 flex justify-center p-4">
+            <button
+              type="button"
+              onClick={() => {
+                stopScan();
+                setShowCartSheet(true);
+              }}
+              className="flex items-center gap-3 rounded-full border-2 border-white/60 bg-white/40 py-3 pl-4 pr-6 shadow-cartoon backdrop-blur-lg transition-transform hover:scale-105 active:scale-95"
+            >
+              <div className="relative flex h-10 w-10 items-center justify-center rounded-full bg-zpd-500 text-white shadow-inner">
+                <ShoppingCart className="h-5 w-5" />
+                <span className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-pawp-500 text-[10px] font-bold text-white outline outline-2 outline-white">
+                  {receivers.length}
+                </span>
+              </div>
+              <span className="text-body-lg font-bold text-zpd-900">
+                {t("transfer.batchCartIndicator", { count: receivers.length })}
+              </span>
+            </button>
           </div>
         )}
 
-        {isLookingUp && !showManualInput && (
-          <div className="flex flex-col items-center gap-2 py-4">
-            <Loader2 className="h-8 w-8 animate-spin text-zpd-500" />
-            <p className="text-body text-zpd-700">กำลังค้นหาผู้ใช้...</p>
-          </div>
-        )}
-      </div>
-    </main>
+      <ManualCodeModal
+        isOpen={showManualModal}
+        onClose={() => {
+          setShowManualModal(false);
+          setManualError(null);
+          resumeScanning();
+        }}
+        onSubmit={(code) => lookupUser(code, true)}
+        isLookingUp={isLookingUp}
+        error={manualError}
+      />
+
+      <TransferBottomSheet
+        isOpen={showCartSheet}
+        onClose={() => {
+          setShowCartSheet(false);
+          if (phase === "SCANNING") {
+            // Need to reset the processed flag to allow camera scanning again
+            processedRef.current = false;
+          }
+        }}
+        receivers={receivers}
+        onRemoveReceiver={removeReceiver}
+        onTransferComplete={handleTransferComplete}
+      />
+
+      <ConfirmModal
+        isOpen={blocker.state === "blocked"}
+        onClose={() => {
+          if (blocker.state === "blocked") blocker.reset();
+        }}
+        onConfirm={() => {
+          if (blocker.state === "blocked") blocker.proceed();
+        }}
+        title={t("modals.navWarningTitle")}
+        description={t("modals.navWarningBody")}
+        confirmLabel={t("modals.navWarningLeave")}
+        cancelLabel={t("common.cancel")}
+        variant="destructive"
+      />
+    </div>
   );
 }

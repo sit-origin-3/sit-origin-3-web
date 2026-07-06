@@ -1,12 +1,18 @@
 export interface UserGroup {
+  id: string;
   name: string;
 }
 
+export interface Giver {
+  nickname: string;
+  groupId: string;
+  groupName: string;
+}
+
 export interface ReceivedPoint {
-  id: number;
   amount: number;
-  reason: string;
   createdAt: string;
+  giver: Giver;
 }
 
 export interface UserProfile {

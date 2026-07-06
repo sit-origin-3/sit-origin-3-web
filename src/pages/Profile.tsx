@@ -203,7 +203,7 @@ export default function Profile() {
           <div className="space-y-1 border-t border-white/40 pt-4">
             <InfoRow icon={Mail} label="อีเมล" value={profile.email} />
             <InfoRow icon={Hash} label="รหัสผู้ใช้" value={profile.userCode} />
-            <InfoRow icon={Users} label="กลุ่ม" value={profile.group} />
+            <InfoRow icon={Users} label="กลุ่ม" value={profile.group?.name || String(profile.group)} />
           </div>
         </div>
 

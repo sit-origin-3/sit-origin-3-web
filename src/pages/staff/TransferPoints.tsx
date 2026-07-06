@@ -86,7 +86,6 @@ function ReceiverCard({
 
 export default function TransferPoints() {
   const {
-    isScanning,
     isFlashOn,
     isFlashSupported,
     cameraError,

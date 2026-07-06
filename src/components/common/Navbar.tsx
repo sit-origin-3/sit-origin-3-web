@@ -14,7 +14,7 @@ import type { ComponentType } from "react";
 interface NavItem {
   label: string;
   path: string;
-  icon: ComponentType<{ className?: string }>;
+  icon: ComponentType<{ className?: string; strokeWidth?: number }>;
 }
 
 const NAV_MAP: Record<string, NavItem[]> = {

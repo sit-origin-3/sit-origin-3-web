@@ -11,12 +11,11 @@ export const api = axios.create({
 // 2. Interceptor: ดักจับ "ก่อน" ที่ Request จะพุ่งออกจาก Frontend
 api.interceptors.request.use(
   (config) => {
-    // ทีเด็ดของ Zustand: คุณสามารถดึง State มาใช้นอก React Component ได้เลยด้วย .getState()
-    const user = useAuthStore.getState().user;
+    const accessToken = useAuthStore.getState().accessToken;
 
     // ถ้ามี Token ให้ยัดใส่ Header Authorization อัตโนมัติในทุกๆ Request
-    if (user?.token) {
-      config.headers.Authorization = `Bearer ${user.token}`;
+    if (accessToken) {
+      config.headers.Authorization = `Bearer ${accessToken}`;
     }
 
     return config;

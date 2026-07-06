@@ -11,9 +11,7 @@ export async function getMe(): Promise<{
   user: UserProfile;
   token: string | null;
 }> {
-  const response = await api.get<UserProfile>("/users/me", {
-    credentials: "include",
-  });
+  const response = await api.get<UserProfile>("/users/me");
 
   let token = null;
   const authHeader =

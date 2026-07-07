@@ -6,7 +6,7 @@ import {
   Trophy,
   ArrowLeftRight,
   LayoutDashboard,
-  UserCog,
+  Settings,
 } from "lucide-react";
 import { useAuthStore } from "../../store/useAuthStore";
 import type { ComponentType } from "react";
@@ -30,7 +30,7 @@ const NAV_MAP: Record<string, NavItem[]> = {
   ],
   ADMIN: [
     { label: "แดชบอร์ด", path: "/dashboard", icon: LayoutDashboard },
-    { label: "จัดการผู้ใช้", path: "/admin/users", icon: UserCog },
+    { label: "ระบบจัดการ", path: "/admin/system", icon: Settings },
     { label: "อันดับ", path: "/leaderboard", icon: Trophy },
   ],
 };

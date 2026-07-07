@@ -40,3 +40,15 @@ export async function givePoints(
   const { data } = await api.post<GivePointsResponse>("/points/give", payload);
   return data;
 }
+
+export interface AssignPointsPayload {
+  userCode: string;
+  amount: number;
+}
+
+export async function assignPoints(
+  payload: AssignPointsPayload,
+): Promise<any> {
+  const { data } = await api.post("/points/assign", payload);
+  return data;
+}

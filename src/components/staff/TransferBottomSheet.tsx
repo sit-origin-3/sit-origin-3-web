@@ -1,4 +1,5 @@
 import { useState } from "react";
+import axios from "axios";
 import {
   X,
   Send,
@@ -67,6 +68,17 @@ export default function TransferBottomSheet({
         total: receivers.length,
       });
     } catch (err: any) {
+      if (axios.isAxiosError(err) && err.response?.status === 400) {
+        const backendError = err.response?.data?.error;
+        if (typeof backendError === "string" && backendError.includes("Exceeded limit for:")) {
+          const code = backendError.split(": ")[1]?.trim();
+          if (code) {
+            setError(t("modals.exceededLimit", { code }));
+            setIsSending(false);
+            return;
+          }
+        }
+      }
       setError(err.response?.data?.message || err.message || t("common.error"));
     } finally {
       setIsSending(false);

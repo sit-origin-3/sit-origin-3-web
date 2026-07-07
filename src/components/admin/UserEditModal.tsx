@@ -57,11 +57,13 @@ export default function UserEditModal({
       onClick={onClose}
     >
       <div
-        className="w-full max-w-md overflow-hidden rounded-[32px] border-2 border-white/60 bg-white/40 shadow-cartoon backdrop-blur-xl animate-in zoom-in-95 flex flex-col"
+        className="w-full max-w-md overflow-hidden rounded-[32px] border-2 border-white/60 bg-white/70 shadow-cartoon backdrop-blur-xl animate-in zoom-in-95 flex flex-col"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between border-b border-white/40 bg-white/30 px-6 py-4">
-          <h2 className="text-h3 text-zpd-900">{t("adminSystem.userModalTitle")}</h2>
+          <h2 className="text-h3 text-zpd-900">
+            {t("adminSystem.userModalTitle")}
+          </h2>
           <button
             type="button"
             onClick={onClose}
@@ -73,7 +75,9 @@ export default function UserEditModal({
 
         <div className="flex flex-col gap-4 p-6">
           <div className="flex items-center gap-4 rounded-2xl border border-white/40 bg-white/30 p-4">
-            <div className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-full ${getAvatarBg(user.role, user.session, user.group?.name)} text-white shadow-sm`}>
+            <div
+              className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-full ${getAvatarBg(user.role, user.session, user.group?.name)} text-white shadow-sm`}
+            >
               <User className="h-6 w-6" />
             </div>
             <div>
@@ -113,7 +117,9 @@ export default function UserEditModal({
           <button
             type="button"
             onClick={handleSaveClick}
-            disabled={!points || isNaN(Number(points)) || Number(points) === user.points}
+            disabled={
+              !points || isNaN(Number(points)) || Number(points) === user.points
+            }
             className="flex w-full min-h-[48px] items-center justify-center gap-2 rounded-2xl bg-zpd-500 px-4 text-body-lg font-bold text-white shadow-cartoon transition-all hover:bg-zpd-600 active:scale-95 disabled:opacity-50"
           >
             <Save className="h-5 w-5" />

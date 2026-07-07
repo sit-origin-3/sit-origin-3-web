@@ -21,6 +21,7 @@ import { logout as logoutApi } from "../../services/authService";
 import { useAuthStore } from "../../store/useAuthStore";
 import ConfirmModal from "../../components/common/ConfirmModal";
 import AuditDetailModal from "../../components/admin/AuditDetailModal";
+import { useSmartRefresh } from "../../hooks/useSmartRefresh";
 
 const ACTIONS = [
   "",
@@ -47,7 +48,6 @@ export default function Dashboard() {
     "ALL" | "FIRSTNAME" | "NICKNAME" | "USERCODE"
   >("ALL");
   const [isLoading, setIsLoading] = useState(true);
-  const [isRefreshing, setIsRefreshing] = useState(false);
 
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
@@ -78,23 +78,11 @@ export default function Dashboard() {
     fetchLogs();
   }, [fetchLogs]);
 
-  useEffect(() => {
-    const interval = setInterval(() => {
-      fetchLogs(true);
-    }, 5000);
-    return () => clearInterval(interval);
+  const handleSilentFetch = useCallback(async () => {
+    await fetchLogs(true);
   }, [fetchLogs]);
 
-  const handleManualRefresh = async () => {
-    setIsRefreshing(true);
-    const start = Date.now();
-    await fetchLogs(true);
-    const elapsed = Date.now() - start;
-    if (elapsed < 1000) {
-      await new Promise((r) => setTimeout(r, 1000 - elapsed));
-    }
-    setIsRefreshing(false);
-  };
+  const { isSpinning, triggerManualRefresh } = useSmartRefresh(handleSilentFetch);
 
   const handleActionChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setFilterAction(e.target.value);
@@ -168,9 +156,9 @@ export default function Dashboard() {
         return { icon: <ArrowRightLeft className="h-6 w-6" />, bgClass: "bg-fox-500/20 group-hover:bg-fox-500/30", textClass: "text-fox-600" };
       case "UPDATE_POINT":
       case "ASSIGN_POINTS":
-        return { icon: <Coins className="h-6 w-6" />, bgClass: "bg-zpd-500/20 group-hover:bg-zpd-500/30", textClass: "text-zpd-600" };
+        return { icon: <Coins className="h-6 w-6" />, bgClass: "bg-berry-500/20 group-hover:bg-berry-500/30", textClass: "text-berry-500" };
       case "UPDATE_CONFIG":
-        return { icon: <Settings className="h-6 w-6" />, bgClass: "bg-zpd-500/20 group-hover:bg-zpd-500/30", textClass: "text-zpd-600" };
+        return { icon: <Settings className="h-6 w-6" />, bgClass: "bg-berry-500/20 group-hover:bg-berry-500/30", textClass: "text-berry-500" };
       default:
         return { icon: <Activity className="h-6 w-6" />, bgClass: "bg-neutral-500/20 group-hover:bg-neutral-500/30", textClass: "text-neutral-600" };
     }
@@ -213,12 +201,11 @@ export default function Dashboard() {
         <div className="flex items-center gap-2">
           <button
             type="button"
-            onClick={handleManualRefresh}
-            disabled={isRefreshing}
-            className="flex h-[44px] w-[44px] items-center justify-center rounded-full border border-zpd-500/40 bg-white/40 text-zpd-600 shadow-cartoon backdrop-blur-md transition-all hover:bg-zpd-50 active:scale-95 disabled:opacity-50"
+            onClick={triggerManualRefresh}
+            className="flex h-[44px] w-[44px] items-center justify-center rounded-full border border-zpd-500/40 bg-white/40 text-zpd-600 shadow-cartoon backdrop-blur-md transition-all hover:bg-zpd-50 active:scale-95"
           >
             <RefreshCw
-              className={`h-5 w-5 ${isRefreshing ? "animate-spin" : ""}`}
+              className={`h-5 w-5 ${isSpinning ? "animate-spin" : ""}`}
             />
           </button>
           <button

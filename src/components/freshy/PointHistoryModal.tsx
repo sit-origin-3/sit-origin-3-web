@@ -25,7 +25,7 @@ export default function PointHistoryModal({
     >
       {/* Centered Modal Card */}
       <div
-        className="flex max-h-[75vh] w-full max-w-md flex-col overflow-hidden rounded-[32px] border-2 border-white/60 bg-white/40 shadow-cartoon backdrop-blur-lg"
+        className="flex max-h-[75vh] w-full max-w-md flex-col overflow-hidden rounded-[32px] border-2 border-white/60 bg-white/70 shadow-cartoon backdrop-blur-lg"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Sticky Header */}
@@ -69,7 +69,10 @@ export default function PointHistoryModal({
                       <span className="text-body-lg font-bold">
                         {tx.action === "receive"
                           ? tx.giver?.group?.name || t("history.unknownStation")
-                          : tx.receiver?.nickname || t("history.unknownUser")}
+                          : t("history.staffGaveTo", {
+                              giver: tx.giver?.nickname || t("history.unknownUser"),
+                              receiver: tx.receiver?.nickname || t("history.unknownUser"),
+                            })}
                       </span>
                     </div>
                     <div className="flex items-center gap-1 text-caption text-neutral-500">

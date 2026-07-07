@@ -4,6 +4,7 @@ import { Flip } from "gsap/Flip";
 import { Trophy, Star, Loader2, WifiOff, RefreshCw } from "lucide-react";
 import { fetchLeaderboard } from "../services/leaderboardService";
 import { useAuthStore } from "../store/useAuthStore";
+import { useSmartRefresh } from "../hooks/useSmartRefresh";
 import { useTranslation } from "react-i18next";
 import type { LeaderboardEntry } from "../types/leaderboard";
 
@@ -153,8 +154,6 @@ export default function Leaderboard() {
   const isFirstRender = useRef(true);
   const lastDataRef = useRef<string>("");
 
-  const [isRefreshing, setIsRefreshing] = useState(false);
-
   const fetchLogs = useCallback(async () => {
     try {
       const { showLeaderboard: lbFlag, entries: data } = await fetchLeaderboard(isAdmin);
@@ -202,25 +201,11 @@ export default function Leaderboard() {
     }
   }, [isAdmin, t]);
 
+  const { isSpinning, triggerManualRefresh } = useSmartRefresh(fetchLogs);
+
   useEffect(() => {
     fetchLogs();
-    const interval = setInterval(fetchLogs, 5000);
-
-    return () => {
-      clearInterval(interval);
-    };
   }, [fetchLogs]);
-
-  const handleManualRefresh = async () => {
-    setIsRefreshing(true);
-    const start = Date.now();
-    await fetchLogs();
-    const elapsed = Date.now() - start;
-    if (elapsed < 1000) {
-      await new Promise((r) => setTimeout(r, 1000 - elapsed));
-    }
-    setIsRefreshing(false);
-  };
 
   if (isLoading) {
     return (
@@ -268,12 +253,11 @@ export default function Leaderboard() {
         </div>
         <button
           type="button"
-          onClick={handleManualRefresh}
-          disabled={isRefreshing}
-          className="flex h-[44px] w-[44px] items-center justify-center rounded-full border border-zpd-500/40 bg-white/40 text-zpd-600 shadow-cartoon backdrop-blur-md transition-all hover:bg-zpd-50 active:scale-95 disabled:opacity-50"
+          onClick={triggerManualRefresh}
+          className="flex h-[44px] w-[44px] items-center justify-center rounded-full border border-zpd-500/40 bg-white/40 text-zpd-600 shadow-cartoon backdrop-blur-md transition-all hover:bg-zpd-50 active:scale-95"
         >
           <RefreshCw
-            className={`h-5 w-5 ${isRefreshing ? "animate-spin" : ""}`}
+            className={`h-5 w-5 ${isSpinning ? "animate-spin" : ""}`}
           />
         </button>
       </div>

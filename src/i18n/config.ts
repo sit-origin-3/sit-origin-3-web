@@ -92,11 +92,11 @@ const resources = {
         navWarningBody:
           "คุณมีรายชื่อนักศึกษาอยู่ในรายการ หากคุณออกตอนนี้ข้อมูลทั้งหมดจะสูญหาย คุณต้องการออกหรือไม่?",
         navWarningLeave: "ออก",
-        removeStudentTitle: "นำนักศึกษาออก",
-        removeStudentBody:
-          "คุณแน่ใจหรือไม่ว่าต้องการนำ {{name}} ออกจากรายการโอน?",
-        removeBtn: "นำออก",
-        amountError: "กรุณากรอกจำนวนคะแนนที่ถูกต้อง",
+        removeStudentTitle: "ลบนักศึกษา",
+        removeStudentBody: "คุณแน่ใจหรือไม่ที่จะลบ {{name}} ออกจากรายการโอน?",
+        removeBtn: "ลบ",
+        amountError: "กรุณาระบุจำนวนคะแนน",
+        exceededLimit: "คะแนนเกินขีดจำกัดสำหรับรหัส: {{code}}",
       },
       adminDashboard: {
         title: "แดชบอร์ดผู้ดูแลระบบ",
@@ -234,7 +234,8 @@ const resources = {
         removeStudentBody:
           "Are you sure you want to remove {{name}} from the transfer list?",
         removeBtn: "Remove",
-        amountError: "Please enter a valid point amount",
+        amountError: "Please specify an amount",
+        exceededLimit: "Exceeded point limit for code: {{code}}",
       },
       adminDashboard: {
         title: "Admin Dashboard",

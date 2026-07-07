@@ -97,7 +97,6 @@ const router = createBrowserRouter([
       { path: "/transfer", element: <TransferPoints /> },
       { path: "/dashboard", element: <Dashboard /> },
       { path: "/admin/system", element: <SystemControl /> },
-      { path: "/admin/users", element: <Upcoming title="จัดการผู้ใช้" /> },
     ],
   },
   { path: "/", element: <HomeRedirect /> },

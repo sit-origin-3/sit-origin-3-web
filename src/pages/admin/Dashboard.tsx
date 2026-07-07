@@ -158,20 +158,21 @@ export default function Dashboard() {
   const startItem = total === 0 ? 0 : (page - 1) * limit + 1;
   const endItem = Math.min(page * limit, total);
 
-  const getActionIcon = (action: string) => {
+  const getActionIconData = (action: string) => {
     switch (action.toUpperCase()) {
       case "LOGIN":
-        return <LogIn className="h-5 w-5" />;
+        return { icon: <LogIn className="h-6 w-6" />, bgClass: "bg-jungle-500/20 group-hover:bg-jungle-500/30", textClass: "text-jungle-600" };
       case "LOGOUT":
-        return <LogOut className="h-5 w-5" />;
+        return { icon: <LogOut className="h-6 w-6" />, bgClass: "bg-pawp-500/20 group-hover:bg-pawp-500/30", textClass: "text-pawp-600" };
       case "GIVE_POINTS":
-        return <ArrowRightLeft className="h-5 w-5" />;
+        return { icon: <ArrowRightLeft className="h-6 w-6" />, bgClass: "bg-fox-500/20 group-hover:bg-fox-500/30", textClass: "text-fox-600" };
       case "UPDATE_POINT":
-        return <Coins className="h-5 w-5" />;
+      case "ASSIGN_POINTS":
+        return { icon: <Coins className="h-6 w-6" />, bgClass: "bg-zpd-500/20 group-hover:bg-zpd-500/30", textClass: "text-zpd-600" };
       case "UPDATE_CONFIG":
-        return <Settings className="h-5 w-5" />;
+        return { icon: <Settings className="h-6 w-6" />, bgClass: "bg-zpd-500/20 group-hover:bg-zpd-500/30", textClass: "text-zpd-600" };
       default:
-        return <Activity className="h-5 w-5" />;
+        return { icon: <Activity className="h-6 w-6" />, bgClass: "bg-neutral-500/20 group-hover:bg-neutral-500/30", textClass: "text-neutral-600" };
     }
   };
 
@@ -205,7 +206,7 @@ export default function Dashboard() {
   );
 
   return (
-    <main className="mx-auto flex min-h-[calc(100dvh-4rem)] w-full max-w-4xl flex-col px-4 py-32">
+    <main className="mx-auto flex min-h-[calc(100dvh-4rem)] w-full max-w-4xl flex-col px-4 pt-16 pb-32">
       {/* Header */}
       <header className="mb-6 flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
         <h1 className="text-h2 text-zpd-900">{t("adminDashboard.title")}</h1>
@@ -300,17 +301,19 @@ export default function Dashboard() {
           </div>
         ) : (
           <div className="flex-1 overflow-y-auto p-4 space-y-3">
-            {filteredLogs.map((log) => (
-              <div
-                key={log.id}
-                onClick={() => setSelectedLog(log)}
-                className="group flex cursor-pointer flex-col gap-3 rounded-2xl border border-white/50 bg-white/60 p-4 shadow-sm backdrop-blur-sm transition-all hover:-translate-y-0.5 hover:bg-white hover:shadow-md sm:flex-row sm:items-center sm:justify-between"
-              >
-                <div className="flex items-center gap-4">
-                  <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-zpd-500/20 text-zpd-700 transition-colors group-hover:bg-zpd-500/30">
-                    {getActionIcon(log.action)}
-                  </div>
-                  <div>
+            {filteredLogs.map((log) => {
+              const iconData = getActionIconData(log.action);
+              return (
+                <div
+                  key={log.id}
+                  onClick={() => setSelectedLog(log)}
+                  className="group flex cursor-pointer flex-col gap-3 rounded-2xl border border-white/50 bg-white/60 p-4 shadow-sm backdrop-blur-sm transition-all hover:-translate-y-0.5 hover:bg-white hover:shadow-md sm:flex-row sm:items-center sm:justify-between"
+                >
+                  <div className="flex items-center gap-4">
+                    <div className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-full transition-colors ${iconData.bgClass} ${iconData.textClass}`}>
+                      {iconData.icon}
+                    </div>
+                    <div>
                     <div className="flex items-center gap-2 text-body-lg font-bold text-zpd-900">
                       <span>{log.actor.nickname}</span>
                       {log.target && (
@@ -348,7 +351,8 @@ export default function Dashboard() {
                   )}
                 </div>
               </div>
-            ))}
+            );
+            })}
           </div>
         )}
 

@@ -1,4 +1,12 @@
-import { X, CalendarDays, User, Info, Shield, Hash, Activity } from "lucide-react";
+import {
+  X,
+  CalendarDays,
+  User,
+  Info,
+  Shield,
+  Hash,
+  Activity,
+} from "lucide-react";
 import { useTranslation } from "react-i18next";
 import type { AuditLog, AuditActor } from "../../services/auditService";
 
@@ -54,7 +62,7 @@ export default function AuditDetailModal({
       onClick={onClose}
     >
       <div
-        className="w-full max-w-lg overflow-hidden rounded-[32px] border-2 border-white/60 bg-white/40 shadow-cartoon backdrop-blur-xl animate-in zoom-in-95 flex flex-col max-h-[90vh]"
+        className="w-full max-w-lg overflow-hidden rounded-[32px] border-2 border-white/60 bg-white/80 shadow-cartoon backdrop-blur-xl animate-in zoom-in-95 flex flex-col max-h-[90vh]"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between border-b border-white/40 bg-white/30 px-6 py-4">
@@ -98,7 +106,10 @@ export default function AuditDetailModal({
           <ActorDetail actor={log.actor} label={t("adminDashboard.actor")} />
 
           {log.target && (
-            <ActorDetail actor={log.target} label={t("adminDashboard.target")} />
+            <ActorDetail
+              actor={log.target}
+              label={t("adminDashboard.target")}
+            />
           )}
 
           {log.metadata && Object.keys(log.metadata).length > 0 && (

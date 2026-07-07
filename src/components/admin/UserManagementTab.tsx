@@ -1,0 +1,118 @@
+import { useState, useEffect, useCallback, useMemo } from "react";
+import { useTranslation } from "react-i18next";
+import { Loader2, Search, User, Star, Activity, Users } from "lucide-react";
+import type { UserProfile } from "../../types/user";
+import { getUsers } from "../../services/userService";
+import UserEditModal from "./UserEditModal";
+
+export default function UserManagementTab() {
+  const { t } = useTranslation();
+  const [users, setUsers] = useState<UserProfile[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedUser, setSelectedUser] = useState<UserProfile | null>(null);
+
+  const fetchAllUsers = useCallback(async () => {
+    setIsLoading(true);
+    try {
+      const data = await getUsers();
+      setUsers(data);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchAllUsers();
+  }, [fetchAllUsers]);
+
+  const filteredUsers = useMemo(() => {
+    if (!searchQuery.trim()) return users;
+    const q = searchQuery.toLowerCase();
+    return users.filter((u) => {
+      return (
+        u.userCode.toLowerCase().includes(q) ||
+        u.firstname.toLowerCase().includes(q) ||
+        u.lastname.toLowerCase().includes(q) ||
+        (u.nickname && u.nickname.toLowerCase().includes(q)) ||
+        (u.group && u.group.name && u.group.name.toLowerCase().includes(q))
+      );
+    });
+  }, [users, searchQuery]);
+
+  return (
+    <div className="flex flex-col gap-6 animate-in fade-in zoom-in-95">
+      {/* Search Bar */}
+      <div className="relative">
+        <Search className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-neutral-400" />
+        <input
+          type="text"
+          placeholder={t("adminSystem.searchUserPlaceholder")}
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className="w-full rounded-2xl border-2 border-white/60 bg-white/40 py-4 pl-12 pr-4 text-body-lg font-medium text-zpd-900 shadow-cartoon backdrop-blur-md outline-none transition-all focus:border-zpd-400 focus:bg-white/60"
+        />
+      </div>
+
+      {/* Users List */}
+      <div className="flex-1 overflow-hidden rounded-[32px] border-2 border-white/60 bg-white/40 shadow-cartoon backdrop-blur-md flex flex-col min-h-[400px]">
+        {isLoading ? (
+          <div className="flex flex-1 items-center justify-center p-12">
+            <Loader2 className="h-10 w-10 animate-spin text-zpd-500" />
+          </div>
+        ) : filteredUsers.length === 0 ? (
+          <div className="flex flex-1 flex-col items-center justify-center p-12 text-center">
+            <Activity className="mb-3 h-12 w-12 text-neutral-400" />
+            <p className="text-body-lg text-neutral-500">No users found.</p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 gap-4 p-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-2">
+            {filteredUsers.map((u) => (
+              <div
+                key={u.id}
+                onClick={() => setSelectedUser(u)}
+                className="group flex cursor-pointer flex-col gap-3 rounded-2xl border border-white/50 bg-white/60 p-4 shadow-sm backdrop-blur-sm transition-all hover:-translate-y-1 hover:bg-white hover:shadow-md"
+              >
+                <div className="flex items-start gap-3">
+                  <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-zpd-500/20 text-zpd-700 transition-colors group-hover:bg-zpd-500/30">
+                    <User className="h-6 w-6" />
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate text-body-lg font-bold text-zpd-900">
+                      {u.nickname || u.firstname}
+                    </p>
+                    <p className="truncate text-caption text-neutral-500">
+                      {u.userCode}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-center justify-between border-t border-white/40 pt-3">
+                  <span className="flex items-center gap-1 text-caption font-bold text-neutral-500">
+                    <Users className="h-3.5 w-3.5" />
+                    {u.group?.name || "No Group"}
+                  </span>
+                  <div className="flex items-center gap-1 rounded-full bg-fox-500/10 px-2 py-0.5 border border-fox-500/20">
+                    <Star className="h-3.5 w-3.5 text-fox-500" fill="currentColor" />
+                    <span className="font-mono text-caption font-bold text-fox-500">
+                      {u.points}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      <UserEditModal
+        isOpen={!!selectedUser}
+        onClose={() => setSelectedUser(null)}
+        user={selectedUser}
+        onRefresh={fetchAllUsers}
+      />
+    </div>
+  );
+}

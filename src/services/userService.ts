@@ -23,3 +23,13 @@ export async function getMe(): Promise<{
   // console.log(response.data);
   return { user: response.data, token };
 }
+
+export async function getUsers(): Promise<UserProfile[]> {
+  const response = await api.get<UserProfile[]>("/users");
+  return response.data;
+}
+
+export async function updateUserPoints(code: string, points: number): Promise<UserProfile> {
+  const response = await api.patch<UserProfile>(`/users/${code}`, { points });
+  return response.data;
+}

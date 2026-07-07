@@ -20,3 +20,8 @@ jobs:
         run: |
           cd /opt/project/deployment
           docker compose up -d --build frontend
+
+      - name: Cleanup Docker Images
+        run: |
+          docker image prune -f
+          docker builder prune -f

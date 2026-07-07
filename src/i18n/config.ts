@@ -78,6 +78,9 @@ const resources = {
       history: {
         title: "ประวัติการรับคะแนน",
         unknownStation: "ไม่ระบุสถานี",
+        unknownUser: "ผู้ใช้ที่ไม่รู้จัก",
+        receivedFrom: "ได้รับจาก: {{name}}",
+        givenTo: "โอนให้: {{group}}",
         emptyTitle: "ยังไม่มีประวัติการรับคะแนน",
         emptyDesc: "แวะไปที่ฐานกิจกรรมเพื่อเริ่มสะสม!",
         emptyPoints: "น้อง ๆ ยังไม่มีแต้มเลยย",
@@ -216,6 +219,9 @@ const resources = {
       history: {
         title: "Point History",
         unknownStation: "Unknown Station",
+        unknownUser: "Unknown User",
+        receivedFrom: "Received from: {{name}}",
+        givenTo: "Given to: {{group}}",
         emptyTitle: "No point history yet",
         emptyDesc: "Visit an activity station to start earning!",
         emptyPoints: "No points recorded yet!",

@@ -3,16 +3,18 @@ export interface UserGroup {
   name: string;
 }
 
-export interface Giver {
+export interface TransactionParty {
   nickname: string;
-  groupId: string;
-  groupName: string;
+  major: string;
+  group: UserGroup;
 }
 
-export interface ReceivedPoint {
+export interface TransactionHistory {
+  action: "give" | "receive";
   amount: number;
   createdAt: string;
-  giver: Giver;
+  giver: TransactionParty;
+  receiver: TransactionParty;
 }
 
 export interface UserProfile {
@@ -26,6 +28,6 @@ export interface UserProfile {
   major: string;
   points: number;
   group: UserGroup;
-  receivedPoints: ReceivedPoint[];
-  rank: number;
+  history: TransactionHistory[];
+  rank: number | null;
 }

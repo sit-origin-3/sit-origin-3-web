@@ -1,12 +1,12 @@
 import { useState } from "react";
 import { History, ListVideo, ChevronRight } from "lucide-react";
-import type { ReceivedPoint } from "../../types/user";
+import type { TransactionHistory } from "../../types/user";
 import { formatTimeGMT7 } from "../../utils/date";
 import PointHistoryModal from "./PointHistoryModal";
 import { useTranslation } from "react-i18next";
 
 interface PointHistoryPreviewProps {
-  transactions: ReceivedPoint[];
+  transactions: TransactionHistory[];
 }
 
 export default function PointHistoryPreview({
@@ -50,14 +50,20 @@ export default function PointHistoryPreview({
                 >
                   <div className="min-w-0 flex-1">
                     <p className="truncate text-body-lg font-bold text-zpd-900">
-                      {tx.giver?.groupName || t("history.unknownStation")}
+                      {tx.action === "receive" 
+                        ? tx.giver?.group?.name || t("history.unknownStation")
+                        : tx.receiver?.nickname || t("history.unknownUser")}
                     </p>
                     <p className="text-caption text-neutral-500">
+                      {tx.action === "receive"
+                        ? t("history.receivedFrom", { name: tx.giver?.nickname || t("history.unknownUser") })
+                        : t("history.givenTo", { group: tx.receiver?.group?.name || t("history.unknownStation") })}
+                      {" • "}
                       {formatTimeGMT7(tx.createdAt)}
                     </p>
                   </div>
-                  <span className="shrink-0 font-mono text-body font-black text-jungle-500">
-                    +{tx.amount.toLocaleString()}
+                  <span className={`shrink-0 font-mono text-body font-black ${tx.action === "receive" ? "text-jungle-500" : "text-pawp-500"}`}>
+                    {tx.action === "receive" ? "+" : "-"}{tx.amount.toLocaleString()}
                   </span>
                 </li>
               );

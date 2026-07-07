@@ -128,7 +128,7 @@ export default function Profile() {
       .then(({ user, token }) => {
         setProfile(user);
         if (token) {
-          useAuthStore.getState().setAuth(token, user as any);
+          useAuthStore.getState().setAuth(token, user);
         }
       })
       .catch((err: unknown) => {
@@ -175,7 +175,7 @@ export default function Profile() {
   const avatarBg = getAvatarBg(profile.role, groupName);
 
   return (
-    <main className="flex min-h-[calc(100dvh-4rem)] items-start justify-center px-4 pt-8 pb-32 md:items-center">
+    <main className="flex min-h-[calc(100dvh-4rem)] items-start justify-center px-4 pt-16 pb-32 md:items-center">
       <div className="w-full max-w-sm space-y-4">
         {/* SINGLE cohesive Candy Glassmorphism card */}
         <div className="flex flex-col overflow-hidden rounded-[32px] border-2 border-white/60 bg-white/40 shadow-cartoon backdrop-blur-md">
@@ -221,7 +221,7 @@ export default function Profile() {
                   {profile.points.toLocaleString()}
                 </p>
               </div>
-              {profile.role === "FRESHY" && (
+              {profile.rank !== null && (
                 <div className="flex flex-1 flex-col items-center justify-center rounded-2xl border border-white/40 bg-white/40 px-4 py-3 shadow-inner backdrop-blur-sm text-center">
                   <p className="text-caption font-semibold text-neutral-500">
                     {t("profile.rankLabel")}
@@ -256,8 +256,8 @@ export default function Profile() {
         </div>
 
         {/* Extras outside the unified card */}
-        {profile.role === "FRESHY" && (
-          <PointHistoryPreview transactions={profile.receivedPoints} />
+        {profile.role !== "ADMIN" && (
+          <PointHistoryPreview transactions={profile.history || []} />
         )}
 
         {profile.role !== "ADMIN" && (

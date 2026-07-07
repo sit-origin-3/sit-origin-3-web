@@ -32,7 +32,7 @@ const resources = {
         anonymousUser: "ใครกันน้า??",
         hiddenData: "ข้อมูลถูกซ่อน",
         anonymousWarning:
-          "กระดานผู้นำแบบไม่ระบุตัวตน — มีเพียงผู้ดูแลระบบเท่านั้นที่จะเห็นข้อมูลทั้งหมด",
+          "รายชื่ออันดับถูกปิดเป็นความลับอยู่ ไม่มีใครรู้นอกจากพี่ที่ดูแลระบบค้าบ",
         loading: "กำลังโหลดอันดับ...",
         offlineData: "การเชื่อมต่อขาดหาย กำลังแสดงข้อมูลล่าสุด",
         emptyPoints: "ยังไม่มีอันดับเลย",
@@ -41,7 +41,7 @@ const resources = {
         title: "โอนคะแนน",
         manualInputBtn: "กรอกรหัส",
         scanMoreBtn: "สแกนเพิ่ม",
-        transferNowBtn: "โอนทันที",
+        transferNowBtn: "โอนคะแนน",
         selectAmountPlaceholder: "0",
         amountLabel: "จำนวนคะแนน (ต่อคน)",
         confirmTransferBtn: "ยืนยันการโอน",
@@ -86,6 +86,14 @@ const resources = {
         emptyDesc: "แวะไปที่ฐานกิจกรรมเพื่อเริ่มสะสม!",
         emptyPoints: "น้อง ๆ ยังไม่มีแต้มเลยย",
       },
+      home: {
+        eventName: "ค่ายรับน้อง Zootopia 2026",
+        eventLocation: "มหาวิทยาลัยเทคโนโลยีพระจอมเกล้าธนบุรี",
+        eventDateTime: "15-17 สิงหาคม 2569",
+        freshyCount: "มีเฟรชชี่เข้าร่วมแล้ว {{count}} คน",
+        scheduleTitle: "ตารางกิจกรรม",
+        scheduleComingSoon: "ตารางกิจกรรมจะประกาศให้ทราบเร็วๆ นี้!",
+      },
       modals: {
         manualInputTitle: "กรอกรหัสผู้ใช้",
         manualInputHint: "เช่น FL72",
@@ -117,9 +125,9 @@ const resources = {
         action_UPDATE_CONFIG: "อัปเดตการตั้งค่า",
         actor: "ผู้กระทำ",
         target: "เป้าหมาย",
-        showingRange: "แสดงรายการที่ {{start}}-{{end}} จากทั้งหมด {{total}}",
+        showingRange: "รายการที่ {{start}}-{{end}} จาก {{total}}",
         showingRangeWithPage:
-          "หน้า {{page}} • แสดงรายการที่ {{start}}-{{end}} จากทั้งหมด {{total}}",
+          "หน้า {{page}} • รายการที่ {{start}}-{{end}} จาก {{total}}",
         searchTarget_ALL: "ทั้งหมด",
         searchTarget_FIRSTNAME: "ชื่อจริง",
         searchTarget_NICKNAME: "ชื่อเล่น",
@@ -194,7 +202,7 @@ const resources = {
         anonymousUser: "Anonymous",
         hiddenData: "Data Hidden",
         anonymousWarning:
-          "Anonymous Leaderboard — Only Admins can see full details.",
+          "The leaderboard is currently anonymous. Only the admins see the names",
         loading: "Loading rankings...",
         offlineData: "Connection lost. Showing latest data.",
         emptyPoints: "No rankings yet.",
@@ -203,7 +211,7 @@ const resources = {
         title: "Transfer Points",
         manualInputBtn: "Manual Input",
         scanMoreBtn: "Scan More",
-        transferNowBtn: "Transfer Now",
+        transferNowBtn: "Transfer",
         selectAmountPlaceholder: "0",
         amountLabel: "Points (per person)",
         confirmTransferBtn: "Confirm Transfer",
@@ -248,6 +256,14 @@ const resources = {
         emptyDesc: "Visit an activity station to start earning!",
         emptyPoints: "No points recorded yet!",
       },
+      home: {
+        eventName: "Zootopia Freshy Camp 2026",
+        eventLocation: "KMUTT Main Campus",
+        eventDateTime: "August 15-17, 2026",
+        freshyCount: "{{count}} Freshies Joined",
+        scheduleTitle: "Event Schedule",
+        scheduleComingSoon: "The schedule will be announced soon!",
+      },
       modals: {
         manualInputTitle: "Enter User Code",
         manualInputHint: "e.g. FL72",
@@ -264,7 +280,8 @@ const resources = {
         removeBtn: "Remove",
         amountError: "Please specify an amount",
         exceededLimit: "Exceeded point limit for code: {{code}}",
-        transferDisabled: "Point transfer is currently disabled by the administrator.",
+        transferDisabled:
+          "Point transfer is currently disabled by the administrator.",
       },
       adminDashboard: {
         title: "Admin Dashboard",

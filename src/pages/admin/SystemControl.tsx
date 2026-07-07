@@ -76,7 +76,9 @@ export default function SystemControl() {
         "Metadata",
       ];
       const rows = data.logs.map((log) => {
-        const localTime = new Date(log.createdAt).toLocaleString("en-GB", { timeZone: "Asia/Bangkok" });
+        const localTime = new Date(log.createdAt).toLocaleString("en-GB", {
+          timeZone: "Asia/Bangkok",
+        });
         return [
           log.id,
           localTime,
@@ -93,10 +95,8 @@ export default function SystemControl() {
       const csv = generateCsv(headers, rows);
       const dateStr = new Date().toISOString().split("T")[0];
       downloadCsv(`audits_export_${dateStr}.csv`, csv);
-      alert(t("adminSystem.exportSuccess"));
     } catch (error) {
       console.error(error);
-      alert(t("adminSystem.exportFail"));
     } finally {
       setIsExportingLogs(false);
     }

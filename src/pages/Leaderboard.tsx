@@ -257,7 +257,7 @@ export default function Leaderboard() {
   const rest = entries.slice(3);
 
   return (
-    <main className="mx-auto w-full max-w-lg px-4 pt-6 pb-32">
+    <main className="mx-auto w-full max-w-lg px-4 py-32">
       <div className="mb-5 flex items-center justify-between">
         <div className="flex items-center gap-2">
           <Trophy className="h-6 w-6 text-fox-500" />
@@ -269,7 +269,9 @@ export default function Leaderboard() {
           disabled={isRefreshing}
           className="flex h-[44px] w-[44px] items-center justify-center rounded-full border border-zpd-500/40 bg-white/40 text-zpd-600 shadow-cartoon backdrop-blur-md transition-all hover:bg-zpd-50 active:scale-95 disabled:opacity-50"
         >
-          <RefreshCw className={`h-5 w-5 ${isRefreshing ? "animate-spin" : ""}`} />
+          <RefreshCw
+            className={`h-5 w-5 ${isRefreshing ? "animate-spin" : ""}`}
+          />
         </button>
       </div>
 

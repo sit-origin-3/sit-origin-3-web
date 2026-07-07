@@ -31,8 +31,16 @@ export interface GivePointsResponse {
 }
 
 export async function getUserByCode(code: string): Promise<ReceiverProfile> {
-  const { data } = await api.get<ReceiverProfile>(`/users/code/${code}`);
-  return data;
+  const { data } = await api.get<
+    Omit<ReceiverProfile, "group"> & {
+      group: string | { id: string; name: string; nameAlt: string };
+    }
+  >(`/users/code/${code}`);
+
+  return {
+    ...data,
+    group: typeof data.group === "object" ? data.group.name : data.group,
+  };
 }
 
 export async function givePoints(
@@ -47,9 +55,7 @@ export interface AssignPointsPayload {
   amount: number;
 }
 
-export async function assignPoints(
-  payload: AssignPointsPayload,
-): Promise<any> {
+export async function assignPoints(payload: AssignPointsPayload): Promise<any> {
   const { data } = await api.post("/points/assign", payload);
   return data;
 }

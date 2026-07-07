@@ -19,7 +19,7 @@ export default function PointHistoryPreview({
   if (!transactions || transactions.length === 0) {
     return (
       <div className="mt-4 rounded-[32px] border-2 border-white/60 bg-white/20 p-6 text-center shadow-cartoon backdrop-blur-md">
-        <p className="text-body-lg font-bold text-neutral-500 drop-shadow-md">
+        <p className="text-body-lg font-bold text-neutral-500">
           {t("history.emptyPoints")}
         </p>
       </div>
@@ -45,25 +45,40 @@ export default function PointHistoryPreview({
                 <li
                   key={`${tx.createdAt}-${index}`}
                   className={`flex items-center justify-between rounded-2xl bg-white/50 p-3 backdrop-blur-sm transition-opacity ${
-                    isLastVisible ? "opacity-30 [mask-image:linear-gradient(to_bottom,black_20%,transparent_100%)]" : "opacity-100"
+                    isLastVisible
+                      ? "opacity-30 [mask-image:linear-gradient(to_bottom,black_20%,transparent_100%)]"
+                      : "opacity-100"
                   }`}
                 >
                   <div className="min-w-0 flex-1">
                     <p className="truncate text-body-lg font-bold text-zpd-900">
-                      {tx.action === "receive" 
+                      {tx.action === "receive"
                         ? tx.giver?.group?.name || t("history.unknownStation")
-                        : tx.receiver?.nickname || t("history.unknownUser")}
+                        : t("history.staffGaveTo", {
+                            giver: tx.giver?.nickname || t("history.unknownUser"),
+                            receiver: tx.receiver?.nickname || t("history.unknownUser"),
+                          })}
                     </p>
                     <p className="text-caption text-neutral-500">
                       {tx.action === "receive"
-                        ? t("history.receivedFrom", { name: tx.giver?.nickname || t("history.unknownUser") })
-                        : t("history.givenTo", { group: tx.receiver?.group?.name || t("history.unknownStation") })}
+                        ? t("history.receivedFrom", {
+                            name:
+                              tx.giver?.nickname || t("history.unknownUser"),
+                          })
+                        : t("history.givenTo", {
+                            group:
+                              tx.receiver?.group?.name ||
+                              t("history.unknownStation"),
+                          })}
                       {" • "}
                       {formatTimeGMT7(tx.createdAt)}
                     </p>
                   </div>
-                  <span className={`shrink-0 font-mono text-body font-black ${tx.action === "receive" ? "text-jungle-500" : "text-pawp-500"}`}>
-                    {tx.action === "receive" ? "+" : "-"}{tx.amount.toLocaleString()}
+                  <span
+                    className={`shrink-0 font-mono text-body font-black ${tx.action === "receive" ? "text-jungle-500" : "text-pawp-500"}`}
+                  >
+                    {tx.action === "receive" ? "+" : "-"}
+                    {tx.amount.toLocaleString()}
                   </span>
                 </li>
               );

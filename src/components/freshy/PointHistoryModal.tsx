@@ -1,12 +1,12 @@
-import { X, Clock, MapPin, Inbox } from "lucide-react";
-import type { ReceivedPoint } from "../../types/user";
+import { X, Clock, MapPin, Inbox, User } from "lucide-react";
+import type { TransactionHistory } from "../../types/user";
 import { formatTimeGMT7 } from "../../utils/date";
 import { useTranslation } from "react-i18next";
 
 interface PointHistoryModalProps {
   isOpen: boolean;
   onClose: () => void;
-  transactions: ReceivedPoint[];
+  transactions: TransactionHistory[];
 }
 
 export default function PointHistoryModal({
@@ -59,19 +59,31 @@ export default function PointHistoryModal({
               >
                 <div className="flex flex-col gap-1">
                   <div className="flex items-center gap-1.5 text-zpd-900">
-                    <MapPin className="h-4 w-4 text-zpd-500" />
+                    {tx.action === "receive" ? (
+                      <MapPin className="h-4 w-4 text-zpd-500" />
+                    ) : (
+                      <User className="h-4 w-4 text-pawp-500" />
+                    )}
                     <span className="text-body-lg font-bold">
-                      {tx.giver?.groupName || t("history.unknownStation")}
+                      {tx.action === "receive" 
+                        ? tx.giver?.group?.name || t("history.unknownStation")
+                        : tx.receiver?.nickname || t("history.unknownUser")}
                     </span>
                   </div>
                   <div className="flex items-center gap-1 text-caption text-neutral-500">
                     <Clock className="h-3 w-3" />
-                    <span>{formatTimeGMT7(tx.createdAt)}</span>
+                    <span>
+                      {tx.action === "receive"
+                        ? t("history.receivedFrom", { name: tx.giver?.nickname || t("history.unknownUser") })
+                        : t("history.givenTo", { group: tx.receiver?.group?.name || t("history.unknownStation") })}
+                      {" • "}
+                      {formatTimeGMT7(tx.createdAt)}
+                    </span>
                   </div>
                 </div>
                 <div className="flex shrink-0 flex-col items-end">
-                  <span className="font-mono text-h3 font-black text-jungle-500 drop-shadow-sm">
-                    +{tx.amount.toLocaleString()}
+                  <span className={`font-mono text-h3 font-black drop-shadow-sm ${tx.action === "receive" ? "text-jungle-500" : "text-pawp-500"}`}>
+                    {tx.action === "receive" ? "+" : "-"}{tx.amount.toLocaleString()}
                   </span>
                 </div>
               </li>

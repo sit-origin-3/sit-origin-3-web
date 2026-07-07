@@ -1,11 +1,7 @@
-export type UserRole = "admin" | "staff" | "freshy";
+import type { UserProfile } from "./user";
 
-export interface User {
-  id: string;
-  studentId: string;
-  displayName: string;
-  role: UserRole;
-}
+export type UserRole = "ADMIN" | "STAFF" | "FRESHY";
+export type User = UserProfile;
 
 export interface LoginCredentials {
   identifier: string;

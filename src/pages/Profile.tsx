@@ -18,6 +18,7 @@ import ConfirmModal from "../components/common/ConfirmModal";
 import PointHistoryPreview from "../components/freshy/PointHistoryPreview";
 import { getAvatarBg } from "../utils/avatar";
 import { useTranslation } from "react-i18next";
+import { useGroupName } from "../hooks/useGroupName";
 import type { UserProfile } from "../types/user";
 
 const ROLE_STYLES: Record<string, string> = {
@@ -103,8 +104,9 @@ function ProfileError({
 
 export default function Profile() {
   const { t } = useTranslation();
-  const navigate = useNavigate();
+  const getGroupName = useGroupName();
   const clearAuth = useAuthStore((s) => s.clearAuth);
+  const navigate = useNavigate();
 
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -163,8 +165,8 @@ export default function Profile() {
   }
 
   const groupId = profile.group?.id || String(profile.group || null);
-  const groupName = profile.group?.name || String(profile.group || "-");
-  const actualGroup = groupId === null ? "-" : `${groupId}: ${groupName}`;
+  const groupName = getGroupName(profile.group as any) || "-";
+  const actualGroup = groupId === null || groupId === "-" ? "-" : `${groupId}: ${groupName}`;
   const avatarBg = getAvatarBg(profile.role, profile.session, groupName);
 
   return (

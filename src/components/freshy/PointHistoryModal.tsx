@@ -2,6 +2,7 @@ import { X, Clock, MapPin, Inbox, User } from "lucide-react";
 import type { TransactionHistory } from "../../types/user";
 import { formatTimeGMT7 } from "../../utils/date";
 import { useTranslation } from "react-i18next";
+import { useGroupName } from "../../hooks/useGroupName";
 
 interface PointHistoryModalProps {
   isOpen: boolean;
@@ -15,6 +16,7 @@ export default function PointHistoryModal({
   transactions,
 }: PointHistoryModalProps) {
   const { t } = useTranslation();
+  const getGroupName = useGroupName();
 
   if (!isOpen) return null;
 
@@ -68,7 +70,7 @@ export default function PointHistoryModal({
                       )}
                       <span className="text-body-lg font-bold">
                         {tx.action === "receive"
-                          ? tx.giver?.group?.name || t("history.unknownStation")
+                          ? getGroupName(tx.giver?.group as any) || t("history.unknownStation")
                           : t("history.staffGaveTo", {
                               giver: tx.giver?.nickname || t("history.unknownUser"),
                               receiver: tx.receiver?.nickname || t("history.unknownUser"),
@@ -85,7 +87,7 @@ export default function PointHistoryModal({
                             })
                           : t("history.givenTo", {
                               group:
-                                tx.receiver?.group?.name ||
+                                getGroupName(tx.receiver?.group as any) ||
                                 t("history.unknownStation"),
                             })}
                         {" • "}

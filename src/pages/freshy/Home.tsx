@@ -4,6 +4,7 @@ import originLogo from "../../assets/origin_logo.png";
 import { MapPin, CalendarDays, Users } from "lucide-react";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
+import AnimatedNumber from "../../components/ui/AnimatedNumber";
 
 gsap.registerPlugin(useGSAP);
 
@@ -28,18 +29,18 @@ export default function Home() {
   return (
     <main
       ref={container}
-      className="mx-auto flex min-h-dvh w-full max-w-lg flex-col px-4 pt-10 pb-32 overflow-hidden"
+      className="mx-auto flex min-h-dvh w-full max-w-lg flex-col px-4 pt-16 pb-32 overflow-hidden"
     >
       {/* Hero Section */}
       <section className="mb-8 flex flex-col items-center text-center">
-        <div className="gsap-item flex h-32 w-32 items-center justify-center rounded-full shadow-hard overflow-hidden bg-white/80 p-2 backdrop-blur-sm border-2 border-white/60">
+        <div className="gsap-item flex h-32 w-32 items-center justify-center rounded-full shadow-hard overflow-hidden bg-white/80 mb-4 p-2 backdrop-blur-sm border-2 border-white/60">
           <img
             src={originLogo}
             alt="SIT Origin"
             className="h-full w-full object-contain drop-shadow-sm"
           />
         </div>
-        <h1 className="gsap-item mb-4 text-h1 text-zpd-900 drop-shadow-sm">
+        <h1 className="gsap-item mb-8 text-h1 text-zpd-900 drop-shadow-sm">
           {t("home.eventName")}
         </h1>
         <div className="gsap-item flex flex-col gap-2 rounded-2xl border-2 border-white/60 bg-white/30 p-4 shadow-sm backdrop-blur-md">
@@ -60,15 +61,28 @@ export default function Home() {
           <div className="gsap-item mb-3 flex h-16 w-16 items-center justify-center rounded-full bg-jungle-500/20">
             <Users className="h-8 w-8 text-jungle-500" />
           </div>
-          <h2 className="gsap-item text-h2 text-zpd-900">
-            {t("home.freshyCount", { count: "500+" })}
+          <h2 className="gsap-item text-h2 text-zpd-900 flex items-center justify-center gap-1.5">
+            {t("home.freshyCount", { count: "___COUNT___" })
+              .split("___COUNT___")
+              .map((part, i, arr) => (
+                <span key={i}>
+                  {part}
+                  {i < arr.length - 1 && (
+                    <span>
+                      <AnimatedNumber value={500} />+
+                    </span>
+                  )}
+                </span>
+              ))}
           </h2>
         </div>
       </section>
 
       {/* Schedule Placeholder Section */}
       <section className="flex flex-col gap-4">
-        <h2 className="gsap-item px-2 text-h2 text-zpd-900">{t("home.scheduleTitle")}</h2>
+        <h2 className="gsap-item px-2 text-h2 text-zpd-900">
+          {t("home.scheduleTitle")}
+        </h2>
         <div className="gsap-item flex min-h-[200px] flex-col items-center justify-center rounded-[32px] border-2 border-white/60 bg-white/30 p-8 text-center shadow-cartoon backdrop-blur-md">
           <CalendarDays className="mb-4 h-12 w-12 text-neutral-400 opacity-50" />
           <p className="text-h3 text-neutral-500 opacity-70">

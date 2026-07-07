@@ -4,6 +4,7 @@ import { X, User, Hash, Shield, Star, Save } from "lucide-react";
 import type { UserProfile } from "../../types/user";
 import { assignPoints } from "../../services/pointsService";
 import ConfirmModal from "../common/ConfirmModal";
+import { getAvatarBg } from "../../utils/avatar";
 
 interface UserEditModalProps {
   isOpen: boolean;
@@ -72,7 +73,7 @@ export default function UserEditModal({
 
         <div className="flex flex-col gap-4 p-6">
           <div className="flex items-center gap-4 rounded-2xl border border-white/40 bg-white/30 p-4">
-            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-zpd-500/20 text-zpd-700">
+            <div className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-full ${getAvatarBg(user.role, user.session, user.group?.name)} text-white shadow-sm`}>
               <User className="h-6 w-6" />
             </div>
             <div>

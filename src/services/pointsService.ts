@@ -14,6 +14,7 @@ export interface ReceiverProfile {
   nickname: string;
   userCode: string;
   role: "ADMIN" | "STAFF" | "FRESHY";
+  session?: "A" | "B" | string | null;
   points: number;
   group: string;
 }

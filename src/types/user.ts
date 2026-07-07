@@ -25,6 +25,7 @@ export interface UserProfile {
   nickname: string;
   userCode: string;
   role: "ADMIN" | "STAFF" | "FRESHY";
+  session?: "A" | "B" | string | null;
   major: string;
   points: number;
   group: UserGroup;

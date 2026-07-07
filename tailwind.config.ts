@@ -68,6 +68,18 @@ const jungle: ColorShades = {
   500: "#10b981",
 };
 
+const berry: ColorShades = {
+  100: "#dbeafe",
+  200: "#bfdbfe",
+  300: "#93c5fd",
+  400: "#60a5fa",
+  500: "#3b82f6",
+  600: "#2563eb",
+  700: "#1d4ed8",
+  800: "#1e40af",
+  900: "#1e3a8a",
+};
+
 export default {
   theme: {
     extend: {
@@ -77,6 +89,7 @@ export default {
         neutral: withOpacityVariants(neutral),
         pawp: withOpacityVariants(pawp),
         jungle: withOpacityVariants(jungle),
+        berry: withOpacityVariants(berry),
       },
       fontFamily: {
         sans: ["Lato", "Noto Sans Thai", "sans-serif"],

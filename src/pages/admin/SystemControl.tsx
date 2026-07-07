@@ -11,7 +11,7 @@ export default function SystemControl() {
   const [activeTab, setActiveTab] = useState<Tab>("CONFIGS");
 
   return (
-    <main className="mx-auto flex min-h-[calc(100dvh-4rem)] w-full max-w-5xl flex-col px-4 pt-8 pb-32">
+    <main className="mx-auto flex min-h-[calc(100dvh-4rem)] w-full max-w-5xl flex-col px-4 pt-16 pb-32">
       <header className="mb-8 text-center sm:text-left">
         <h1 className="text-h1 text-zpd-900">{t("adminSystem.title")}</h1>
       </header>
@@ -27,10 +27,14 @@ export default function SystemControl() {
               : "text-zpd-700 hover:bg-white/60 hover:text-zpd-900"
           }`}
         >
-          <Settings className={`h-6 w-6 ${activeTab === "CONFIGS" ? "animate-spin-slow" : ""}`} />
-          <span className="text-body-lg font-bold">{t("adminSystem.tabConfigs")}</span>
+          <Settings
+            className={`h-6 w-6 ${activeTab === "CONFIGS" ? "animate-spin-slow" : ""}`}
+          />
+          <span className="text-body-lg font-bold">
+            {t("adminSystem.tabConfigs")}
+          </span>
         </button>
-        
+
         <button
           type="button"
           onClick={() => setActiveTab("USERS")}
@@ -41,7 +45,9 @@ export default function SystemControl() {
           }`}
         >
           <Users className="h-6 w-6" />
-          <span className="text-body-lg font-bold">{t("adminSystem.tabUsers")}</span>
+          <span className="text-body-lg font-bold">
+            {t("adminSystem.tabUsers")}
+          </span>
         </button>
       </div>
 

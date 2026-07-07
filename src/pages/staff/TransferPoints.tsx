@@ -25,6 +25,7 @@ import {
 import ManualCodeModal from "../../components/staff/ManualCodeModal";
 import TransferBottomSheet from "../../components/staff/TransferBottomSheet";
 import ConfirmModal from "../../components/common/ConfirmModal";
+import { getAvatarBg } from "../../utils/avatar";
 import { useTranslation } from "react-i18next";
 
 type Phase = "SCANNING" | "SCANNED" | "RESULTS";
@@ -321,7 +322,7 @@ export default function TransferPoints() {
         <div className="absolute inset-0 z-30 flex flex-col items-center justify-center bg-black/60 p-4 backdrop-blur-sm">
           <div className="w-full max-w-sm rounded-[32px] border-2 border-white/60 bg-white/20 p-6 shadow-cartoon backdrop-blur-xl">
             <div className="flex flex-col items-center gap-3">
-              <div className="flex h-16 w-16 items-center justify-center rounded-full border-4 border-white/70 bg-zpd-500 shadow-hard">
+              <div className={`flex h-16 w-16 items-center justify-center rounded-full border-4 border-white/70 ${getAvatarBg(currentReceiver.role, currentReceiver.session, currentReceiver.group)} shadow-hard`}>
                 <User className="h-8 w-8 text-white" strokeWidth={2} />
               </div>
               <div className="text-center text-white">

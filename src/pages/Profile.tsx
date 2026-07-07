@@ -16,6 +16,7 @@ import { logout as logoutApi } from "../services/authService";
 import { useAuthStore } from "../store/useAuthStore";
 import ConfirmModal from "../components/common/ConfirmModal";
 import PointHistoryPreview from "../components/freshy/PointHistoryPreview";
+import { getAvatarBg } from "../utils/avatar";
 import { useTranslation } from "react-i18next";
 import type { UserProfile } from "../types/user";
 
@@ -98,17 +99,7 @@ function ProfileError({
   );
 }
 
-const getAvatarBg = (role: string, groupName: string) => {
-  const upperRole = role.toUpperCase();
-  if (upperRole === "ADMIN") return "bg-neutral-900";
-  if (upperRole === "STAFF") return "bg-jungle-500";
-
-  const upperGroup = groupName.toUpperCase();
-  if (upperGroup.startsWith("A")) return "bg-zpd-500";
-  if (upperGroup.startsWith("B")) return "bg-pawp-500";
-
-  return "bg-zpd-500"; // Fallback
-};
+// getAvatarBg has been moved to src/utils/avatar.ts
 
 export default function Profile() {
   const { t } = useTranslation();
@@ -171,8 +162,10 @@ export default function Profile() {
     );
   }
 
+  const groupId = profile.group?.id || String(profile.group || null);
   const groupName = profile.group?.name || String(profile.group || "-");
-  const avatarBg = getAvatarBg(profile.role, groupName);
+  const actualGroup = groupId === null ? "-" : `${groupId}: ${groupName}`;
+  const avatarBg = getAvatarBg(profile.role, profile.session, groupName);
 
   return (
     <main className="flex min-h-[calc(100dvh-4rem)] items-start justify-center px-4 pt-16 pb-32 md:items-center">
@@ -206,7 +199,7 @@ export default function Profile() {
               <p className="text-caption font-semibold uppercase tracking-wider text-neutral-500">
                 {t("profile.groupLabel")}
               </p>
-              <p className="text-h2 font-black text-zpd-900">{groupName}</p>
+              <p className="text-h2 font-black text-zpd-900">{actualGroup}</p>
             </div>
 
             {/* ROW 2: Points & Rank */}

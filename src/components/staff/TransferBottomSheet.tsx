@@ -12,6 +12,7 @@ import {
 import type { ReceiverProfile } from "../../services/pointsService";
 import { givePoints } from "../../services/pointsService";
 import ConfirmModal from "../common/ConfirmModal";
+import { getAvatarBg } from "../../utils/avatar";
 import { useTranslation } from "react-i18next";
 
 interface TransferBottomSheetProps {
@@ -68,14 +69,22 @@ export default function TransferBottomSheet({
         total: receivers.length,
       });
     } catch (err: any) {
-      if (axios.isAxiosError(err) && err.response?.status === 400) {
-        const backendError = err.response?.data?.error;
-        if (typeof backendError === "string" && backendError.includes("Exceeded limit for:")) {
-          const code = backendError.split(": ")[1]?.trim();
-          if (code) {
-            setError(t("modals.exceededLimit", { code }));
-            setIsSending(false);
-            return;
+      if (axios.isAxiosError(err)) {
+        if (err.response?.status === 403) {
+          setError(t("modals.transferDisabled"));
+          setIsSending(false);
+          return;
+        }
+        
+        if (err.response?.status === 400) {
+          const backendError = err.response?.data?.error;
+          if (typeof backendError === "string" && backendError.includes("Exceeded limit for:")) {
+            const code = backendError.split(": ")[1]?.trim();
+            if (code) {
+              setError(t("modals.exceededLimit", { code }));
+              setIsSending(false);
+              return;
+            }
           }
         }
       }
@@ -121,8 +130,8 @@ export default function TransferBottomSheet({
                 className="flex items-center justify-between rounded-2xl border border-white/40 bg-white/50 p-3 shadow-sm"
               >
                 <div className="flex items-center gap-3 overflow-hidden">
-                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-zpd-500/10">
-                    <User className="h-5 w-5 text-zpd-600" />
+                  <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full ${getAvatarBg(r.role, r.session, r.group)} text-white`}>
+                    <User className="h-5 w-5" />
                   </div>
                   <div className="min-w-0">
                     <p className="truncate text-body font-bold text-zpd-900">

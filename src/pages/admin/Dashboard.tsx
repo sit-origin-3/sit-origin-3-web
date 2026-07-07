@@ -7,16 +7,19 @@ import {
   ChevronRight,
   Activity,
   ArrowRight,
-  User,
   Loader2,
   CalendarDays,
-  Target,
+  LogIn,
+  Settings,
+  ArrowRightLeft,
+  Coins,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { getAudits, type AuditLog } from "../../services/auditService";
 import { logout as logoutApi } from "../../services/authService";
 import { useAuthStore } from "../../store/useAuthStore";
 import ConfirmModal from "../../components/common/ConfirmModal";
+import AuditDetailModal from "../../components/admin/AuditDetailModal";
 
 const ACTIONS = [
   "",
@@ -43,6 +46,8 @@ export default function Dashboard() {
 
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
+
+  const [selectedLog, setSelectedLog] = useState<AuditLog | null>(null);
 
   const fetchLogs = useCallback(async () => {
     setIsLoading(true);
@@ -96,6 +101,53 @@ export default function Dashboard() {
   }, [logs, searchQuery]);
 
   const totalPages = Math.ceil(total / limit);
+  const startItem = total === 0 ? 0 : (page - 1) * limit + 1;
+  const endItem = Math.min(page * limit, total);
+
+  const getActionIcon = (action: string) => {
+    switch (action.toUpperCase()) {
+      case "LOGIN":
+        return <LogIn className="h-5 w-5" />;
+      case "LOGOUT":
+        return <LogOut className="h-5 w-5" />;
+      case "GIVE_POINTS":
+        return <ArrowRightLeft className="h-5 w-5" />;
+      case "UPDATE_POINT":
+        return <Coins className="h-5 w-5" />;
+      case "UPDATE_CONFIG":
+        return <Settings className="h-5 w-5" />;
+      default:
+        return <Activity className="h-5 w-5" />;
+    }
+  };
+
+  const PaginationControls = () => (
+    <div className="flex items-center gap-4">
+      <button
+        type="button"
+        disabled={page <= 1 || isLoading}
+        onClick={() => setPage((p) => p - 1)}
+        className="flex h-10 w-10 items-center justify-center rounded-xl bg-white/60 text-zpd-700 shadow-sm transition-all hover:bg-white disabled:opacity-50 disabled:hover:bg-white/60"
+      >
+        <ChevronLeft className="h-5 w-5" />
+      </button>
+      <span className="text-caption font-bold text-neutral-500 whitespace-nowrap">
+        {t("adminDashboard.showingRange", {
+          start: startItem,
+          end: endItem,
+          total,
+        })}
+      </span>
+      <button
+        type="button"
+        disabled={page >= totalPages || isLoading}
+        onClick={() => setPage((p) => p + 1)}
+        className="flex h-10 w-10 items-center justify-center rounded-xl bg-white/60 text-zpd-700 shadow-sm transition-all hover:bg-white disabled:opacity-50 disabled:hover:bg-white/60"
+      >
+        <ChevronRight className="h-5 w-5" />
+      </button>
+    </div>
+  );
 
   return (
     <main className="mx-auto flex min-h-[calc(100dvh-4rem)] w-full max-w-4xl flex-col px-4 pt-8 pb-32">
@@ -140,6 +192,13 @@ export default function Dashboard() {
           </select>
         </div>
       </div>
+      
+      {/* Top Pagination */}
+      {!isLoading && total > 0 && (
+        <div className="mb-4 flex justify-end">
+          <PaginationControls />
+        </div>
+      )}
 
       {/* Logs List */}
       <div className="flex-1 overflow-hidden rounded-[32px] border-2 border-white/60 bg-white/40 shadow-cartoon backdrop-blur-md flex flex-col">
@@ -159,38 +218,31 @@ export default function Dashboard() {
             {filteredLogs.map((log) => (
               <div
                 key={log.id}
-                className="flex flex-col gap-3 rounded-2xl border border-white/50 bg-white/60 p-4 shadow-sm backdrop-blur-sm sm:flex-row sm:items-center sm:justify-between"
+                onClick={() => setSelectedLog(log)}
+                className="group flex cursor-pointer flex-col gap-3 rounded-2xl border border-white/50 bg-white/60 p-4 shadow-sm backdrop-blur-sm transition-all hover:-translate-y-0.5 hover:bg-white hover:shadow-md sm:flex-row sm:items-center sm:justify-between"
               >
-                <div className="flex items-center gap-3">
-                  <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-zpd-500/20 text-zpd-700">
-                    <Activity className="h-6 w-6" />
+                <div className="flex items-center gap-4">
+                  <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-zpd-500/20 text-zpd-700 transition-colors group-hover:bg-zpd-500/30">
+                    {getActionIcon(log.action)}
                   </div>
                   <div>
-                    <span className="inline-block rounded-full bg-zpd-500/10 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-zpd-700 border border-zpd-500/20 mb-1">
-                      {t(`adminDashboard.action_${log.action}` as any) ||
-                        log.action}
-                    </span>
-                    <div className="flex items-center gap-1.5 text-body font-medium text-zpd-900">
-                      <User className="h-4 w-4 text-neutral-400" />
-                      <span>{log.actor.userCode}</span>
-                      <span className="text-neutral-500 hidden sm:inline">
-                        ({log.actor.firstname})
-                      </span>
+                    <div className="flex items-center gap-2 text-body-lg font-bold text-zpd-900">
+                      <span>{log.actor.nickname}</span>
                       {log.target && (
                         <>
-                          <ArrowRight className="mx-1 h-4 w-4 text-neutral-300" />
-                          <Target className="h-4 w-4 text-neutral-400" />
-                          <span>{log.target.userCode}</span>
-                          <span className="text-neutral-500 hidden sm:inline">
-                            ({log.target.firstname})
-                          </span>
+                          <ArrowRight className="h-4 w-4 text-neutral-400" />
+                          <span>{log.target.nickname}</span>
                         </>
                       )}
                     </div>
+                    <span className="mt-1 inline-block text-caption font-medium text-neutral-500">
+                      {t(`adminDashboard.action_${log.action}` as any) ||
+                        log.action}
+                    </span>
                   </div>
                 </div>
 
-                <div className="flex items-center justify-between sm:flex-col sm:items-end sm:gap-1 border-t border-white/40 pt-3 sm:border-0 sm:pt-0">
+                <div className="flex items-center justify-between border-t border-white/40 pt-3 sm:border-0 sm:flex-col sm:items-end sm:gap-1 sm:pt-0">
                   <div className="flex items-center gap-1 text-caption text-neutral-500">
                     <CalendarDays className="h-3.5 w-3.5" />
                     {new Date(log.createdAt).toLocaleString("en-GB", {
@@ -215,30 +267,10 @@ export default function Dashboard() {
           </div>
         )}
 
-        {/* Pagination */}
+        {/* Bottom Pagination */}
         {!isLoading && totalPages > 1 && (
-          <div className="flex items-center justify-between border-t border-white/40 bg-white/30 px-6 py-4">
-            <button
-              type="button"
-              disabled={page <= 1}
-              onClick={() => setPage((p) => p - 1)}
-              className="flex items-center gap-1 rounded-xl bg-white/60 px-4 py-2 text-body font-bold text-zpd-700 shadow-sm transition-all hover:bg-white disabled:opacity-50 disabled:hover:bg-white/60"
-            >
-              <ChevronLeft className="h-5 w-5" />
-              {t("adminDashboard.prevPage")}
-            </button>
-            <span className="font-mono text-body font-bold text-neutral-500">
-              {page} / {totalPages}
-            </span>
-            <button
-              type="button"
-              disabled={page >= totalPages}
-              onClick={() => setPage((p) => p + 1)}
-              className="flex items-center gap-1 rounded-xl bg-white/60 px-4 py-2 text-body font-bold text-zpd-700 shadow-sm transition-all hover:bg-white disabled:opacity-50 disabled:hover:bg-white/60"
-            >
-              {t("adminDashboard.nextPage")}
-              <ChevronRight className="h-5 w-5" />
-            </button>
+          <div className="flex items-center justify-between border-t border-white/40 bg-white/30 px-6 py-4 sm:justify-end">
+            <PaginationControls />
           </div>
         )}
       </div>
@@ -252,6 +284,12 @@ export default function Dashboard() {
         description={t("profile.logoutConfirmDesc")}
         confirmLabel={t("common.logout")}
         variant="destructive"
+      />
+
+      <AuditDetailModal
+        isOpen={!!selectedLog}
+        onClose={() => setSelectedLog(null)}
+        log={selectedLog}
       />
     </main>
   );

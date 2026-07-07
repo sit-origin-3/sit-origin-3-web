@@ -1,3 +1,4 @@
+import { createPortal } from "react-dom";
 import { X, Clock, MapPin, Inbox, User } from "lucide-react";
 import type { TransactionHistory } from "../../types/user";
 import { formatTimeGMT7 } from "../../utils/date";
@@ -20,7 +21,7 @@ export default function PointHistoryModal({
 
   if (!isOpen) return null;
 
-  return (
+  return createPortal(
     <div
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 px-4 backdrop-blur-sm"
       onClick={onClose}
@@ -109,6 +110,7 @@ export default function PointHistoryModal({
           )}
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }

@@ -247,7 +247,7 @@ const resources = {
         logoutConfirmDesc: "Are you sure you want to logout?",
         pointHistoryTitle: "Recent History",
         easterEggBounty:
-          "BOUNTY HUNT: Spot P'Hope (IT), P'T้ree (IT), or P'Tan (IT) in the wild! Catch 'em (gently) for {{points}} juicy points!!",
+          "BOUNTY HUNT: Spot P'Hope (IT), P'Three (IT), or P'Tan (IT) in the wild! Catch 'em (gently) for {{points}} juicy points!!",
       },
       history: {
         title: "Point History",

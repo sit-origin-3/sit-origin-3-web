@@ -22,6 +22,7 @@ import { useGroupName } from "../hooks/useGroupName";
 import type { UserProfile } from "../types/user";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
+import AnimatedNumber from "../components/ui/AnimatedNumber";
 
 gsap.registerPlugin(useGSAP);
 
@@ -290,7 +291,7 @@ export default function Profile() {
                     : t("profile.remainingGroupPoints")}
                 </p>
                 <p className="font-mono text-h3 font-black text-fox-500">
-                  {profile.points.toLocaleString()}
+                  <AnimatedNumber value={profile.points} />
                 </p>
               </div>
               {profile.rank !== null && (

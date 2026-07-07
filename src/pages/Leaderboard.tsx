@@ -7,6 +7,8 @@ import { useAuthStore } from "../store/useAuthStore";
 import { useSmartRefresh } from "../hooks/useSmartRefresh";
 import { useGroupName } from "../hooks/useGroupName";
 import { useTranslation } from "react-i18next";
+import { useGSAP } from "@gsap/react";
+import AnimatedNumber from "../components/ui/AnimatedNumber";
 import type { LeaderboardEntry } from "../types/leaderboard";
 
 gsap.registerPlugin(Flip);
@@ -92,7 +94,7 @@ function PodiumCard({
       <div className="flex shrink-0 items-center gap-1">
         <Star className="h-4 w-4 text-fox-500" fill="currentColor" />
         <span className="font-mono text-body-lg font-bold text-fox-500">
-          {entry.points.toLocaleString()}
+          <AnimatedNumber value={entry.points} />
         </span>
       </div>
     </div>
@@ -137,7 +139,7 @@ function RankRow({
       <div className="flex shrink-0 items-center gap-1">
         <Star className="h-3.5 w-3.5 text-fox-400" fill="currentColor" />
         <span className="font-mono text-body font-bold text-fox-500">
-          {entry.points.toLocaleString()}
+          <AnimatedNumber value={entry.points} />
         </span>
       </div>
     </div>
@@ -210,6 +212,18 @@ export default function Leaderboard() {
     fetchLogs();
   }, [fetchLogs]);
 
+  useGSAP(() => {
+    if (!isLoading && entries.length > 0) {
+      gsap.from(".gsap-leaderboard-item", {
+        y: 15,
+        opacity: 0,
+        duration: 0.6,
+        stagger: 0.05,
+        ease: "power3.out",
+      });
+    }
+  }, { scope: listRef, dependencies: [isLoading] });
+
   if (isLoading) {
     return (
       <main className="flex min-h-[calc(100dvh-6rem)] items-center justify-center px-4 py-8">
@@ -275,7 +289,7 @@ export default function Leaderboard() {
         {podium.map((entry) => {
           const key = entry.id ? `user-${entry.id}` : `rank-${entry.rank}`;
           return (
-            <div key={key} data-flip-id={`lb-${key}`}>
+            <div key={key} data-flip-id={`lb-${key}`} className="gsap-leaderboard-item">
               <PodiumCard entry={entry} showLeaderboard={showLeaderboard} />
             </div>
           );
@@ -290,7 +304,7 @@ export default function Leaderboard() {
         {rest.map((entry) => {
           const key = entry.id ? `user-${entry.id}` : `rank-${entry.rank}`;
           return (
-            <div key={key} data-flip-id={`lb-${key}`}>
+            <div key={key} data-flip-id={`lb-${key}`} className="gsap-leaderboard-item">
               <RankRow entry={entry} showLeaderboard={showLeaderboard} />
             </div>
           );

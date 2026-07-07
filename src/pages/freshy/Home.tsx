@@ -1,13 +1,30 @@
+import { useRef } from "react";
 import { useTranslation } from "react-i18next";
 import { PartyPopper, MapPin, CalendarDays, Users } from "lucide-react";
+import gsap from "gsap";
+import { useGSAP } from "@gsap/react";
+
+gsap.registerPlugin(useGSAP);
 
 export default function Home() {
   const { t } = useTranslation();
+  const container = useRef<HTMLElement>(null);
+
+  useGSAP(() => {
+    gsap.from(".gsap-stagger", {
+      y: 40,
+      opacity: 0,
+      scale: 0.95,
+      duration: 0.6,
+      stagger: 0.1,
+      ease: "back.out(1.4)",
+    });
+  }, { scope: container });
 
   return (
-    <main className="mx-auto flex min-h-dvh w-full max-w-lg flex-col px-4 pt-10 pb-32">
+    <main ref={container} className="mx-auto flex min-h-dvh w-full max-w-lg flex-col px-4 pt-10 pb-32 overflow-hidden">
       {/* Hero Section */}
-      <section className="mb-8 flex flex-col items-center text-center">
+      <section className="gsap-stagger mb-8 flex flex-col items-center text-center">
         <div className="mb-6 flex h-28 w-28 items-center justify-center rounded-full border-4 border-white/60 bg-white/40 shadow-cartoon backdrop-blur-xl">
           <PartyPopper className="h-14 w-14 text-fox-500 drop-shadow-md" strokeWidth={2} />
         </div>
@@ -27,7 +44,7 @@ export default function Home() {
       </section>
 
       {/* Stats Section */}
-      <section className="mb-8">
+      <section className="gsap-stagger mb-8">
         <div className="flex flex-col items-center justify-center rounded-[32px] border-2 border-white/60 bg-white/40 p-8 text-center shadow-cartoon backdrop-blur-lg">
           <div className="mb-3 flex h-16 w-16 items-center justify-center rounded-full bg-jungle-500/20">
             <Users className="h-8 w-8 text-jungle-500" />
@@ -39,7 +56,7 @@ export default function Home() {
       </section>
 
       {/* Schedule Placeholder Section */}
-      <section className="flex flex-col gap-4">
+      <section className="gsap-stagger flex flex-col gap-4">
         <h2 className="px-2 text-h2 text-zpd-900">{t("home.scheduleTitle")}</h2>
         <div className="flex min-h-[200px] flex-col items-center justify-center rounded-[32px] border-2 border-white/60 bg-white/30 p-8 text-center shadow-cartoon backdrop-blur-md">
           <CalendarDays className="mb-4 h-12 w-12 text-neutral-400 opacity-50" />

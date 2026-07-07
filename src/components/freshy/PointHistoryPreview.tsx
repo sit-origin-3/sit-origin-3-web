@@ -1,10 +1,14 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { History, ListVideo, ChevronRight } from "lucide-react";
 import type { TransactionHistory } from "../../types/user";
 import { formatTimeGMT7 } from "../../utils/date";
 import PointHistoryModal from "./PointHistoryModal";
 import { useTranslation } from "react-i18next";
 import { useGroupName } from "../../hooks/useGroupName";
+import gsap from "gsap";
+import { useGSAP } from "@gsap/react";
+
+gsap.registerPlugin(useGSAP);
 
 interface PointHistoryPreviewProps {
   transactions: TransactionHistory[];
@@ -16,6 +20,19 @@ export default function PointHistoryPreview({
   const { t } = useTranslation();
   const getGroupName = useGroupName();
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  useGSAP(() => {
+    if (transactions && transactions.length > 0) {
+      gsap.from(".gsap-history-item", {
+        x: -20,
+        opacity: 0,
+        duration: 0.4,
+        stagger: 0.08,
+        ease: "power2.out",
+      });
+    }
+  }, { scope: containerRef, dependencies: [transactions] });
 
   // If no transactions, we can hide the preview block entirely or show a mini empty state
   if (!transactions || transactions.length === 0) {
@@ -32,7 +49,7 @@ export default function PointHistoryPreview({
   const previewItems = transactions.slice(0, 4);
 
   return (
-    <>
+    <div ref={containerRef}>
       <div className="mt-4 rounded-[32px] border-2 border-white/60 bg-white/40 p-6 shadow-cartoon backdrop-blur-lg">
         <div className="mb-4 flex items-center gap-2 text-zpd-900">
           <History className="h-5 w-5 text-zpd-500" />
@@ -46,7 +63,7 @@ export default function PointHistoryPreview({
               return (
                 <li
                   key={`${tx.createdAt}-${index}`}
-                  className={`flex items-center justify-between rounded-2xl bg-white/50 p-3 backdrop-blur-sm transition-opacity ${
+                  className={`gsap-history-item flex items-center justify-between rounded-2xl bg-white/50 p-3 backdrop-blur-sm transition-opacity ${
                     isLastVisible
                       ? "opacity-30 [mask-image:linear-gradient(to_bottom,black_20%,transparent_100%)]"
                       : "opacity-100"
@@ -104,6 +121,6 @@ export default function PointHistoryPreview({
         onClose={() => setIsModalOpen(false)}
         transactions={transactions}
       />
-    </>
+    </div>
   );
 }

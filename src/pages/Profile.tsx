@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { AxiosError } from "axios";
 import { QRCodeSVG } from "qrcode.react";
@@ -20,6 +20,10 @@ import { getAvatarBg } from "../utils/avatar";
 import { useTranslation } from "react-i18next";
 import { useGroupName } from "../hooks/useGroupName";
 import type { UserProfile } from "../types/user";
+import gsap from "gsap";
+import { useGSAP } from "@gsap/react";
+
+gsap.registerPlugin(useGSAP);
 
 const ROLE_STYLES: Record<string, string> = {
   ADMIN: "bg-neutral-900/10 text-neutral-800 border-neutral-900/20",
@@ -114,6 +118,8 @@ export default function Profile() {
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   const [easterEgg, setEasterEgg] = useState<string | null>(null);
+  const containerRef = useRef<HTMLElement>(null);
+  const easterEggRef = useRef<HTMLHeadingElement>(null);
 
   useEffect(() => {
     if (profile?.role === "FRESHY" && !easterEgg) {
@@ -124,6 +130,31 @@ export default function Profile() {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [profile?.role]);
+
+  useGSAP(() => {
+    if (profile) {
+      gsap.from(".gsap-profile-stagger", {
+        y: 40,
+        opacity: 0,
+        scale: 0.95,
+        duration: 0.6,
+        stagger: 0.1,
+        ease: "back.out(1.4)",
+      });
+    }
+  }, { scope: containerRef, dependencies: [profile] });
+
+  useGSAP(() => {
+    if (easterEgg && easterEggRef.current) {
+      gsap.to(easterEggRef.current, {
+        y: -10,
+        yoyo: true,
+        repeat: 3,
+        duration: 0.3,
+        ease: "sine.inOut"
+      });
+    }
+  }, { scope: containerRef, dependencies: [easterEgg] });
 
   const fetchProfile = useCallback(() => {
     setIsLoading(true);
@@ -181,21 +212,21 @@ export default function Profile() {
   const avatarBg = getAvatarBg(profile.role, profile.session, groupName);
 
   return (
-    <main className="flex min-h-[calc(100dvh-4rem)] items-start justify-center px-4 pt-16 pb-32 md:items-center">
+    <main ref={containerRef} className="flex min-h-[calc(100dvh-4rem)] items-start justify-center px-4 pt-16 pb-32 md:items-center overflow-hidden">
       <div className="w-full max-w-sm space-y-4">
         {/* SINGLE cohesive Candy Glassmorphism card */}
-        <div className="flex flex-col overflow-hidden rounded-[32px] border-2 border-white/60 bg-white/40 shadow-cartoon backdrop-blur-md">
+        <div className="gsap-profile-stagger flex flex-col overflow-hidden rounded-[32px] border-2 border-white/60 bg-white/40 shadow-cartoon backdrop-blur-md">
           {/* HEADER (Identity) */}
           <div className="flex flex-col items-center gap-3 p-6 pb-5">
             <div
-              className={`flex h-20 w-20 items-center justify-center rounded-full border-4 border-white/70 shadow-hard ${avatarBg}`}
+              className={`gsap-profile-stagger flex h-20 w-20 items-center justify-center rounded-full border-4 border-white/70 shadow-hard ${avatarBg}`}
             >
               <User className="h-10 w-10 text-white" strokeWidth={2} />
             </div>
 
-            <div className="w-full px-4 text-center">
+            <div className="gsap-profile-stagger w-full px-4 text-center">
               {easterEgg ? (
-                <h1 className="animate-pulse bg-gradient-to-r from-pawp-500 via-fox-500 to-berry-500 bg-clip-text text-h3 font-black leading-snug text-transparent drop-shadow-sm">
+                <h1 ref={easterEggRef} className="animate-pulse bg-gradient-to-r from-pawp-500 via-fox-500 to-berry-500 bg-clip-text text-h3 font-black leading-snug text-transparent drop-shadow-sm">
                   {easterEgg}
                 </h1>
               ) : (
@@ -212,7 +243,7 @@ export default function Profile() {
           </div>
 
           {/* BODY (Statistics) */}
-          <div className="flex flex-col gap-3 border-y border-white/40 bg-white/30 px-6 py-5">
+          <div className="gsap-profile-stagger flex flex-col gap-3 border-y border-white/40 bg-white/30 px-6 py-5">
             {/* ROW 1: Group */}
             <div className="flex flex-col items-center justify-center rounded-2xl border border-white/60 bg-white/60 px-4 py-3 shadow-sm backdrop-blur-sm">
               <p className="text-caption font-semibold uppercase tracking-wider text-neutral-500">
@@ -269,14 +300,16 @@ export default function Profile() {
 
         {/* Extras outside the unified card */}
         {profile.role !== "ADMIN" && (
-          <PointHistoryPreview transactions={profile.history || []} />
+          <div className="gsap-profile-stagger">
+            <PointHistoryPreview transactions={profile.history || []} />
+          </div>
         )}
 
         {profile.role !== "ADMIN" && (
           <button
             type="button"
             onClick={() => setShowLogoutModal(true)}
-            className="flex min-h-[44px] w-full items-center justify-center gap-2 rounded-2xl border-2 border-pawp-500/30 bg-white/40 px-4 py-3 text-body-lg font-bold text-pawp-500 shadow-cartoon backdrop-blur-lg transition-all hover:bg-pawp-500/10 active:translate-y-0.5 active:shadow-none"
+            className="gsap-profile-stagger flex min-h-[44px] w-full items-center justify-center gap-2 rounded-2xl border-2 border-pawp-500/30 bg-white/40 px-4 py-3 text-body-lg font-bold text-pawp-500 shadow-cartoon backdrop-blur-lg transition-all hover:bg-pawp-500/10 active:translate-y-0.5 active:shadow-none"
           >
             <LogOut className="h-5 w-5" />
             {t("common.logout")}

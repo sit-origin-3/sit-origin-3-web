@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { X, User, Hash, Shield, Star, Save } from "lucide-react";
 import type { UserProfile } from "../../types/user";
-import { updateUserPoints } from "../../services/userService";
+import { assignPoints } from "../../services/pointsService";
 import ConfirmModal from "../common/ConfirmModal";
 
 interface UserEditModalProps {
@@ -39,7 +39,7 @@ export default function UserEditModal({
   const executeUpdate = async () => {
     setIsUpdating(true);
     try {
-      await updateUserPoints(user.userCode, Number(points));
+      await assignPoints({ userCode: user.userCode, amount: Number(points) });
       onRefresh();
       setShowConfirm(false);
       onClose();

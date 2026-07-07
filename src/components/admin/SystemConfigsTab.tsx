@@ -11,6 +11,7 @@ export default function SystemConfigsTab() {
 
   // Local state for edits
   const [maxPoints, setMaxPoints] = useState<string>("");
+  const [optimisticAllowGivePoint, setOptimisticAllowGivePoint] = useState<boolean | null>(null);
 
   // Confirmation Modal State
   const [confirmKey, setConfirmKey] = useState<string | null>(null);
@@ -51,12 +52,19 @@ export default function SystemConfigsTab() {
   const executeUpdate = async () => {
     if (!confirmKey) return;
     setIsUpdating(true);
+    
+    if (confirmKey === "ALLOW_GIVE_POINT") {
+      setOptimisticAllowGivePoint(confirmValue === "true");
+    }
+
     try {
       await updateConfig(confirmKey, confirmValue);
       await fetchAll();
+      setOptimisticAllowGivePoint(null);
       // Optional: Add toast success here
     } catch (error) {
       console.error(error);
+      setOptimisticAllowGivePoint(null);
       // Optional: Add toast error here
     } finally {
       setIsUpdating(false);
@@ -72,7 +80,8 @@ export default function SystemConfigsTab() {
     );
   }
 
-  const allowGivePoint = configs.find((c) => c.key === "ALLOW_GIVE_POINT")?.value === "true";
+  const actualAllowGivePoint = configs.find((c) => c.key === "ALLOW_GIVE_POINT")?.value === "true";
+  const allowGivePoint = optimisticAllowGivePoint !== null ? optimisticAllowGivePoint : actualAllowGivePoint;
 
   return (
     <div className="flex flex-col gap-6 animate-in fade-in zoom-in-95">

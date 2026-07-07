@@ -4,6 +4,7 @@ import type { TransactionHistory } from "../../types/user";
 import { formatTimeGMT7 } from "../../utils/date";
 import PointHistoryModal from "./PointHistoryModal";
 import { useTranslation } from "react-i18next";
+import { useGroupName } from "../../hooks/useGroupName";
 
 interface PointHistoryPreviewProps {
   transactions: TransactionHistory[];
@@ -13,6 +14,7 @@ export default function PointHistoryPreview({
   transactions,
 }: PointHistoryPreviewProps) {
   const { t } = useTranslation();
+  const getGroupName = useGroupName();
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   // If no transactions, we can hide the preview block entirely or show a mini empty state
@@ -53,7 +55,7 @@ export default function PointHistoryPreview({
                   <div className="min-w-0 flex-1">
                     <p className="truncate text-body-lg font-bold text-zpd-900">
                       {tx.action === "receive"
-                        ? tx.giver?.group?.name || t("history.unknownStation")
+                        ? getGroupName(tx.giver?.group as any) || t("history.unknownStation")
                         : t("history.staffGaveTo", {
                             giver: tx.giver?.nickname || t("history.unknownUser"),
                             receiver: tx.receiver?.nickname || t("history.unknownUser"),
@@ -67,7 +69,7 @@ export default function PointHistoryPreview({
                           })
                         : t("history.givenTo", {
                             group:
-                              tx.receiver?.group?.name ||
+                              getGroupName(tx.receiver?.group as any) ||
                               t("history.unknownStation"),
                           })}
                       {" • "}

@@ -14,6 +14,7 @@ import { givePoints } from "../../services/pointsService";
 import ConfirmModal from "../common/ConfirmModal";
 import { getAvatarBg } from "../../utils/avatar";
 import { useTranslation } from "react-i18next";
+import { useGroupName } from "../../hooks/useGroupName";
 
 interface TransferBottomSheetProps {
   isOpen: boolean;
@@ -35,6 +36,7 @@ export default function TransferBottomSheet({
   onTransferComplete,
 }: TransferBottomSheetProps) {
   const { t } = useTranslation();
+  const getGroupName = useGroupName();
   const [amount, setAmount] = useState("");
   const [isSending, setIsSending] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -139,7 +141,7 @@ export default function TransferBottomSheet({
                     </p>
                     <div className="flex items-center gap-1 text-caption text-neutral-500">
                       <Users className="h-3 w-3" />
-                      <span>{r.group}</span>
+                      <span>{getGroupName(r.group, r.groupAlt)}</span>
                       <span className="mx-1">•</span>
                       <span className="font-mono">{r.userCode}</span>
                     </div>

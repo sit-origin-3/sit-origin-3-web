@@ -5,6 +5,7 @@ import { Trophy, Star, Loader2, WifiOff, RefreshCw } from "lucide-react";
 import { fetchLeaderboard } from "../services/leaderboardService";
 import { useAuthStore } from "../store/useAuthStore";
 import { useSmartRefresh } from "../hooks/useSmartRefresh";
+import { useGroupName } from "../hooks/useGroupName";
 import { useTranslation } from "react-i18next";
 import type { LeaderboardEntry } from "../types/leaderboard";
 
@@ -55,6 +56,7 @@ function PodiumCard({
   showLeaderboard: boolean;
 }) {
   const { t } = useTranslation();
+  const getGroupName = useGroupName();
   const idx = entry.rank - 1;
   return (
     <div
@@ -79,7 +81,7 @@ function PodiumCard({
         </div>
         {showLeaderboard && entry.firstname ? (
           <p className="truncate text-caption text-neutral-500">
-            {entry.firstname} {entry.lastname} · {entry.group}
+            {entry.firstname} {entry.lastname} · {getGroupName(entry.group, entry.groupAlt)}
           </p>
         ) : (
           <p className="text-caption text-neutral-400/60">
@@ -105,6 +107,7 @@ function RankRow({
   showLeaderboard: boolean;
 }) {
   const { t } = useTranslation();
+  const getGroupName = useGroupName();
   return (
     <div className="flex items-center gap-3 rounded-2xl border-2 border-white/60 bg-white/40 px-4 py-3 backdrop-blur-md">
       <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-zpd-500/10 font-mono text-caption font-bold text-zpd-700">
@@ -117,7 +120,7 @@ function RankRow({
               {entry.nickname}
             </p>
             <p className="truncate text-caption text-neutral-400">
-              {entry.firstname} {entry.lastname} · {entry.group}
+              {entry.firstname} {entry.lastname} · {getGroupName(entry.group, entry.groupAlt)}
             </p>
           </>
         ) : (

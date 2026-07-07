@@ -5,6 +5,7 @@ import type { UserProfile } from "../../types/user";
 import { assignPoints } from "../../services/pointsService";
 import ConfirmModal from "../common/ConfirmModal";
 import { getAvatarBg } from "../../utils/avatar";
+import { useGroupName } from "../../hooks/useGroupName";
 
 interface UserEditModalProps {
   isOpen: boolean;
@@ -18,8 +19,9 @@ export default function UserEditModal({
   onClose,
   user,
   onRefresh,
-}: UserEditModalProps) {
+  }: UserEditModalProps) {
   const { t } = useTranslation();
+  const getGroupName = useGroupName();
   const [points, setPoints] = useState<string>("");
   const [showConfirm, setShowConfirm] = useState(false);
   const [isUpdating, setIsUpdating] = useState(false);
@@ -95,6 +97,33 @@ export default function UserEditModal({
                   {user.role}
                 </span>
               </div>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-2 text-caption text-zpd-900">
+            <div className="rounded-xl border border-white/40 bg-white/30 p-3">
+              <span className="block font-bold text-neutral-500">{t("adminSystem.userDetailID")}</span>
+              <span className="font-mono">{user.id}</span>
+            </div>
+            <div className="rounded-xl border border-white/40 bg-white/30 p-3 overflow-hidden">
+              <span className="block font-bold text-neutral-500">{t("adminSystem.userDetailEmail")}</span>
+              <span className="truncate block" title={user.email}>{user.email || "-"}</span>
+            </div>
+            <div className="rounded-xl border border-white/40 bg-white/30 p-3">
+              <span className="block font-bold text-neutral-500">{t("adminSystem.userDetailRole")}</span>
+              <span>{user.role}</span>
+            </div>
+            <div className="rounded-xl border border-white/40 bg-white/30 p-3">
+              <span className="block font-bold text-neutral-500">{t("adminSystem.userDetailSession")}</span>
+              <span>{user.session || "-"}</span>
+            </div>
+            <div className="rounded-xl border border-white/40 bg-white/30 p-3">
+              <span className="block font-bold text-neutral-500">{t("adminSystem.userDetailMajor")}</span>
+              <span>{user.major || "-"}</span>
+            </div>
+            <div className="rounded-xl border border-white/40 bg-white/30 p-3 overflow-hidden">
+              <span className="block font-bold text-neutral-500">{t("adminSystem.userDetailGroup")}</span>
+              <span className="truncate block">{user.group ? `${user.group.id}: ${getGroupName(user.group as any)}` : "-"}</span>
             </div>
           </div>
 

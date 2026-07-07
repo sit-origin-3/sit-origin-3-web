@@ -48,16 +48,18 @@ export default function ManualCodeModal({
   };
 
   return (
-    <div 
+    <div
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4 backdrop-blur-sm"
       onClick={handleBackdropClick}
     >
-      <div 
-        className="w-full max-w-sm rounded-3xl border-2 border-white/60 bg-white/40 p-6 shadow-cartoon backdrop-blur-lg"
+      <div
+        className="w-full max-w-sm rounded-3xl border-2 border-white/60 bg-white/70 p-6 shadow-cartoon backdrop-blur-lg"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="mb-4 flex items-center justify-between">
-          <h2 className="text-h3 text-zpd-900">{t("modals.manualInputTitle")}</h2>
+          <h2 className="text-center text-h3 text-zpd-900">
+            {t("modals.manualInputTitle")}
+          </h2>
           <button
             type="button"
             onClick={() => {
@@ -76,9 +78,9 @@ export default function ManualCodeModal({
             value={code}
             onChange={(e) => setCode(e.target.value.toUpperCase())}
             placeholder={t("modals.manualInputHint")}
-            maxLength={6}
+            maxLength={4}
             autoFocus
-            className="h-14 w-full rounded-2xl border-2 border-white/60 bg-white/50 px-4 text-center font-mono text-h2 uppercase tracking-[0.3em] text-zpd-900 shadow-cartoon backdrop-blur-md outline-none transition-all focus:border-zpd-400 focus:ring-2 focus:ring-zpd-400/30"
+            className="h-14 min-h-[44px] w-full rounded-2xl border-2 border-white/60 bg-white/50 px-4 text-center font-mono text-h4 uppercase tracking-[0.2em] text-zpd-900 shadow-cartoon backdrop-blur-md outline-none transition-all focus:border-zpd-400 focus:ring-2 focus:ring-zpd-400/30"
           />
 
           {error && (

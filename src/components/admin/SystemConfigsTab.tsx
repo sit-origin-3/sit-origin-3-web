@@ -12,6 +12,7 @@ export default function SystemConfigsTab() {
   // Local state for edits
   const [maxPoints, setMaxPoints] = useState<string>("");
   const [optimisticAllowGivePoint, setOptimisticAllowGivePoint] = useState<boolean | null>(null);
+  const [optimisticShowLeaderboard, setOptimisticShowLeaderboard] = useState<boolean | null>(null);
 
   // Confirmation Modal State
   const [confirmKey, setConfirmKey] = useState<string | null>(null);
@@ -43,6 +44,13 @@ export default function SystemConfigsTab() {
     setConfirmValue(current.value === "true" ? "false" : "true");
   };
 
+  const handleToggleShowLeaderboard = () => {
+    const current = configs.find((c) => c.key === "SHOW_LEADERBOARD");
+    if (!current) return;
+    setConfirmKey("SHOW_LEADERBOARD");
+    setConfirmValue(current.value === "true" ? "false" : "true");
+  };
+
   const handleSaveMaxPoints = () => {
     if (!maxPoints.trim() || isNaN(Number(maxPoints))) return;
     setConfirmKey("MAX_POINTS_PER_FRESHY");
@@ -55,16 +63,20 @@ export default function SystemConfigsTab() {
     
     if (confirmKey === "ALLOW_GIVE_POINT") {
       setOptimisticAllowGivePoint(confirmValue === "true");
+    } else if (confirmKey === "SHOW_LEADERBOARD") {
+      setOptimisticShowLeaderboard(confirmValue === "true");
     }
 
     try {
       await updateConfig(confirmKey, confirmValue);
       await fetchAll();
       setOptimisticAllowGivePoint(null);
+      setOptimisticShowLeaderboard(null);
       // Optional: Add toast success here
     } catch (error) {
       console.error(error);
       setOptimisticAllowGivePoint(null);
+      setOptimisticShowLeaderboard(null);
       // Optional: Add toast error here
     } finally {
       setIsUpdating(false);
@@ -82,6 +94,9 @@ export default function SystemConfigsTab() {
 
   const actualAllowGivePoint = configs.find((c) => c.key === "ALLOW_GIVE_POINT")?.value === "true";
   const allowGivePoint = optimisticAllowGivePoint !== null ? optimisticAllowGivePoint : actualAllowGivePoint;
+
+  const actualShowLeaderboard = configs.find((c) => c.key === "SHOW_LEADERBOARD")?.value === "true";
+  const showLeaderboard = optimisticShowLeaderboard !== null ? optimisticShowLeaderboard : actualShowLeaderboard;
 
   return (
     <div className="flex flex-col gap-6 animate-in fade-in zoom-in-95">
@@ -109,6 +124,28 @@ export default function SystemConfigsTab() {
               <span
                 className={`inline-block h-6 w-6 transform rounded-full bg-white shadow-sm transition-transform ${
                   allowGivePoint ? "translate-x-6" : "translate-x-0.5"
+                }`}
+              />
+            </button>
+          </div>
+
+          {/* Toggle SHOW_LEADERBOARD */}
+          <div className="flex items-center justify-between rounded-2xl border border-white/50 bg-white/60 p-5 shadow-sm backdrop-blur-sm">
+            <div>
+              <p className="text-body-lg font-bold text-zpd-900">
+                {t("adminSystem.configs_showLeaderboard")}
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={handleToggleShowLeaderboard}
+              className={`relative flex h-8 w-14 shrink-0 cursor-pointer items-center rounded-full border-2 transition-colors ${
+                showLeaderboard ? "border-jungle-500 bg-jungle-500" : "border-neutral-300 bg-neutral-300"
+              }`}
+            >
+              <span
+                className={`inline-block h-6 w-6 transform rounded-full bg-white shadow-sm transition-transform ${
+                  showLeaderboard ? "translate-x-6" : "translate-x-0.5"
                 }`}
               />
             </button>

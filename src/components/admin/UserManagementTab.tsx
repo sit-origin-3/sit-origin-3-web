@@ -4,6 +4,7 @@ import { Loader2, Search, User, Star, Activity, Users } from "lucide-react";
 import type { UserProfile } from "../../types/user";
 import { getUsers } from "../../services/userService";
 import UserEditModal from "./UserEditModal";
+import { getAvatarBg } from "../../utils/avatar";
 
 export default function UserManagementTab() {
   const { t } = useTranslation();
@@ -76,7 +77,7 @@ export default function UserManagementTab() {
                 className="group flex cursor-pointer flex-col gap-3 rounded-2xl border border-white/50 bg-white/60 p-4 shadow-sm backdrop-blur-sm transition-all hover:-translate-y-1 hover:bg-white hover:shadow-md"
               >
                 <div className="flex items-start gap-3">
-                  <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-zpd-500/20 text-zpd-700 transition-colors group-hover:bg-zpd-500/30">
+                  <div className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-full ${getAvatarBg(u.role, u.session, u.group?.name)} text-white shadow-sm transition-transform group-hover:scale-105`}>
                     <User className="h-6 w-6" />
                   </div>
                   <div className="min-w-0 flex-1">

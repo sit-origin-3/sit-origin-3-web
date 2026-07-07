@@ -100,6 +100,7 @@ const resources = {
         removeBtn: "ลบ",
         amountError: "กรุณาระบุจำนวนคะแนน",
         exceededLimit: "คะแนนเกินขีดจำกัดสำหรับรหัส: {{code}}",
+        transferDisabled: "ระบบโอนคะแนนไม่ได้เปิดใช้งานในขณะนี้",
       },
       adminDashboard: {
         title: "แดชบอร์ดผู้ดูแลระบบ",
@@ -205,7 +206,7 @@ const resources = {
       profile: {
         roleAdmin: "Admin",
         roleStaff: "Staff",
-        roleFreshy: "Student",
+        roleFreshy: "Freshy",
         totalPoints: "Total Points",
         remainingGroupPoints: "Group's Remaining Points",
         rankLabel: "Rank",
@@ -245,6 +246,7 @@ const resources = {
         removeBtn: "Remove",
         amountError: "Please specify an amount",
         exceededLimit: "Exceeded point limit for code: {{code}}",
+        transferDisabled: "Point transfer is currently disabled by the administrator.",
       },
       adminDashboard: {
         title: "Admin Dashboard",

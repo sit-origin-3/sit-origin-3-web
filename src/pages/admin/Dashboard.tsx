@@ -13,6 +13,7 @@ import {
   Settings,
   ArrowRightLeft,
   Coins,
+  RefreshCw,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { getAudits, type AuditLog } from "../../services/auditService";
@@ -42,15 +43,17 @@ export default function Dashboard() {
 
   const [filterAction, setFilterAction] = useState<string>("");
   const [searchQuery, setSearchQuery] = useState("");
+  const [searchTarget, setSearchTarget] = useState<"ALL" | "FIRSTNAME" | "NICKNAME" | "USERCODE">("ALL");
   const [isLoading, setIsLoading] = useState(true);
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
 
   const [selectedLog, setSelectedLog] = useState<AuditLog | null>(null);
 
-  const fetchLogs = useCallback(async () => {
-    setIsLoading(true);
+  const fetchLogs = useCallback(async (silent = false) => {
+    if (!silent) setIsLoading(true);
     try {
       const data = await getAudits({
         page,
@@ -62,13 +65,31 @@ export default function Dashboard() {
     } catch (error) {
       console.error("Failed to fetch audits", error);
     } finally {
-      setIsLoading(false);
+      if (!silent) setIsLoading(false);
     }
   }, [page, limit, filterAction]);
 
   useEffect(() => {
     fetchLogs();
   }, [fetchLogs]);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      fetchLogs(true);
+    }, 5000);
+    return () => clearInterval(interval);
+  }, [fetchLogs]);
+
+  const handleManualRefresh = async () => {
+    setIsRefreshing(true);
+    const start = Date.now();
+    await fetchLogs(true);
+    const elapsed = Date.now() - start;
+    if (elapsed < 1000) {
+      await new Promise((r) => setTimeout(r, 1000 - elapsed));
+    }
+    setIsRefreshing(false);
+  };
 
   const handleActionChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setFilterAction(e.target.value);
@@ -88,17 +109,35 @@ export default function Dashboard() {
   const filteredLogs = useMemo(() => {
     if (!searchQuery.trim()) return logs;
     const lowerQuery = searchQuery.toLowerCase();
+    
     return logs.filter((log) => {
-      const actorMatch =
-        log.actor.firstname.toLowerCase().includes(lowerQuery) ||
-        log.actor.userCode.toLowerCase().includes(lowerQuery);
-      const targetMatch =
-        log.target &&
-        (log.target.firstname.toLowerCase().includes(lowerQuery) ||
-          log.target.userCode.toLowerCase().includes(lowerQuery));
-      return actorMatch || targetMatch;
+      const checkActor = (target: "FIRSTNAME" | "NICKNAME" | "USERCODE") => {
+        switch (target) {
+          case "FIRSTNAME": return log.actor.firstname.toLowerCase().includes(lowerQuery);
+          case "NICKNAME": return log.actor.nickname.toLowerCase().includes(lowerQuery);
+          case "USERCODE": return log.actor.userCode.toLowerCase().includes(lowerQuery);
+        }
+      };
+      
+      const checkTarget = (target: "FIRSTNAME" | "NICKNAME" | "USERCODE") => {
+        if (!log.target) return false;
+        switch (target) {
+          case "FIRSTNAME": return log.target.firstname.toLowerCase().includes(lowerQuery);
+          case "NICKNAME": return log.target.nickname.toLowerCase().includes(lowerQuery);
+          case "USERCODE": return log.target.userCode.toLowerCase().includes(lowerQuery);
+        }
+      };
+
+      if (searchTarget === "ALL") {
+        return (
+          checkActor("FIRSTNAME") || checkActor("NICKNAME") || checkActor("USERCODE") ||
+          checkTarget("FIRSTNAME") || checkTarget("NICKNAME") || checkTarget("USERCODE")
+        );
+      } else {
+        return checkActor(searchTarget) || checkTarget(searchTarget);
+      }
     });
-  }, [logs, searchQuery]);
+  }, [logs, searchQuery, searchTarget]);
 
   const totalPages = Math.ceil(total / limit);
   const startItem = total === 0 ? 0 : (page - 1) * limit + 1;
@@ -132,7 +171,8 @@ export default function Dashboard() {
         <ChevronLeft className="h-5 w-5" />
       </button>
       <span className="text-caption font-bold text-neutral-500 whitespace-nowrap">
-        {t("adminDashboard.showingRange", {
+        {t("adminDashboard.showingRangeWithPage", {
+          page,
           start: startItem,
           end: endItem,
           total,
@@ -154,18 +194,40 @@ export default function Dashboard() {
       {/* Header */}
       <header className="mb-6 flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
         <h1 className="text-h2 text-zpd-900">{t("adminDashboard.title")}</h1>
-        <button
-          type="button"
-          onClick={() => setShowLogoutModal(true)}
-          className="flex min-h-[44px] items-center gap-2 rounded-full border border-pawp-500/40 bg-white/40 px-6 py-2 text-body font-bold text-pawp-500 shadow-cartoon backdrop-blur-md transition-all hover:bg-pawp-50 active:scale-95"
-        >
-          <LogOut className="h-5 w-5" />
-          {t("common.logout")}
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={handleManualRefresh}
+            disabled={isRefreshing}
+            className="flex h-[44px] w-[44px] items-center justify-center rounded-full border border-zpd-500/40 bg-white/40 text-zpd-600 shadow-cartoon backdrop-blur-md transition-all hover:bg-zpd-50 active:scale-95 disabled:opacity-50"
+          >
+            <RefreshCw className={`h-5 w-5 ${isRefreshing ? "animate-spin" : ""}`} />
+          </button>
+          <button
+            type="button"
+            onClick={() => setShowLogoutModal(true)}
+            className="flex min-h-[44px] items-center gap-2 rounded-full border border-pawp-500/40 bg-white/40 px-6 py-2 text-body font-bold text-pawp-500 shadow-cartoon backdrop-blur-md transition-all hover:bg-pawp-50 active:scale-95"
+          >
+            <LogOut className="h-5 w-5" />
+            {t("common.logout")}
+          </button>
+        </div>
       </header>
 
       {/* Filters & Search */}
       <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center">
+        <div className="flex w-full sm:w-auto gap-2">
+          <select
+            value={searchTarget}
+            onChange={(e) => setSearchTarget(e.target.value as any)}
+            className="rounded-2xl border-2 border-white/60 bg-white/40 px-4 py-3 text-body font-medium text-zpd-900 shadow-sm backdrop-blur-md outline-none transition-all focus:border-zpd-400 focus:bg-white/60 appearance-none cursor-pointer"
+          >
+            <option value="ALL">{t("adminDashboard.searchTarget_ALL")}</option>
+            <option value="FIRSTNAME">{t("adminDashboard.searchTarget_FIRSTNAME")}</option>
+            <option value="NICKNAME">{t("adminDashboard.searchTarget_NICKNAME")}</option>
+            <option value="USERCODE">{t("adminDashboard.searchTarget_USERCODE")}</option>
+          </select>
+        </div>
         <div className="relative flex-1">
           <Search className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-neutral-400" />
           <input

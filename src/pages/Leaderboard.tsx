@@ -1,7 +1,7 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import gsap from "gsap";
 import { Flip } from "gsap/Flip";
-import { Trophy, Star, Loader2, WifiOff } from "lucide-react";
+import { Trophy, Star, Loader2, WifiOff, RefreshCw } from "lucide-react";
 import { fetchLeaderboard } from "../services/leaderboardService";
 import { useAuthStore } from "../store/useAuthStore";
 import { useTranslation } from "react-i18next";
@@ -152,64 +152,72 @@ export default function Leaderboard() {
   const isFirstRender = useRef(true);
   const lastDataRef = useRef<string>("");
 
-  useEffect(() => {
-    let cancelled = false;
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
-    const load = async () => {
-      try {
-        const data = await fetchLeaderboard(isAdmin);
-        if (cancelled) return;
+  const fetchLogs = useCallback(async () => {
+    try {
+      const data = await fetchLeaderboard(isAdmin);
 
-        const dataStr = JSON.stringify(data);
-        if (dataStr === lastDataRef.current) {
-          setError(null);
-          setIsLoading(false);
-          return;
-        }
-        lastDataRef.current = dataStr;
-
-        if (!isFirstRender.current && listRef.current) {
-          const state = Flip.getState(
-            listRef.current.querySelectorAll("[data-flip-id]"),
-          );
-          setEntries(data);
-          requestAnimationFrame(() => {
-            if (!listRef.current) return;
-            Flip.from(state, {
-              duration: 0.5,
-              ease: "power2.inOut",
-              stagger: 0.02,
-              absolute: true,
-              onEnter: (elements) =>
-                gsap.fromTo(
-                  elements,
-                  { opacity: 0, scale: 0.95 },
-                  { opacity: 1, scale: 1, duration: 0.3 },
-                ),
-            });
-          });
-        } else {
-          setEntries(data);
-          isFirstRender.current = false;
-        }
-
+      const dataStr = JSON.stringify(data);
+      if (dataStr === lastDataRef.current) {
         setError(null);
         setIsLoading(false);
-      } catch {
-        if (cancelled) return;
-        setError(t("leaderboard.offlineData"));
-        setIsLoading(false);
+        return;
       }
-    };
+      lastDataRef.current = dataStr;
 
-    load();
-    const interval = setInterval(load, 5000);
+      if (!isFirstRender.current && listRef.current) {
+        const state = Flip.getState(
+          listRef.current.querySelectorAll("[data-flip-id]"),
+        );
+        setEntries(data);
+        requestAnimationFrame(() => {
+          if (!listRef.current) return;
+          Flip.from(state, {
+            duration: 0.5,
+            ease: "power2.inOut",
+            stagger: 0.02,
+            absolute: true,
+            onEnter: (elements) =>
+              gsap.fromTo(
+                elements,
+                { opacity: 0, scale: 0.95 },
+                { opacity: 1, scale: 1, duration: 0.3 },
+              ),
+          });
+        });
+      } else {
+        setEntries(data);
+        isFirstRender.current = false;
+      }
+
+      setError(null);
+      setIsLoading(false);
+    } catch {
+      setError(t("leaderboard.offlineData"));
+      setIsLoading(false);
+    }
+  }, [isAdmin, t]);
+
+  useEffect(() => {
+    fetchLogs();
+    const interval = setInterval(fetchLogs, 5000);
 
     return () => {
-      cancelled = true;
       clearInterval(interval);
     };
-  }, [isAdmin, t]);
+  }, [fetchLogs]);
+
+  const handleManualRefresh = async () => {
+    setIsRefreshing(true);
+    const start = Date.now();
+    await fetchLogs();
+    const elapsed = Date.now() - start;
+    if (elapsed < 1000) {
+      await new Promise((r) => setTimeout(r, 1000 - elapsed));
+    }
+    setIsRefreshing(false);
+  };
 
   if (isLoading) {
     return (
@@ -255,6 +263,14 @@ export default function Leaderboard() {
           <Trophy className="h-6 w-6 text-fox-500" />
           <h1 className="text-h2 text-zpd-900">{t("leaderboard.title")}</h1>
         </div>
+        <button
+          type="button"
+          onClick={handleManualRefresh}
+          disabled={isRefreshing}
+          className="flex h-[44px] w-[44px] items-center justify-center rounded-full border border-zpd-500/40 bg-white/40 text-zpd-600 shadow-cartoon backdrop-blur-md transition-all hover:bg-zpd-50 active:scale-95 disabled:opacity-50"
+        >
+          <RefreshCw className={`h-5 w-5 ${isRefreshing ? "animate-spin" : ""}`} />
+        </button>
       </div>
 
       {!isAdmin && (

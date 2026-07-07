@@ -11,6 +11,7 @@ import Profile from "./pages/Profile";
 import Leaderboard from "./pages/Leaderboard";
 import TransferPoints from "./pages/staff/TransferPoints";
 import Dashboard from "./pages/admin/Dashboard";
+import SystemControl from "./pages/admin/SystemControl";
 import Navbar from "./components/common/Navbar";
 import AppLayout from "./components/layout/AppLayout";
 import { useAuthStore } from "./store/useAuthStore";
@@ -95,6 +96,7 @@ const router = createBrowserRouter([
       { path: "/leaderboard", element: <Leaderboard /> },
       { path: "/transfer", element: <TransferPoints /> },
       { path: "/dashboard", element: <Dashboard /> },
+      { path: "/admin/system", element: <SystemControl /> },
       { path: "/admin/users", element: <Upcoming title="จัดการผู้ใช้" /> },
     ],
   },

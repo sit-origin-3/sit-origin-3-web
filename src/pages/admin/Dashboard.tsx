@@ -43,7 +43,9 @@ export default function Dashboard() {
 
   const [filterAction, setFilterAction] = useState<string>("");
   const [searchQuery, setSearchQuery] = useState("");
-  const [searchTarget, setSearchTarget] = useState<"ALL" | "FIRSTNAME" | "NICKNAME" | "USERCODE">("ALL");
+  const [searchTarget, setSearchTarget] = useState<
+    "ALL" | "FIRSTNAME" | "NICKNAME" | "USERCODE"
+  >("ALL");
   const [isLoading, setIsLoading] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
 
@@ -52,22 +54,25 @@ export default function Dashboard() {
 
   const [selectedLog, setSelectedLog] = useState<AuditLog | null>(null);
 
-  const fetchLogs = useCallback(async (silent = false) => {
-    if (!silent) setIsLoading(true);
-    try {
-      const data = await getAudits({
-        page,
-        limit,
-        action: filterAction || undefined,
-      });
-      setLogs(data.logs);
-      setTotal(data.total);
-    } catch (error) {
-      console.error("Failed to fetch audits", error);
-    } finally {
-      if (!silent) setIsLoading(false);
-    }
-  }, [page, limit, filterAction]);
+  const fetchLogs = useCallback(
+    async (silent = false) => {
+      if (!silent) setIsLoading(true);
+      try {
+        const data = await getAudits({
+          page,
+          limit,
+          action: filterAction || undefined,
+        });
+        setLogs(data.logs);
+        setTotal(data.total);
+      } catch (error) {
+        console.error("Failed to fetch audits", error);
+      } finally {
+        if (!silent) setIsLoading(false);
+      }
+    },
+    [page, limit, filterAction],
+  );
 
   useEffect(() => {
     fetchLogs();
@@ -109,29 +114,39 @@ export default function Dashboard() {
   const filteredLogs = useMemo(() => {
     if (!searchQuery.trim()) return logs;
     const lowerQuery = searchQuery.toLowerCase();
-    
+
     return logs.filter((log) => {
       const checkActor = (target: "FIRSTNAME" | "NICKNAME" | "USERCODE") => {
         switch (target) {
-          case "FIRSTNAME": return log.actor.firstname.toLowerCase().includes(lowerQuery);
-          case "NICKNAME": return log.actor.nickname.toLowerCase().includes(lowerQuery);
-          case "USERCODE": return log.actor.userCode.toLowerCase().includes(lowerQuery);
+          case "FIRSTNAME":
+            return log.actor.firstname.toLowerCase().includes(lowerQuery);
+          case "NICKNAME":
+            return log.actor.nickname.toLowerCase().includes(lowerQuery);
+          case "USERCODE":
+            return log.actor.userCode.toLowerCase().includes(lowerQuery);
         }
       };
-      
+
       const checkTarget = (target: "FIRSTNAME" | "NICKNAME" | "USERCODE") => {
         if (!log.target) return false;
         switch (target) {
-          case "FIRSTNAME": return log.target.firstname.toLowerCase().includes(lowerQuery);
-          case "NICKNAME": return log.target.nickname.toLowerCase().includes(lowerQuery);
-          case "USERCODE": return log.target.userCode.toLowerCase().includes(lowerQuery);
+          case "FIRSTNAME":
+            return log.target.firstname.toLowerCase().includes(lowerQuery);
+          case "NICKNAME":
+            return log.target.nickname.toLowerCase().includes(lowerQuery);
+          case "USERCODE":
+            return log.target.userCode.toLowerCase().includes(lowerQuery);
         }
       };
 
       if (searchTarget === "ALL") {
         return (
-          checkActor("FIRSTNAME") || checkActor("NICKNAME") || checkActor("USERCODE") ||
-          checkTarget("FIRSTNAME") || checkTarget("NICKNAME") || checkTarget("USERCODE")
+          checkActor("FIRSTNAME") ||
+          checkActor("NICKNAME") ||
+          checkActor("USERCODE") ||
+          checkTarget("FIRSTNAME") ||
+          checkTarget("NICKNAME") ||
+          checkTarget("USERCODE")
         );
       } else {
         return checkActor(searchTarget) || checkTarget(searchTarget);
@@ -190,7 +205,7 @@ export default function Dashboard() {
   );
 
   return (
-    <main className="mx-auto flex min-h-[calc(100dvh-4rem)] w-full max-w-4xl flex-col px-4 pt-8 pb-32">
+    <main className="mx-auto flex min-h-[calc(100dvh-4rem)] w-full max-w-4xl flex-col px-4 py-32">
       {/* Header */}
       <header className="mb-6 flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
         <h1 className="text-h2 text-zpd-900">{t("adminDashboard.title")}</h1>
@@ -201,7 +216,9 @@ export default function Dashboard() {
             disabled={isRefreshing}
             className="flex h-[44px] w-[44px] items-center justify-center rounded-full border border-zpd-500/40 bg-white/40 text-zpd-600 shadow-cartoon backdrop-blur-md transition-all hover:bg-zpd-50 active:scale-95 disabled:opacity-50"
           >
-            <RefreshCw className={`h-5 w-5 ${isRefreshing ? "animate-spin" : ""}`} />
+            <RefreshCw
+              className={`h-5 w-5 ${isRefreshing ? "animate-spin" : ""}`}
+            />
           </button>
           <button
             type="button"
@@ -223,9 +240,15 @@ export default function Dashboard() {
             className="rounded-2xl border-2 border-white/60 bg-white/40 px-4 py-3 text-body font-medium text-zpd-900 shadow-sm backdrop-blur-md outline-none transition-all focus:border-zpd-400 focus:bg-white/60 appearance-none cursor-pointer"
           >
             <option value="ALL">{t("adminDashboard.searchTarget_ALL")}</option>
-            <option value="FIRSTNAME">{t("adminDashboard.searchTarget_FIRSTNAME")}</option>
-            <option value="NICKNAME">{t("adminDashboard.searchTarget_NICKNAME")}</option>
-            <option value="USERCODE">{t("adminDashboard.searchTarget_USERCODE")}</option>
+            <option value="FIRSTNAME">
+              {t("adminDashboard.searchTarget_FIRSTNAME")}
+            </option>
+            <option value="NICKNAME">
+              {t("adminDashboard.searchTarget_NICKNAME")}
+            </option>
+            <option value="USERCODE">
+              {t("adminDashboard.searchTarget_USERCODE")}
+            </option>
           </select>
         </div>
         <div className="relative flex-1">
@@ -254,16 +277,16 @@ export default function Dashboard() {
           </select>
         </div>
       </div>
-      
-      {/* Top Pagination */}
-      {!isLoading && total > 0 && (
-        <div className="mb-4 flex justify-end">
-          <PaginationControls />
-        </div>
-      )}
 
-      {/* Logs List */}
       <div className="flex-1 overflow-hidden rounded-[32px] border-2 border-white/60 bg-white/40 shadow-cartoon backdrop-blur-md flex flex-col">
+        {/* Top Pagination */}
+        {!isLoading && total > 0 && (
+          <div className="flex items-center justify-between border-t border-white/40 bg-white/30 px-6 py-4 sm:justify-end">
+            <PaginationControls />
+          </div>
+        )}
+
+        {/* Logs List */}
         {isLoading ? (
           <div className="flex flex-1 items-center justify-center p-12">
             <Loader2 className="h-10 w-10 animate-spin text-zpd-500" />

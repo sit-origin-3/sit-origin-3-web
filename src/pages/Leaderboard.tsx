@@ -48,10 +48,10 @@ function PodiumIcon({ rank }: { rank: number }) {
 
 function PodiumCard({
   entry,
-  isAdmin,
+  showLeaderboard,
 }: {
   entry: LeaderboardEntry;
-  isAdmin: boolean;
+  showLeaderboard: boolean;
 }) {
   const { t } = useTranslation();
   const idx = entry.rank - 1;
@@ -66,7 +66,7 @@ function PodiumCard({
       </div>
       <div className="min-w-0 flex-1">
         <div className="flex items-center gap-2">
-          {isAdmin && entry.nickname ? (
+          {showLeaderboard && entry.nickname ? (
             <p className="truncate text-body-lg text-zpd-900">
               {entry.nickname}
             </p>
@@ -76,7 +76,7 @@ function PodiumCard({
             </p>
           )}
         </div>
-        {isAdmin && entry.firstname ? (
+        {showLeaderboard && entry.firstname ? (
           <p className="truncate text-caption text-neutral-500">
             {entry.firstname} {entry.lastname} · {entry.group}
           </p>
@@ -98,10 +98,10 @@ function PodiumCard({
 
 function RankRow({
   entry,
-  isAdmin,
+  showLeaderboard,
 }: {
   entry: LeaderboardEntry;
-  isAdmin: boolean;
+  showLeaderboard: boolean;
 }) {
   const { t } = useTranslation();
   return (
@@ -110,7 +110,7 @@ function RankRow({
         {entry.rank}
       </span>
       <div className="min-w-0 flex-1">
-        {isAdmin && entry.nickname ? (
+        {showLeaderboard && entry.nickname ? (
           <>
             <p className="truncate text-body font-semibold text-zpd-900">
               {entry.nickname}
@@ -146,6 +146,7 @@ export default function Leaderboard() {
   const isAdmin = userRole?.toUpperCase() === "ADMIN";
 
   const [entries, setEntries] = useState<LeaderboardEntry[]>([]);
+  const [showLeaderboard, setShowLeaderboard] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const listRef = useRef<HTMLDivElement>(null);
@@ -156,9 +157,9 @@ export default function Leaderboard() {
 
   const fetchLogs = useCallback(async () => {
     try {
-      const data = await fetchLeaderboard(isAdmin);
+      const { showLeaderboard: lbFlag, entries: data } = await fetchLeaderboard(isAdmin);
 
-      const dataStr = JSON.stringify(data);
+      const dataStr = JSON.stringify({ lbFlag, data });
       if (dataStr === lastDataRef.current) {
         setError(null);
         setIsLoading(false);
@@ -171,6 +172,7 @@ export default function Leaderboard() {
           listRef.current.querySelectorAll("[data-flip-id]"),
         );
         setEntries(data);
+        setShowLeaderboard(lbFlag);
         requestAnimationFrame(() => {
           if (!listRef.current) return;
           Flip.from(state, {
@@ -188,6 +190,7 @@ export default function Leaderboard() {
         });
       } else {
         setEntries(data);
+        setShowLeaderboard(lbFlag);
         isFirstRender.current = false;
       }
 
@@ -275,7 +278,7 @@ export default function Leaderboard() {
         </button>
       </div>
 
-      {!isAdmin && (
+      {!showLeaderboard && (
         <div className="mb-4 rounded-2xl border border-zpd-400/30 bg-zpd-400/10 px-4 py-2.5 text-center text-caption font-semibold text-zpd-700">
           {t("leaderboard.anonymousWarning")}
         </div>
@@ -286,7 +289,7 @@ export default function Leaderboard() {
           const key = entry.id ? `user-${entry.id}` : `rank-${entry.rank}`;
           return (
             <div key={key} data-flip-id={`lb-${key}`}>
-              <PodiumCard entry={entry} isAdmin={isAdmin} />
+              <PodiumCard entry={entry} showLeaderboard={showLeaderboard} />
             </div>
           );
         })}
@@ -301,7 +304,7 @@ export default function Leaderboard() {
           const key = entry.id ? `user-${entry.id}` : `rank-${entry.rank}`;
           return (
             <div key={key} data-flip-id={`lb-${key}`}>
-              <RankRow entry={entry} isAdmin={isAdmin} />
+              <RankRow entry={entry} showLeaderboard={showLeaderboard} />
             </div>
           );
         })}

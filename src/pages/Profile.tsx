@@ -113,6 +113,17 @@ export default function Profile() {
   const [error, setError] = useState<string | null>(null);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
+  const [easterEgg, setEasterEgg] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (profile?.role === "FRESHY" && !easterEgg) {
+      // 0.5% chance (1 in 200)
+      if (Math.random() < 0.005) {
+        setEasterEgg(t("profile.easterEggBounty"));
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [profile?.role]);
 
   const fetchProfile = useCallback(() => {
     setIsLoading(true);
@@ -182,10 +193,16 @@ export default function Profile() {
               <User className="h-10 w-10 text-white" strokeWidth={2} />
             </div>
 
-            <div className="text-center">
-              <h1 className="text-h2 text-zpd-900">
-                {profile.firstname} {profile.lastname} ({profile.nickname})
-              </h1>
+            <div className="w-full px-4 text-center">
+              {easterEgg ? (
+                <h1 className="animate-pulse bg-gradient-to-r from-pawp-500 via-fox-500 to-berry-500 bg-clip-text text-h3 font-black leading-snug text-transparent drop-shadow-sm">
+                  {easterEgg}
+                </h1>
+              ) : (
+                <h1 className="text-h2 text-zpd-900 leading-tight">
+                  {profile.firstname} {profile.lastname} ({profile.nickname})
+                </h1>
+              )}
             </div>
 
             <div className="flex flex-wrap items-center justify-center gap-2">

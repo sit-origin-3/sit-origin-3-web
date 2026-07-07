@@ -108,10 +108,14 @@ export default function Login() {
     <main className="flex min-h-dvh items-center justify-center px-4 py-8">
       <div className="w-full max-w-sm">
         <div className="mb-6 flex flex-col items-center gap-2">
-          <div className="flex h-24 w-24 items-center justify-center rounded-full shadow-hard overflow-hidden bg-white/80 p-2 backdrop-blur-sm border-2 border-white/60">
-            <img src={originLogo} alt="SIT Origin" className="h-full w-full object-contain drop-shadow-sm" />
+          <div className="flex h-32 w-32 items-center justify-center rounded-full shadow-hard overflow-hidden bg-white/80 p-2 backdrop-blur-sm border-2 border-white/60">
+            <img
+              src={originLogo}
+              alt="SIT Origin"
+              className="h-full w-full object-contain drop-shadow-sm"
+            />
           </div>
-          <h1 className="text-h1 text-zpd-900">SIT Origin</h1>
+          <h1 className="text-h1 text-zpd-900">SIT Origin #3</h1>
           <p className="text-caption text-neutral-500">{t("login.title")}</p>
         </div>
 

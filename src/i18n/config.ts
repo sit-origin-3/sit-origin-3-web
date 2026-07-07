@@ -19,7 +19,7 @@ const resources = {
       },
       login: {
         title: "เข้าสู่ระบบ",
-        emailOrIdPlaceholder: "รหัสผู้ใช้ หรือ อีเมล",
+        emailOrIdPlaceholder: "รหัสนักศึกษาหรืออีเมล",
         passwordPlaceholder: "รหัสผ่าน",
         loginButton: "เข้าสู่ระบบ",
         errorInvalid: "รหัสผู้ใช้หรือรหัสผ่านไม่ถูกต้อง",
@@ -74,10 +74,12 @@ const resources = {
         logoutConfirmTitle: "ออกจากระบบ?",
         logoutConfirmDesc: "คุณต้องการออกจากระบบใช่หรือไม่",
         pointHistoryTitle: "ประวัติล่าสุด",
+        easterEggBounty:
+          "หาตัวพี่โฮป IT พี่ทรี IT หรือพี่แทน IT ให้เจอ ถ้าน้องเจอ รับไปเลย 26 แต้มมม!! (รับจำนวนจำกัดนะน้องง)",
       },
       history: {
         title: "ประวัติการรับคะแนน",
-        unknownStation: "ไม่ระบุสถานี",
+        unknownStation: "ไม่ระบุฐาน",
         unknownUser: "ผู้ใช้ที่ไม่รู้จัก",
         receivedFrom: "ได้รับจาก {{name}}",
         givenTo: "โอนให้ {{group}}",
@@ -87,7 +89,7 @@ const resources = {
         emptyPoints: "น้อง ๆ ยังไม่มีแต้มเลยย",
       },
       home: {
-        eventName: "ค่ายรับน้อง Zootopia 2026",
+        eventName: "SIT Origin #3",
         eventLocation: "มหาวิทยาลัยเทคโนโลยีพระจอมเกล้าธนบุรี",
         eventDateTime: "15-17 สิงหาคม 2569",
         freshyCount: "มีเฟรชชี่เข้าร่วมแล้ว {{count}} คน",
@@ -189,7 +191,7 @@ const resources = {
       },
       login: {
         title: "Login",
-        emailOrIdPlaceholder: "User Code or Email",
+        emailOrIdPlaceholder: "Student ID or Email",
         passwordPlaceholder: "Password",
         loginButton: "Login",
         errorInvalid: "Invalid username or password",
@@ -244,6 +246,8 @@ const resources = {
         logoutConfirmTitle: "Logout?",
         logoutConfirmDesc: "Are you sure you want to logout?",
         pointHistoryTitle: "Recent History",
+        easterEggBounty:
+          "BOUNTY HUNT: Spot P'Hope (IT), P'Three (IT), or P'Tan (IT) in the wild! Catch 'em (gently) for 26 juicy points!! (the prize are limited!)",
       },
       history: {
         title: "Point History",
@@ -257,8 +261,8 @@ const resources = {
         emptyPoints: "No points recorded yet!",
       },
       home: {
-        eventName: "Zootopia Freshy Camp 2026",
-        eventLocation: "KMUTT Main Campus",
+        eventName: "SIT Origin #3",
+        eventLocation: "KMUTT (Bangmod Campus)",
         eventDateTime: "August 15-17, 2026",
         freshyCount: "{{count}} Freshies Joined",
         scheduleTitle: "Event Schedule",

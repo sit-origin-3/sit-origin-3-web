@@ -10,6 +10,7 @@ import Login from "./pages/Login";
 import Profile from "./pages/Profile";
 import Leaderboard from "./pages/Leaderboard";
 import TransferPoints from "./pages/staff/TransferPoints";
+import Dashboard from "./pages/admin/Dashboard";
 import Navbar from "./components/common/Navbar";
 import AppLayout from "./components/layout/AppLayout";
 import { useAuthStore } from "./store/useAuthStore";
@@ -28,6 +29,15 @@ function ProtectedLayout() {
       <Navbar />
     </>
   );
+}
+
+function HomeRedirect() {
+  const user = useAuthStore((s) => s.user);
+  if (!user) return <Navigate to="/login" replace />;
+  if (user.role.toUpperCase() === "ADMIN") {
+    return <Navigate to="/dashboard" replace />;
+  }
+  return <Navigate to="/profile" replace />;
 }
 
 function Upcoming({ title }: { title: string }) {
@@ -84,12 +94,12 @@ const router = createBrowserRouter([
       { path: "/home", element: <Upcoming title="หน้าหลัก" /> },
       { path: "/leaderboard", element: <Leaderboard /> },
       { path: "/transfer", element: <TransferPoints /> },
-      { path: "/dashboard", element: <Upcoming title="แดชบอร์ด" /> },
+      { path: "/dashboard", element: <Dashboard /> },
       { path: "/admin/users", element: <Upcoming title="จัดการผู้ใช้" /> },
     ],
   },
-  { path: "/", element: <Navigate to="/profile" replace /> },
-  { path: "*", element: <Navigate to="/" replace /> },
+  { path: "/", element: <HomeRedirect /> },
+  { path: "*", element: <HomeRedirect /> },
 ]);
 
 function App() {

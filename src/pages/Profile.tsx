@@ -260,14 +260,16 @@ export default function Profile() {
           <PointHistoryPreview transactions={profile.receivedPoints} />
         )}
 
-        <button
-          type="button"
-          onClick={() => setShowLogoutModal(true)}
-          className="flex min-h-[44px] w-full items-center justify-center gap-2 rounded-2xl border-2 border-pawp-500/30 bg-white/40 px-4 py-3 text-body-lg font-bold text-pawp-500 shadow-cartoon backdrop-blur-lg transition-all hover:bg-pawp-500/10 active:translate-y-0.5 active:shadow-none"
-        >
-          <LogOut className="h-5 w-5" />
-          {t("common.logout")}
-        </button>
+        {profile.role !== "ADMIN" && (
+          <button
+            type="button"
+            onClick={() => setShowLogoutModal(true)}
+            className="flex min-h-[44px] w-full items-center justify-center gap-2 rounded-2xl border-2 border-pawp-500/30 bg-white/40 px-4 py-3 text-body-lg font-bold text-pawp-500 shadow-cartoon backdrop-blur-lg transition-all hover:bg-pawp-500/10 active:translate-y-0.5 active:shadow-none"
+          >
+            <LogOut className="h-5 w-5" />
+            {t("common.logout")}
+          </button>
+        )}
       </div>
 
       <ConfirmModal

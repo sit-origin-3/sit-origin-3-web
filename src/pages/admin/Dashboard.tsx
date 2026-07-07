@@ -82,7 +82,8 @@ export default function Dashboard() {
     await fetchLogs(true);
   }, [fetchLogs]);
 
-  const { isSpinning, triggerManualRefresh } = useSmartRefresh(handleSilentFetch);
+  const { isSpinning, triggerManualRefresh } =
+    useSmartRefresh(handleSilentFetch);
 
   const handleActionChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setFilterAction(e.target.value);
@@ -149,18 +150,42 @@ export default function Dashboard() {
   const getActionIconData = (action: string) => {
     switch (action.toUpperCase()) {
       case "LOGIN":
-        return { icon: <LogIn className="h-6 w-6" />, bgClass: "bg-jungle-500/20 group-hover:bg-jungle-500/30", textClass: "text-jungle-600" };
+        return {
+          icon: <LogIn className="h-6 w-6" />,
+          bgClass: "bg-jungle-500/20 group-hover:bg-jungle-500/30",
+          textClass: "text-jungle-600",
+        };
       case "LOGOUT":
-        return { icon: <LogOut className="h-6 w-6" />, bgClass: "bg-pawp-500/20 group-hover:bg-pawp-500/30", textClass: "text-pawp-600" };
+        return {
+          icon: <LogOut className="h-6 w-6" />,
+          bgClass: "bg-pawp-500/20 group-hover:bg-pawp-500/30",
+          textClass: "text-pawp-600",
+        };
       case "GIVE_POINTS":
-        return { icon: <ArrowRightLeft className="h-6 w-6" />, bgClass: "bg-fox-500/20 group-hover:bg-fox-500/30", textClass: "text-fox-600" };
+        return {
+          icon: <ArrowRightLeft className="h-6 w-6" />,
+          bgClass: "bg-fox-500/20 group-hover:bg-fox-500/30",
+          textClass: "text-fox-600",
+        };
       case "UPDATE_POINT":
       case "ASSIGN_POINTS":
-        return { icon: <Coins className="h-6 w-6" />, bgClass: "bg-berry-500/20 group-hover:bg-berry-500/30", textClass: "text-berry-500" };
+        return {
+          icon: <Coins className="h-6 w-6" />,
+          bgClass: "bg-berry-500/20 group-hover:bg-berry-500/30",
+          textClass: "text-berry-500",
+        };
       case "UPDATE_CONFIG":
-        return { icon: <Settings className="h-6 w-6" />, bgClass: "bg-berry-500/20 group-hover:bg-berry-500/30", textClass: "text-berry-500" };
+        return {
+          icon: <Settings className="h-6 w-6" />,
+          bgClass: "bg-berry-500/20 group-hover:bg-berry-500/30",
+          textClass: "text-berry-500",
+        };
       default:
-        return { icon: <Activity className="h-6 w-6" />, bgClass: "bg-neutral-500/20 group-hover:bg-neutral-500/30", textClass: "text-neutral-600" };
+        return {
+          icon: <Activity className="h-6 w-6" />,
+          bgClass: "bg-neutral-500/20 group-hover:bg-neutral-500/30",
+          textClass: "text-neutral-600",
+        };
     }
   };
 
@@ -297,48 +322,50 @@ export default function Dashboard() {
                   className="group flex cursor-pointer flex-col gap-3 rounded-2xl border border-white/50 bg-white/60 p-4 shadow-sm backdrop-blur-sm transition-all hover:-translate-y-0.5 hover:bg-white hover:shadow-md sm:flex-row sm:items-center sm:justify-between"
                 >
                   <div className="flex items-center gap-4">
-                    <div className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-full transition-colors ${iconData.bgClass} ${iconData.textClass}`}>
+                    <div
+                      className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-full transition-colors ${iconData.bgClass} ${iconData.textClass}`}
+                    >
                       {iconData.icon}
                     </div>
                     <div>
-                    <div className="flex items-center gap-2 text-body-lg font-bold text-zpd-900">
-                      <span>{log.actor.nickname}</span>
-                      {log.target && (
-                        <>
-                          <ArrowRight className="h-4 w-4 text-neutral-400" />
-                          <span>{log.target.nickname}</span>
-                        </>
-                      )}
+                      <div className="flex items-center gap-2 text-body-lg font-bold text-zpd-900">
+                        <span>{log.actor.nickname}</span>
+                        {log.target && (
+                          <>
+                            <ArrowRight className="h-4 w-4 text-neutral-400" />
+                            <span>{log.target.nickname}</span>
+                          </>
+                        )}
+                      </div>
+                      <span className="mt-1 inline-block text-caption font-medium text-neutral-500">
+                        {t(`adminDashboard.action_${log.action}` as any) ||
+                          log.action}
+                      </span>
                     </div>
-                    <span className="mt-1 inline-block text-caption font-medium text-neutral-500">
-                      {t(`adminDashboard.action_${log.action}` as any) ||
-                        log.action}
-                    </span>
                   </div>
-                </div>
 
-                <div className="flex items-center justify-between border-t border-white/40 pt-3 sm:border-0 sm:flex-col sm:items-end sm:gap-1 sm:pt-0">
-                  <div className="flex items-center gap-1 text-caption text-neutral-500">
-                    <CalendarDays className="h-3.5 w-3.5" />
-                    {new Date(log.createdAt).toLocaleString("en-GB", {
-                      timeZone: "Asia/Bangkok",
-                      day: "2-digit",
-                      month: "short",
-                      year: "numeric",
-                      hour: "2-digit",
-                      minute: "2-digit",
-                      second: "2-digit",
-                    })}
+                  <div className="flex items-center justify-between border-t border-white/40 pt-3 sm:border-0 sm:flex-col sm:items-end sm:gap-1 sm:pt-0">
+                    <div className="flex items-center gap-1 text-caption text-neutral-500">
+                      <CalendarDays className="h-3.5 w-3.5" />
+                      {new Date(log.createdAt).toLocaleString("en-GB", {
+                        timeZone: "Asia/Bangkok",
+                        day: "2-digit",
+                        month: "short",
+                        year: "numeric",
+                        hour: "2-digit",
+                        minute: "2-digit",
+                        second: "2-digit",
+                      })}
+                    </div>
+                    {log.metadata?.amount !== undefined && (
+                      <span className="font-mono text-body font-bold text-fox-500">
+                        {log.metadata.amount > 0 ? "+" : ""}
+                        {log.metadata.amount} pts
+                      </span>
+                    )}
                   </div>
-                  {log.metadata?.amount !== undefined && (
-                    <span className="font-mono text-body font-bold text-fox-500">
-                      {log.metadata.amount > 0 ? "+" : ""}
-                      {log.metadata.amount} pts
-                    </span>
-                  )}
                 </div>
-              </div>
-            );
+              );
             })}
           </div>
         )}

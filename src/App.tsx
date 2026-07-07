@@ -4,7 +4,7 @@ import {
   Navigate,
   Outlet,
 } from "react-router-dom";
-import { Construction, Loader2 } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import Login from "./pages/Login";
 import Profile from "./pages/Profile";
@@ -12,6 +12,7 @@ import Leaderboard from "./pages/Leaderboard";
 import TransferPoints from "./pages/staff/TransferPoints";
 import Dashboard from "./pages/admin/Dashboard";
 import SystemControl from "./pages/admin/SystemControl";
+import Home from "./pages/freshy/Home";
 import Navbar from "./components/common/Navbar";
 import AppLayout from "./components/layout/AppLayout";
 import { useAuthStore } from "./store/useAuthStore";
@@ -41,17 +42,7 @@ function HomeRedirect() {
   return <Navigate to="/profile" replace />;
 }
 
-function Upcoming({ title }: { title: string }) {
-  return (
-    <main className="flex min-h-[calc(100dvh-6rem)] items-center justify-center px-4">
-      <div className="flex max-w-xs flex-col items-center gap-3 rounded-[32px] border-2 border-white/60 bg-white/40 p-8 text-center shadow-cartoon backdrop-blur-lg">
-        <Construction className="h-10 w-10 text-fox-400" />
-        <h1 className="text-h2 text-zpd-900">{title}</h1>
-        <p className="text-body text-neutral-500">กำลังพัฒนา...</p>
-      </div>
-    </main>
-  );
-}
+
 
 function AuthInitializer({ children }: { children: React.ReactNode }) {
   const [isInitializing, setIsInitializing] = useState(true);
@@ -92,7 +83,7 @@ const router = createBrowserRouter([
     element: <ProtectedLayout />,
     children: [
       { path: "/profile", element: <Profile /> },
-      { path: "/home", element: <Upcoming title="หน้าหลัก" /> },
+      { path: "/home", element: <Home /> },
       { path: "/leaderboard", element: <Leaderboard /> },
       { path: "/transfer", element: <TransferPoints /> },
       { path: "/dashboard", element: <Dashboard /> },

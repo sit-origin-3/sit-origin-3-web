@@ -75,7 +75,7 @@ const resources = {
         logoutConfirmDesc: "คุณต้องการออกจากระบบใช่หรือไม่",
         pointHistoryTitle: "ประวัติล่าสุด",
         easterEggBounty:
-          "หาตัวพี่โฮป IT พี่ทรี IT หรือพี่แทน IT ให้เจอ ถ้าน้องเจอ รับไปเลย 26 แต้มมม!! (รับจำนวนจำกัดนะน้องง)",
+          "หาตัวพี่โฮป IT พี่ทรี IT หรือพี่แทน IT ให้เจอ ถ้าน้องเจอ รับไปเลย {{points}} แต้มมม!!",
       },
       history: {
         title: "ประวัติการรับคะแนน",
@@ -247,7 +247,7 @@ const resources = {
         logoutConfirmDesc: "Are you sure you want to logout?",
         pointHistoryTitle: "Recent History",
         easterEggBounty:
-          "BOUNTY HUNT: Spot P'Hope (IT), P'Three (IT), or P'Tan (IT) in the wild! Catch 'em (gently) for 26 juicy points!! (the prize are limited!)",
+          "BOUNTY HUNT: Spot P'Hope (IT), P'T้ree (IT), or P'Tan (IT) in the wild! Catch 'em (gently) for {{points}} juicy points!!",
       },
       history: {
         title: "Point History",

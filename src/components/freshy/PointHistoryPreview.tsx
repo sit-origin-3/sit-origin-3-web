@@ -25,10 +25,10 @@ export default function PointHistoryPreview({
   useGSAP(() => {
     if (transactions && transactions.length > 0) {
       gsap.from(".gsap-history-item", {
-        x: -20,
+        x: -15,
         opacity: 0,
-        duration: 0.4,
-        stagger: 0.08,
+        duration: 0.5,
+        stagger: 0.05,
         ease: "power2.out",
       });
     }

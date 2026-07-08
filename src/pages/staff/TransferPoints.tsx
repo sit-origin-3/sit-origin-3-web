@@ -240,13 +240,6 @@ export default function TransferPoints() {
         className={`absolute inset-0 z-0 h-full w-full object-cover [&_#qr-shaded-region]:hidden [&_video]:h-full [&_video]:w-full [&_video]:object-cover ${isInitializing ? "opacity-0" : "opacity-100"}`}
       />
 
-      {/* CUSTOM FRIENDLY SCANNING RETICLE */}
-      {(phase === "SCANNING" || phase === "SCANNED") && !isInitializing && !cameraError && (
-        <div className="pointer-events-none absolute inset-0 z-10 flex items-center justify-center overflow-hidden">
-          <div className="h-[250px] w-[250px] rounded-[32px] border-4 border-white/80 shadow-[0_0_0_9999px_rgba(0,0,0,0.5),0_0_20px_rgba(0,0,0,0.3)_inset] shadow-cartoon" />
-        </div>
-      )}
-
       {/* Skeleton Loading State */}
       {isInitializing && phase === "SCANNING" && (
         <div className="absolute inset-0 z-40 flex flex-col items-center justify-center bg-black/60 backdrop-blur-md">
@@ -270,34 +263,44 @@ export default function TransferPoints() {
         </div>
       )}
 
-      {/* Control Buttons (Underneath Reticle) */}
+      {/* Scanner Reticle and Controls Group */}
       {(phase === "SCANNING" || phase === "SCANNED") && (
-        <div className="absolute left-1/2 top-1/2 z-20 flex -translate-x-1/2 translate-y-44 items-center gap-3">
-          <button
-            type="button"
-            onClick={() => {
-              stopScan();
-              setShowManualModal(true);
-            }}
-            className="flex h-[44px] items-center gap-2 rounded-full border border-white/60 bg-white/40 px-6 text-body font-bold text-white shadow-cartoon backdrop-blur-md transition-all hover:bg-white/50 active:scale-95"
-          >
-            <Keyboard className="h-5 w-5" />
-            <span>{t("transfer.manualInputBtn")}</span>
-          </button>
+        <div className="pointer-events-none absolute inset-0 z-10 flex flex-col items-center justify-center -translate-y-8 md:-translate-y-16 overflow-hidden">
+          {/* CUSTOM FRIENDLY SCANNING RETICLE */}
+          {!isInitializing && !cameraError ? (
+            <div className="h-[250px] w-[250px] shrink-0 rounded-[32px] border-4 border-white/80 shadow-[0_0_0_9999px_rgba(0,0,0,0.5),0_0_20px_rgba(0,0,0,0.3)_inset]" />
+          ) : (
+            <div className="h-[250px] w-[250px] shrink-0" />
+          )}
 
-          {isFlashSupported && (
+          {/* Control Buttons */}
+          <div className="pointer-events-auto mt-8 flex w-full items-center justify-center gap-3 px-4">
             <button
               type="button"
-              onClick={toggleFlash}
-              className="flex h-[44px] w-[44px] items-center justify-center rounded-full border border-white/60 bg-white/40 text-white shadow-cartoon backdrop-blur-md transition-all hover:bg-white/50 active:scale-95"
+              onClick={() => {
+                stopScan();
+                setShowManualModal(true);
+              }}
+              className="flex h-[44px] items-center gap-2 rounded-full border border-white/60 bg-white/40 px-6 text-body font-bold text-white shadow-cartoon backdrop-blur-md transition-all hover:bg-white/50 active:scale-95"
             >
-              {isFlashOn ? (
-                <FlashlightOff className="h-5 w-5" />
-              ) : (
-                <Flashlight className="h-5 w-5" />
-              )}
+              <Keyboard className="h-5 w-5" />
+              <span>{t("transfer.manualInputBtn")}</span>
             </button>
-          )}
+
+            {isFlashSupported && (
+              <button
+                type="button"
+                onClick={toggleFlash}
+                className="flex h-[44px] w-[44px] items-center justify-center rounded-full border border-white/60 bg-white/40 text-white shadow-cartoon backdrop-blur-md transition-all hover:bg-white/50 active:scale-95"
+              >
+                {isFlashOn ? (
+                  <FlashlightOff className="h-5 w-5" />
+                ) : (
+                  <Flashlight className="h-5 w-5" />
+                )}
+              </button>
+            )}
+          </div>
         </div>
       )}
 
@@ -324,7 +327,9 @@ export default function TransferPoints() {
         <div className="absolute inset-0 z-30 flex flex-col items-center justify-center bg-black/60 p-4 backdrop-blur-sm">
           <div className="w-full max-w-sm rounded-[32px] border-2 border-white/60 bg-white/20 p-6 shadow-cartoon backdrop-blur-xl">
             <div className="flex flex-col items-center gap-3">
-              <div className={`flex h-16 w-16 items-center justify-center rounded-full border-4 border-white/70 ${getAvatarBg(currentReceiver.role, currentReceiver.session, currentReceiver.group)} shadow-hard`}>
+              <div
+                className={`flex h-16 w-16 items-center justify-center rounded-full border-4 border-white/70 ${getAvatarBg(currentReceiver.role, currentReceiver.session, currentReceiver.group)} shadow-hard`}
+              >
                 <User className="h-8 w-8 text-white" strokeWidth={2} />
               </div>
               <div className="text-center text-white">
@@ -338,7 +343,12 @@ export default function TransferPoints() {
               <div className="flex flex-wrap items-center justify-center gap-2">
                 <span className="inline-flex items-center gap-1 rounded-full border border-white/40 bg-white/20 px-3 py-1 text-caption font-bold text-white shadow-sm">
                   <Users className="h-3 w-3" />
-                  {getGroupName(currentReceiver.group, currentReceiver.groupAlt)?.formatted}
+                  {
+                    getGroupName(
+                      currentReceiver.group,
+                      currentReceiver.groupAlt,
+                    )?.formatted
+                  }
                 </span>
                 <span className="inline-flex items-center gap-1 rounded-full border border-white/40 bg-white/20 px-3 py-1 text-caption font-bold text-white shadow-sm">
                   <Star className="h-3 w-3" />

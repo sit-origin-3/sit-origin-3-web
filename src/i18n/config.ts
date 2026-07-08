@@ -25,6 +25,7 @@ const resources = {
         errorInvalid: "รหัสผู้ใช้หรือรหัสผ่านไม่ถูกต้อง",
         errorEmpty: "กรุณากรอกข้อมูลให้ครบถ้วน",
       },
+      navbar: {},
       leaderboard: {
         title: "อันดับ",
         rank: "อันดับ",
@@ -75,7 +76,7 @@ const resources = {
         logoutConfirmDesc: "คุณต้องการออกจากระบบใช่หรือไม่",
         pointHistoryTitle: "ประวัติล่าสุด",
         easterEggBounty:
-          "(แคปหน้านี้ไว้เลย) หาตัวพี่โฮป IT พี่ทรี IT หรือพี่แทน IT ให้เจอ ถ้าน้องเจอ รับไปเลย {{points}} แต้มมม!!",
+          "(แคปหน้านี้ไว้เลย🤫) หาตัวพี่โฮป IT พี่ทรี IT หรือพี่แทน IT ให้เจอ ถ้าน้องเจอ รับไปเลย {{points}} แต้มมม!!",
       },
       history: {
         title: "ประวัติการรับคะแนน",
@@ -247,7 +248,7 @@ const resources = {
         logoutConfirmDesc: "Are you sure you want to logout?",
         pointHistoryTitle: "Recent History",
         easterEggBounty:
-          "(CAPTURE THIS) BOUNTY HUNT: Spot P'Hope (IT), P'Three (IT), or P'Tan (IT) in the wild! Catch 'em (gently) for {{points}} juicy points!!",
+          "(CAPTURE THIS🤫) BOUNTY HUNT: Spot P'Hope (IT), P'Three (IT), or P'Tan (IT) in the wild! Catch 'em (gently) for {{points}} juicy points!!",
       },
       history: {
         title: "Point History",

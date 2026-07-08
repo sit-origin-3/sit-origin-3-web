@@ -45,8 +45,9 @@ export default function PointHistoryPreview({
     );
   }
 
-  // Take up to 4 items to demonstrate the fade effect on the last one
-  const previewItems = transactions.slice(0, 4);
+  const MAX_PREVIEW_ITEMS = 4;
+  const hasMore = transactions.length >= MAX_PREVIEW_ITEMS;
+  const previewItems = hasMore ? transactions.slice(0, MAX_PREVIEW_ITEMS) : transactions;
 
   return (
     <div ref={containerRef}>
@@ -59,7 +60,7 @@ export default function PointHistoryPreview({
         <div className="relative">
           <ul className="space-y-2">
             {previewItems.map((tx, index) => {
-              const isLastVisible = index === 3;
+              const isLastVisible = hasMore && index === MAX_PREVIEW_ITEMS - 1;
               return (
                 <li
                   key={`${tx.createdAt}-${index}`}
@@ -105,15 +106,17 @@ export default function PointHistoryPreview({
           </ul>
         </div>
 
-        <button
-          type="button"
-          onClick={() => setIsModalOpen(true)}
-          className="mt-4 flex min-h-[44px] w-full items-center justify-center gap-2 rounded-2xl bg-white/60 px-4 py-2.5 text-body font-bold text-zpd-800 shadow-sm transition-all hover:bg-white/80 active:scale-95"
-        >
-          <ListVideo className="h-4 w-4" />
-          {t("common.viewAll")}
-          <ChevronRight className="h-4 w-4 opacity-70" />
-        </button>
+        {hasMore && (
+          <button
+            type="button"
+            onClick={() => setIsModalOpen(true)}
+            className="mt-4 flex min-h-[44px] w-full items-center justify-center gap-2 rounded-2xl bg-white/60 px-4 py-2.5 text-body font-bold text-zpd-800 shadow-sm transition-all hover:bg-white/80 active:scale-95"
+          >
+            <ListVideo className="h-4 w-4" />
+            {t("common.viewAll")}
+            <ChevronRight className="h-4 w-4 opacity-70" />
+          </button>
+        )}
       </div>
 
       <PointHistoryModal

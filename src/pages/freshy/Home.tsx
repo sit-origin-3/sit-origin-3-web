@@ -16,10 +16,11 @@ export default function Home() {
   const user = useAuthStore((s) => s.user);
 
   const [activeTab, setActiveTab] = useState<string>("A1");
+  const [adminSessionView, setAdminSessionView] = useState<"A" | "B">("A");
 
   useEffect(() => {
     const groupId = typeof user?.group === "object" ? (user.group as any)?.id : user?.group;
-    if (groupId && typeof groupId === "string" && groupId.startsWith("A")) {
+    if (groupId && typeof groupId === "string" && (groupId.startsWith("A") || groupId.startsWith("B"))) {
       setActiveTab(groupId);
     }
   }, [user]);
@@ -133,35 +134,57 @@ export default function Home() {
 
       {/* Schedule Section */}
       <section className="flex flex-col gap-4">
-        <h2 className="gsap-item px-2 text-h2 text-zpd-900">
-          {t("home.scheduleTitle")}
+        <h2 className="gsap-item px-2 text-h2 text-zpd-900 flex justify-between items-center">
+          <span>{t("home.scheduleTitle")}</span>
+          {user && ["ADMIN", "STAFF"].includes(user.role.toUpperCase()) && (
+            <div className="flex bg-white/40 rounded-lg p-1 text-sm font-semibold border border-white/60 shadow-sm backdrop-blur-sm">
+              <button
+                className={`px-3 py-1 rounded-md transition-colors ${adminSessionView === "A" ? "bg-zpd-500 text-white shadow-sm" : "text-zpd-700 hover:bg-white/50"}`}
+                onClick={() => { setAdminSessionView("A"); setActiveTab("A1"); gsap.killTweensOf(".gsap-schedule-item"); }}
+              >
+                A
+              </button>
+              <button
+                className={`px-3 py-1 rounded-md transition-colors ${adminSessionView === "B" ? "bg-zpd-500 text-white shadow-sm" : "text-zpd-700 hover:bg-white/50"}`}
+                onClick={() => { setAdminSessionView("B"); setActiveTab("B1"); gsap.killTweensOf(".gsap-schedule-item"); }}
+              >
+                B
+              </button>
+            </div>
+          )}
         </h2>
 
-        {isSessionB ? (
-          <div className="gsap-item flex min-h-[200px] flex-col items-center justify-center rounded-[32px] border-2 border-white/60 bg-white/30 p-8 text-center shadow-cartoon backdrop-blur-md">
-            <CalendarDays className="mb-4 h-12 w-12 text-neutral-400 opacity-50" />
-            <p className="text-h3 text-neutral-500 opacity-70">
-              {t("home.sessionBScheduleComingSoon")}
-            </p>
-          </div>
-        ) : (
-          <>
-            <div className="gsap-item flex w-full gap-2 overflow-x-auto pb-2 scrollbar-hide px-2">
-              {["A1", "A2", "A3", "A4", "A5"].map((grp) => (
+        <>
+          <div className="gsap-item flex w-full gap-2 overflow-x-auto pb-2 scrollbar-hide px-2">
+            {[
+              { id: "1", name: "HORSE" },
+              { id: "2", name: "SLOTH" },
+              { id: "3", name: "SHEEP" },
+              { id: "4", name: "ARCTIC SHREW" },
+              { id: "5", name: "TIGER" },
+            ].map((grp) => {
+              const sessionPrefix = user && ["ADMIN", "STAFF"].includes(user.role.toUpperCase())
+                ? adminSessionView
+                : isSessionB ? "B" : "A";
+              const groupId = `${sessionPrefix}${grp.id}`;
+
+              return (
                 <button
-                  key={grp}
+                  key={groupId}
                   type="button"
-                  onClick={() => handleTabChange(grp)}
-                  className={`shrink-0 rounded-2xl px-6 py-2.5 font-bold transition-all shadow-sm ${
-                    activeTab === grp
+                  onClick={() => handleTabChange(groupId)}
+                  className={`shrink-0 flex flex-col items-center justify-center gap-0.5 rounded-2xl px-4 py-2 transition-all shadow-sm ${
+                    activeTab === groupId
                       ? "bg-zpd-500 text-white border border-zpd-600 scale-105 shadow-md"
                       : "bg-white/60 text-zpd-900 border border-white/60 hover:bg-white/80 backdrop-blur-sm"
                   }`}
                 >
-                  {grp}
+                  <span className="text-sm md:text-base font-bold">{groupId}</span>
+                  <span className="text-[10px] font-semibold uppercase tracking-wider opacity-75">{grp.name}</span>
                 </button>
-              ))}
-            </div>
+              );
+            })}
+          </div>
 
             <div className="flex flex-col gap-3">
               {schedule.map((item) => (
@@ -195,7 +218,6 @@ export default function Home() {
               ))}
             </div>
           </>
-        )}
       </section>
     </main>
   );

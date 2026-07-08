@@ -146,9 +146,10 @@ function RankRow({
 interface LeaderboardListProps {
   entries: LeaderboardEntry[];
   showLeaderboard: boolean;
+  isRefreshing: boolean;
 }
 
-export default function LeaderboardList({ entries, showLeaderboard }: LeaderboardListProps) {
+export default function LeaderboardList({ entries, showLeaderboard, isRefreshing }: LeaderboardListProps) {
   const [localEntries, setLocalEntries] = useState(entries);
   const listRef = useRef<HTMLDivElement>(null);
   const flipStateRef = useRef<Flip.FlipState | null>(null);
@@ -187,7 +188,7 @@ export default function LeaderboardList({ entries, showLeaderboard }: Leaderboar
         duration: 0.6,
         ease: "power3.out",
         absolute: true,
-        stagger: 0.05,
+        stagger: 0.02,
         scale: true,
       });
       flipStateRef.current = null;
@@ -200,7 +201,10 @@ export default function LeaderboardList({ entries, showLeaderboard }: Leaderboar
   const rest = localEntries.slice(3);
 
   return (
-    <div ref={listRef} className="space-y-2">
+    <div
+      ref={listRef}
+      className={`space-y-2 transition-opacity duration-300 ${isRefreshing ? "opacity-60 animate-pulse" : "opacity-100"}`}
+    >
       {podium.map((entry) => {
         const key = entry.id ? `user-${entry.id}` : `rank-${entry.rank}`;
         return (

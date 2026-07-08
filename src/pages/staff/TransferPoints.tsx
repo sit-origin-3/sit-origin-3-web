@@ -197,15 +197,16 @@ export default function TransferPoints() {
     exceeded: ExceededUser[];
   }) => {
     setShowCartSheet(false);
-    clearReceivers();
     setTransferResults(results);
     setPhase("RESULTS");
   };
 
   if (phase === "RESULTS" && transferResults) {
-    const isPartial =
-      transferResults.failed > 0 && transferResults.successful > 0;
-    const isFail = transferResults.successful === 0;
+    const successCount = transferResults.receivers.length;
+    const failedCount = transferResults.exceeded.length;
+
+    const isPartial = failedCount > 0 && successCount > 0;
+    const isFail = failedCount > 0 && successCount === 0;
 
     return (
       <main className="flex min-h-dvh flex-col items-center justify-center bg-zpd-50 p-4">
@@ -234,27 +235,45 @@ export default function TransferPoints() {
                   : t("transfer.success")}
             </h1>
             <p className="mt-2 text-body font-medium text-neutral-600">
-              {t("transfer.successSummary", { count: transferResults.successful })} |{" "}
-              <span className={transferResults.failed > 0 ? "text-pawp-500 font-bold" : ""}>
-                {t("transfer.failSummary", { count: transferResults.failed })}
+              {t("transfer.successSummary", { count: successCount })} |{" "}
+              <span className={failedCount > 0 ? "text-pawp-500 font-bold" : ""}>
+                {t("transfer.failSummary", { count: failedCount })}
               </span>
             </p>
 
-            {transferResults.exceeded && transferResults.exceeded.length > 0 && (
+            {receivers && receivers.length > 0 && (
               <div className="mt-4 flex max-h-[40vh] w-full flex-col gap-2 overflow-y-auto pr-1">
-                {transferResults.exceeded.map((u) => (
-                  <div
-                    key={u.userCode}
-                    className="flex flex-col items-start justify-between rounded-xl bg-white/40 p-3 shadow-sm backdrop-blur-sm border border-white/50 text-left"
-                  >
-                    <div className="font-bold text-zpd-900">
-                      {u.nickname} ({u.userCode})
+                {receivers.map((user) => {
+                  const exceededUser = transferResults.exceeded.find((e) => e.userCode === user.userCode);
+                  const isFailed = !!exceededUser;
+
+                  return (
+                    <div
+                      key={user.userCode}
+                      className="flex justify-between items-center py-2 border-b border-white/20 last:border-0"
+                    >
+                      <div className="font-bold text-zpd-900">
+                        {user.nickname} ({user.userCode})
+                      </div>
+                      <div className="text-right">
+                        {isFailed ? (
+                          <>
+                            <div className="text-sm font-bold text-pawp-500">
+                              {t("transfer.statusFailed", "Failed")}
+                            </div>
+                            <div className="text-xs font-semibold text-pawp-600 mt-0.5 bg-white/50 px-1.5 py-0.5 rounded-md">
+                              {t("transfer.remainingQuota", { remaining: exceededUser.remaining })}
+                            </div>
+                          </>
+                        ) : (
+                          <div className="text-sm font-bold text-jungle-500">
+                            {t("transfer.statusSuccess", "Success")}
+                          </div>
+                        )}
+                      </div>
                     </div>
-                    <div className="text-caption font-semibold text-pawp-600 mt-1 bg-white/50 px-2 py-0.5 rounded-md">
-                      {t("transfer.remainingQuota", { remaining: u.remaining })}
-                    </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             )}
           </div>
@@ -262,6 +281,7 @@ export default function TransferPoints() {
             type="button"
             onClick={() => {
               setTransferResults(null);
+              clearReceivers();
               resumeScanning();
             }}
             className="mt-2 flex min-h-[44px] w-full items-center justify-center gap-2 rounded-2xl bg-zpd-500 px-6 py-3 text-body-lg font-bold text-white shadow-hard transition-all hover:bg-zpd-600 active:translate-y-0.5 active:shadow-none"

@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, Fragment } from "react";
 import gsap from "gsap";
 import { Flip } from "gsap/Flip";
 import { useGSAP } from "@gsap/react";
@@ -191,8 +191,17 @@ export default function LeaderboardList({ entries, showLeaderboard, isRefreshing
         duration: 0.6,
         ease: "power3.out",
         absolute: true,
-        stagger: 0.02,
+        stagger: 0.05,
         scale: true,
+        onEnter: (elements) => {
+          return gsap.fromTo(elements,
+            { y: 50, opacity: 0 },
+            { y: 0, opacity: 1, duration: 0.6, ease: "power3.out" }
+          );
+        },
+        onLeave: (elements) => {
+          return gsap.to(elements, { opacity: 0, duration: 0.3 });
+        },
         onComplete: () => {
           if (listRef.current) {
             listRef.current.style.height = '';
@@ -205,35 +214,30 @@ export default function LeaderboardList({ entries, showLeaderboard, isRefreshing
 
   if (localEntries.length === 0) return null;
 
-  const podium = localEntries.slice(0, 3);
-  const rest = localEntries.slice(3);
-
   return (
     <div
       ref={listRef}
       className={`space-y-2 transition-opacity duration-300 ${isRefreshing ? "opacity-60 animate-pulse" : "opacity-100"}`}
     >
-      {podium.map((entry) => {
+      {localEntries.map((entry, index) => {
         const key = entry.id ? `user-${entry.id}` : `rank-${entry.rank}`;
-        return (
-          <div key={key} data-flip-id={`lb-${key}`} className="gsap-leaderboard-item leaderboard-item">
-            <PodiumCard entry={entry} showLeaderboard={showLeaderboard} />
-          </div>
-        );
-      })}
+        const isPodium = index < 3;
 
-      {rest.length > 0 && (
-        <div className="pb-1 pt-2">
-          <div className="h-px bg-white/40" />
-        </div>
-      )}
-
-      {rest.map((entry) => {
-        const key = entry.id ? `user-${entry.id}` : `rank-${entry.rank}`;
         return (
-          <div key={key} data-flip-id={`lb-${key}`} className="gsap-leaderboard-item leaderboard-item">
-            <RankRow entry={entry} showLeaderboard={showLeaderboard} />
-          </div>
+          <Fragment key={key}>
+            {index === 3 && (
+              <div className="pb-1 pt-2">
+                <div className="h-px bg-white/40" />
+              </div>
+            )}
+            <div data-flip-id={`lb-${key}`} className="gsap-leaderboard-item leaderboard-item">
+              {isPodium ? (
+                <PodiumCard entry={entry} showLeaderboard={showLeaderboard} />
+              ) : (
+                <RankRow entry={entry} showLeaderboard={showLeaderboard} />
+              )}
+            </div>
+          </Fragment>
         );
       })}
     </div>

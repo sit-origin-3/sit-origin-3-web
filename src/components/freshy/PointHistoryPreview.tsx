@@ -65,7 +65,7 @@ export default function PointHistoryPreview({
           </span>
         </div>
 
-        <div className={`relative ${isOverflow ? "[mask-image:linear-gradient(to_bottom,black_60%,transparent_100%)] [-webkit-mask-image:linear-gradient(to_bottom,black_60%,transparent_100%)]" : ""}`}>
+        <div className={`relative ${isOverflow ? "[mask-image:linear-gradient(to_bottom,black_80%,transparent_100%)] [-webkit-mask-image:linear-gradient(to_bottom,black_80%,transparent_100%)]" : ""}`}>
           <ul className="space-y-2">
             {previewItems.map((tx, index) => {
               return (

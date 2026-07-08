@@ -94,11 +94,14 @@ const router = createBrowserRouter([
   { path: "*", element: <HomeRedirect /> },
 ]);
 
+import { Toaster } from "react-hot-toast";
+
 function App() {
   return (
     <AuthInitializer>
       <AppLayout>
         <RouterProvider router={router} />
+        <Toaster position="top-center" />
       </AppLayout>
     </AuthInitializer>
   );

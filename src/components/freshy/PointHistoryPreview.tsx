@@ -5,11 +5,7 @@ import { formatTimeGMT7 } from "../../utils/date";
 import PointHistoryModal from "./PointHistoryModal";
 import { useTranslation } from "react-i18next";
 import { useGroupName } from "../../hooks/useGroupName";
-import gsap from "gsap";
-import { useGSAP } from "@gsap/react";
 import { useAuthStore } from "../../store/useAuthStore";
-
-gsap.registerPlugin(useGSAP);
 
 interface PointHistoryPreviewProps {
   transactions: TransactionHistory[];
@@ -24,17 +20,6 @@ export default function PointHistoryPreview({
   const containerRef = useRef<HTMLDivElement>(null);
   const user = useAuthStore((s) => s.user);
 
-  useGSAP(() => {
-    if (transactions && transactions.length > 0) {
-      gsap.from(".gsap-history-item", {
-        x: -15,
-        opacity: 0,
-        duration: 0.5,
-        stagger: 0.05,
-        ease: "power2.out",
-      });
-    }
-  }, { scope: containerRef, dependencies: [transactions] });
 
   if (!transactions || transactions.length === 0) {
     return (
@@ -71,7 +56,7 @@ export default function PointHistoryPreview({
               return (
                 <li
                   key={`${tx.createdAt}-${index}`}
-                  className="gsap-history-item flex items-center justify-between rounded-2xl bg-white/50 p-3 backdrop-blur-sm transition-opacity"
+                  className="gsap-history-item flex items-center justify-between rounded-2xl bg-white/50 p-3 backdrop-blur-sm"
                 >
                   <div className="min-w-0 flex-1">
                     <p className="truncate text-body-lg font-bold text-zpd-900 flex items-center gap-1">

@@ -33,9 +33,9 @@ const ROLE_STYLES: Record<string, string> = {
 };
 
 const EASTER_EGG_TIERS = [
-  { chance: 0.01, points: 47 }, // 0.5% chance
-  { chance: 0.02, points: 26 }, // 1.0% chance
-  { chance: 0.035, points: 11 }, // 2.0% chance
+  { chance: 0.01, points: 67 }, // 0.5% chance
+  { chance: 0.025, points: 67 }, // 1.0% chance
+  { chance: 0.04, points: 67 }, // 2.0% chance
 ];
 
 function RoleBadge({ role }: { role: string }) {
@@ -140,20 +140,58 @@ export default function Profile() {
     () => {
       if (profile) {
         const tl = gsap.timeline();
-        
+
         // Step 1: ID Card drops in
         tl.fromTo(
           ".gsap-id-card",
           { y: -150, opacity: 0 },
-          { y: 0, opacity: 1, duration: 0.7, ease: "back.out(1.2)", clearProps: "transform" }
+          {
+            y: 0,
+            opacity: 1,
+            duration: 0.7,
+            ease: "back.out(1.2)",
+            clearProps: "transform",
+          },
         )
-        // Step 2: Content stagger in
-        .fromTo(
-          ".gsap-profile-item",
-          { y: 15, opacity: 0 },
-          { y: 0, opacity: 1, stagger: 0.08, duration: 0.5, ease: "power3.out", clearProps: "transform" },
-          "-=0.3"
-        );
+          // Step 2: Content stagger in
+          .fromTo(
+            ".gsap-profile-item",
+            { y: 15, opacity: 0 },
+            {
+              y: 0,
+              opacity: 1,
+              stagger: 0.08,
+              duration: 0.5,
+              ease: "power3.out",
+              clearProps: "transform",
+            },
+            "-=0.3",
+          )
+          .fromTo(
+            ".gsap-history-item",
+            { y: 15, opacity: 0 },
+            {
+              y: 0,
+              opacity: 1,
+              stagger: 0.05,
+              duration: 0.4,
+              ease: "power3.out",
+              clearProps: "all",
+            },
+            "-=0.2",
+          )
+          .fromTo(
+            ".gsap-logout-btn",
+            { y: 15, opacity: 0 },
+            {
+              y: 0,
+              opacity: 1,
+              duration: 0.4,
+              ease: "power3.out",
+              clearProps: "transform",
+            },
+            "-=0.2",
+          );
       }
     },
     { scope: containerRef, dependencies: [profile] },
@@ -251,80 +289,80 @@ export default function Profile() {
               </div>
 
               <div className="gsap-profile-item opacity-0 w-full px-4 text-center">
-              {easterEggPoints !== null ? (
-                <h1
-                  ref={easterEggRef}
-                  className="bg-gradient-to-r from-pawp-500 via-fox-500 to-berry-500 bg-clip-text text-h3 font-black leading-snug text-transparent"
-                >
-                  {t("profile.easterEggBounty", { points: easterEggPoints })}
-                </h1>
-              ) : (
-                <h1 className="text-h2 text-zpd-900 leading-tight">
-                  {profile.firstname} {profile.lastname} ({profile.nickname})
-                </h1>
-              )}
-            </div>
-
-            <div className="gsap-profile-item opacity-0 flex flex-wrap items-center justify-center gap-2">
-              <RoleBadge role={profile.role} />
-              <MajorBadge major={profile.major} />
-            </div>
-          </div>
-
-          {/* BODY (Statistics) */}
-          <div className="flex flex-col gap-3 border-y border-white/40 bg-white/30 px-6 py-5">
-            {/* ROW 1: Group */}
-            <div className="gsap-profile-item opacity-0 flex flex-col items-center justify-center rounded-2xl border border-white/60 bg-white/60 px-4 py-3 shadow-sm backdrop-blur-sm">
-              <p className="text-caption font-semibold uppercase tracking-wider text-neutral-500">
-                {t("profile.groupLabel")}
-              </p>
-              <p className="text-h2 font-black text-zpd-900">{actualGroup}</p>
-            </div>
-
-            {/* ROW 2: Points & Rank */}
-            <div className="flex gap-3">
-              <div className="gsap-profile-item opacity-0 flex flex-1 flex-col items-center justify-center rounded-2xl border border-white/40 bg-white/40 px-4 py-3 shadow-inner backdrop-blur-sm text-center">
-                <p className="text-caption font-semibold text-neutral-500">
-                  {profile.role === "FRESHY"
-                    ? t("profile.pointsLabel")
-                    : t("profile.remainingGroupPoints")}
-                </p>
-                <p className="font-mono text-h3 font-black text-fox-500">
-                  <AnimatedNumber value={profile.points} />
-                </p>
+                {easterEggPoints !== null ? (
+                  <h1
+                    ref={easterEggRef}
+                    className="bg-gradient-to-r from-pawp-500 via-fox-500 to-berry-500 bg-clip-text text-h3 font-black leading-snug text-transparent"
+                  >
+                    {t("profile.easterEggBounty", { points: easterEggPoints })}
+                  </h1>
+                ) : (
+                  <h1 className="text-h2 text-zpd-900 leading-tight">
+                    {profile.firstname} {profile.lastname} ({profile.nickname})
+                  </h1>
+                )}
               </div>
-              {profile.rank !== null && (
+
+              <div className="gsap-profile-item opacity-0 flex flex-wrap items-center justify-center gap-2">
+                <RoleBadge role={profile.role} />
+                <MajorBadge major={profile.major} />
+              </div>
+            </div>
+
+            {/* BODY (Statistics) */}
+            <div className="flex flex-col gap-3 border-y border-white/40 bg-white/30 px-6 py-5">
+              {/* ROW 1: Group */}
+              <div className="gsap-profile-item opacity-0 flex flex-col items-center justify-center rounded-2xl border border-white/60 bg-white/60 px-4 py-3 shadow-sm backdrop-blur-sm">
+                <p className="text-caption font-semibold uppercase tracking-wider text-neutral-500">
+                  {t("profile.groupLabel")}
+                </p>
+                <p className="text-h2 font-black text-zpd-900">{actualGroup}</p>
+              </div>
+
+              {/* ROW 2: Points & Rank */}
+              <div className="flex gap-3">
                 <div className="gsap-profile-item opacity-0 flex flex-1 flex-col items-center justify-center rounded-2xl border border-white/40 bg-white/40 px-4 py-3 shadow-inner backdrop-blur-sm text-center">
                   <p className="text-caption font-semibold text-neutral-500">
-                    {t("profile.rankLabel")}
+                    {profile.role === "FRESHY"
+                      ? t("profile.pointsLabel")
+                      : t("profile.remainingGroupPoints")}
                   </p>
-                  <p className="font-mono text-h3 font-black text-zpd-900">
-                    #{profile.rank}
+                  <p className="font-mono text-h3 font-black text-fox-500">
+                    <AnimatedNumber value={profile.points} />
                   </p>
                 </div>
-              )}
-            </div>
-          </div>
-
-          {/* FOOTER (QR & Code) - Hidden for STAFF & ADMIN */}
-          {profile.role === "FRESHY" && (
-            <div className="gsap-profile-item opacity-0 flex flex-col items-center p-6 pt-5 bg-white/20">
-              <div className="mb-3 flex justify-center rounded-2xl bg-white p-4 shadow-sm">
-                <QRCodeSVG
-                  value={profile.userCode}
-                  size={240}
-                  level="H"
-                  marginSize={2}
-                />
+                {profile.rank !== null && (
+                  <div className="gsap-profile-item opacity-0 flex flex-1 flex-col items-center justify-center rounded-2xl border border-white/40 bg-white/40 px-4 py-3 shadow-inner backdrop-blur-sm text-center">
+                    <p className="text-caption font-semibold text-neutral-500">
+                      {t("profile.rankLabel")}
+                    </p>
+                    <p className="font-mono text-h3 font-black text-zpd-900">
+                      #{profile.rank}
+                    </p>
+                  </div>
+                )}
               </div>
-              <p className="font-mono text-h2 font-black tracking-widest text-zpd-900">
-                {profile.userCode}
-              </p>
-              <p className="mt-1 text-center text-caption text-neutral-500">
-                {t("profile.qrHint")}
-              </p>
             </div>
-          )}
+
+            {/* FOOTER (QR & Code) - Hidden for STAFF & ADMIN */}
+            {profile.role === "FRESHY" && (
+              <div className="gsap-profile-item opacity-0 flex flex-col items-center p-6 pt-5 bg-white/20">
+                <div className="mb-3 flex justify-center rounded-2xl bg-white p-4 shadow-sm">
+                  <QRCodeSVG
+                    value={profile.userCode}
+                    size={240}
+                    level="H"
+                    marginSize={2}
+                  />
+                </div>
+                <p className="font-mono text-h2 font-black tracking-widest text-zpd-900">
+                  {profile.userCode}
+                </p>
+                <p className="mt-1 text-center text-caption text-neutral-500">
+                  {t("profile.qrHint")}
+                </p>
+              </div>
+            )}
           </div>
         </div>
 
@@ -339,7 +377,7 @@ export default function Profile() {
           <button
             type="button"
             onClick={() => setShowLogoutModal(true)}
-            className="gsap-profile-item opacity-0 flex min-h-[44px] w-full items-center justify-center gap-2 rounded-2xl border-2 border-pawp-500/30 bg-white/40 px-4 py-3 text-body-lg font-bold text-pawp-500 shadow-cartoon backdrop-blur-lg transition-all hover:bg-pawp-500/10 active:translate-y-0.5 active:shadow-none"
+            className="gsap-logout-btn opacity-0 flex min-h-[44px] w-full items-center justify-center gap-2 rounded-2xl border-2 border-pawp-500/30 bg-white/40 px-4 py-3 text-body-lg font-bold text-pawp-500 shadow-cartoon backdrop-blur-lg transition-colors hover:bg-pawp-500/10 active:translate-y-0.5 active:shadow-none"
           >
             <LogOut className="h-5 w-5" />
             {t("common.logout")}

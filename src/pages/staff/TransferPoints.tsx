@@ -338,7 +338,7 @@ export default function TransferPoints() {
               <div className="flex flex-wrap items-center justify-center gap-2">
                 <span className="inline-flex items-center gap-1 rounded-full border border-white/40 bg-white/20 px-3 py-1 text-caption font-bold text-white shadow-sm">
                   <Users className="h-3 w-3" />
-                  {getGroupName(currentReceiver.group, currentReceiver.groupAlt)}
+                  {getGroupName(currentReceiver.group, currentReceiver.groupAlt)?.formatted}
                 </span>
                 <span className="inline-flex items-center gap-1 rounded-full border border-white/40 bg-white/20 px-3 py-1 text-caption font-bold text-white shadow-sm">
                   <Star className="h-3 w-3" />

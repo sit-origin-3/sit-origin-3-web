@@ -83,7 +83,7 @@ function PodiumCard({
         </div>
         {showLeaderboard && entry.firstname ? (
           <p className="truncate text-caption text-neutral-500">
-            {entry.firstname} {entry.lastname} · {getGroupName(entry.group, entry.groupAlt)}
+            {entry.firstname} {entry.lastname} · {getGroupName(entry.group, entry.groupAlt)?.formatted}
           </p>
         ) : (
           <p className="text-caption text-neutral-400/60">
@@ -122,7 +122,7 @@ function RankRow({
               {entry.nickname}
             </p>
             <p className="truncate text-caption text-neutral-400">
-              {entry.firstname} {entry.lastname} · {getGroupName(entry.group, entry.groupAlt)}
+              {entry.firstname} {entry.lastname} · {getGroupName(entry.group, entry.groupAlt)?.formatted}
             </p>
           </>
         ) : (
@@ -158,6 +158,7 @@ export default function Leaderboard() {
   const listRef = useRef<HTMLDivElement>(null);
   const isFirstRender = useRef(true);
   const lastDataRef = useRef<string>("");
+  const flipStateRef = useRef<Flip.FlipState | null>(null);
 
   const fetchLogs = useCallback(async () => {
     try {
@@ -172,31 +173,14 @@ export default function Leaderboard() {
       lastDataRef.current = dataStr;
 
       if (!isFirstRender.current && listRef.current) {
-        const state = Flip.getState(
-          listRef.current.querySelectorAll("[data-flip-id]"),
+        flipStateRef.current = Flip.getState(
+          listRef.current.querySelectorAll(".leaderboard-item"),
         );
-        setEntries(data);
-        setShowLeaderboard(lbFlag);
-        requestAnimationFrame(() => {
-          if (!listRef.current) return;
-          Flip.from(state, {
-            duration: 0.5,
-            ease: "power2.inOut",
-            stagger: 0.02,
-            absolute: true,
-            onEnter: (elements) =>
-              gsap.fromTo(
-                elements,
-                { opacity: 0, scale: 0.95 },
-                { opacity: 1, scale: 1, duration: 0.3 },
-              ),
-          });
-        });
-      } else {
-        setEntries(data);
-        setShowLeaderboard(lbFlag);
-        isFirstRender.current = false;
       }
+      
+      setEntries(data);
+      setShowLeaderboard(lbFlag);
+      isFirstRender.current = false;
 
       setError(null);
       setIsLoading(false);
@@ -223,6 +207,19 @@ export default function Leaderboard() {
       });
     }
   }, { scope: listRef, dependencies: [isLoading] });
+
+  useGSAP(() => {
+    if (flipStateRef.current && listRef.current) {
+      Flip.from(flipStateRef.current, {
+        duration: 0.6,
+        ease: "power3.out",
+        absolute: true,
+        stagger: 0.05,
+        scale: true,
+      });
+      flipStateRef.current = null;
+    }
+  }, { scope: listRef, dependencies: [entries] });
 
   if (isLoading) {
     return (
@@ -289,7 +286,7 @@ export default function Leaderboard() {
         {podium.map((entry) => {
           const key = entry.id ? `user-${entry.id}` : `rank-${entry.rank}`;
           return (
-            <div key={key} data-flip-id={`lb-${key}`} className="gsap-leaderboard-item">
+            <div key={key} data-flip-id={`lb-${key}`} className="gsap-leaderboard-item leaderboard-item">
               <PodiumCard entry={entry} showLeaderboard={showLeaderboard} />
             </div>
           );
@@ -304,7 +301,7 @@ export default function Leaderboard() {
         {rest.map((entry) => {
           const key = entry.id ? `user-${entry.id}` : `rank-${entry.rank}`;
           return (
-            <div key={key} data-flip-id={`lb-${key}`} className="gsap-leaderboard-item">
+            <div key={key} data-flip-id={`lb-${key}`} className="gsap-leaderboard-item leaderboard-item">
               <RankRow entry={entry} showLeaderboard={showLeaderboard} />
             </div>
           );

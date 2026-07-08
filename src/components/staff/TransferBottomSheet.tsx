@@ -141,7 +141,7 @@ export default function TransferBottomSheet({
                     </p>
                     <div className="flex items-center gap-1 text-caption text-neutral-500">
                       <Users className="h-3 w-3" />
-                      <span>{getGroupName(r.group, r.groupAlt)}</span>
+                      <span>{getGroupName(r.group, r.groupAlt)?.formatted}</span>
                       <span className="mx-1">•</span>
                       <span className="font-mono">{r.userCode}</span>
                     </div>

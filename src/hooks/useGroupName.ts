@@ -1,19 +1,50 @@
 import { useTranslation } from "react-i18next";
 
+export interface GroupDisplayInfo {
+  id: string;
+  name: string;
+  nameAlt: string;
+  displayName: string;
+  formatted: string;
+}
+
 export const useGroupName = () => {
   const { i18n } = useTranslation();
   
   return (
-    group?: { name?: string; nameAlt?: string } | string | null,
+    group?: { id?: string; name?: string; nameAlt?: string } | string | null,
     altName?: string | null
-  ) => {
+  ): GroupDisplayInfo | null => {
     const isEn = i18n.language.startsWith("en");
-    if (!group) return "";
+    if (!group) return null;
     
+    let id = "";
+    let name = "";
+    let nameAlt = altName || "";
+
     if (typeof group === "string") {
-      return isEn && altName ? altName : group;
+      name = group;
+    } else {
+      id = group.id || "";
+      name = group.name || "";
+      nameAlt = group.nameAlt || altName || "";
     }
     
-    return isEn && group.nameAlt ? group.nameAlt : (group.name || "");
+    const displayName = isEn && nameAlt ? nameAlt : name;
+    
+    let formatted = displayName;
+    if (id && id !== "-" && displayName) {
+      formatted = `${id}: ${displayName}`;
+    } else if (id && id !== "-") {
+      formatted = id;
+    }
+
+    return {
+      id,
+      name,
+      nameAlt,
+      displayName,
+      formatted
+    };
   };
 };

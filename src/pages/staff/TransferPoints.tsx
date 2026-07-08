@@ -268,7 +268,7 @@ export default function TransferPoints() {
         <div className="pointer-events-none absolute inset-0 z-10 flex flex-col items-center justify-center -translate-y-8 md:-translate-y-16 overflow-hidden">
           {/* CUSTOM FRIENDLY SCANNING RETICLE */}
           {!isInitializing && !cameraError ? (
-            <div className="h-[250px] w-[250px] shrink-0 rounded-[32px] border-4 border-white/80 shadow-[0_0_0_9999px_rgba(0,0,0,0.5),0_0_20px_rgba(0,0,0,0.3)_inset]" />
+            <div className="h-[250px] w-[250px] shrink-0 rounded-[32px] border-4 border-white/80 shadow-[0_0_0_99999px_rgba(0,0,0,0.7),0_0_20px_rgba(0,0,0,0.3)_inset]" />
           ) : (
             <div className="h-[250px] w-[250px] shrink-0" />
           )}

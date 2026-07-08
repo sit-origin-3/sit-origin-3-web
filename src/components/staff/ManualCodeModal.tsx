@@ -32,6 +32,12 @@ export default function ManualCodeModal({
     return () => document.removeEventListener("keydown", handleKeyDown);
   }, [isOpen, isLookingUp, onClose]);
 
+  useEffect(() => {
+    if (!isOpen) {
+      window.scrollTo(0, 0);
+    }
+  }, [isOpen]);
+
   if (!isOpen) return null;
 
   const handleBackdropClick = () => {
@@ -77,6 +83,7 @@ export default function ManualCodeModal({
             type="text"
             value={code}
             onChange={(e) => setCode(e.target.value.toUpperCase())}
+            onBlur={() => window.scrollTo(0, 0)}
             placeholder={t("modals.manualInputHint")}
             maxLength={4}
             autoFocus

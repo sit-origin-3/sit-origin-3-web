@@ -1,11 +1,12 @@
 import { useState, useEffect, useCallback, useRef } from "react";
-import { Trophy, Loader2, WifiOff, RefreshCw } from "lucide-react";
+import { Trophy, WifiOff, RefreshCw } from "lucide-react";
 import { fetchLeaderboard } from "../services/leaderboardService";
 import { useAuthStore } from "../store/useAuthStore";
 import { useSmartRefresh } from "../hooks/useSmartRefresh";
 import { useTranslation } from "react-i18next";
 import type { LeaderboardEntry } from "../types/leaderboard";
 import LeaderboardList from "../components/leaderboard/LeaderboardList";
+import LeaderboardSkeleton from "../components/leaderboard/LeaderboardSkeleton";
 
 export default function Leaderboard() {
   const { t } = useTranslation();
@@ -46,17 +47,6 @@ export default function Leaderboard() {
     fetchLogs();
   }, [fetchLogs]);
 
-  if (isLoading) {
-    return (
-      <main className="flex min-h-[calc(100dvh-6rem)] items-center justify-center px-4 py-8">
-        <div className="flex flex-col items-center gap-3">
-          <Loader2 className="h-10 w-10 animate-spin text-zpd-500" />
-          <p className="text-body text-zpd-700">{t("leaderboard.loading")}</p>
-        </div>
-      </main>
-    );
-  }
-
   if (error && entries.length === 0) {
     return (
       <main className="flex min-h-[calc(100dvh-6rem)] items-center justify-center px-4 py-8">
@@ -80,6 +70,8 @@ export default function Leaderboard() {
     );
   }
 
+  const showSkeleton = isLoading && entries.length === 0;
+
   return (
     <main className="mx-auto flex min-h-screen w-full max-w-lg flex-col px-4 pt-16 pb-32">
       <div className="mb-5 flex items-center justify-between">
@@ -98,14 +90,18 @@ export default function Leaderboard() {
         </button>
       </div>
 
-      {!showLeaderboard && (
+      {!showLeaderboard && !showSkeleton && (
         <div className="mb-4 rounded-2xl border border-zpd-400/30 bg-zpd-400/10 px-4 py-2.5 text-center text-caption font-semibold text-zpd-700">
           {t("leaderboard.anonymousWarning")}
         </div>
       )}
 
       <div className="flex-grow">
-        <LeaderboardList entries={entries} showLeaderboard={showLeaderboard} />
+        {showSkeleton ? (
+          <LeaderboardSkeleton />
+        ) : (
+          <LeaderboardList entries={entries} showLeaderboard={showLeaderboard} />
+        )}
       </div>
 
       {error && entries.length > 0 && (

@@ -25,7 +25,14 @@ const resources = {
         errorInvalid: "รหัสผู้ใช้หรือรหัสผ่านไม่ถูกต้อง",
         errorEmpty: "กรุณากรอกข้อมูลให้ครบถ้วน",
       },
-      navbar: {},
+      navbar: {
+        home: "หน้าหลัก",
+        profile: "โปรไฟล์",
+        leaderboard: "อันดับ",
+        transfer: "โอนคะแนน",
+        dashboard: "แดชบอร์ด",
+        system: "ระบบจัดการ",
+      },
       leaderboard: {
         title: "อันดับ",
         rank: "อันดับ",
@@ -197,6 +204,14 @@ const resources = {
         loginButton: "Login",
         errorInvalid: "Invalid username or password",
         errorEmpty: "Please enter all fields",
+      },
+      navbar: {
+        home: "Home",
+        profile: "Profile",
+        leaderboard: "Leaderboard",
+        transfer: "Transfer",
+        dashboard: "Dashboard",
+        system: "System",
       },
       leaderboard: {
         title: "Leaderboard",

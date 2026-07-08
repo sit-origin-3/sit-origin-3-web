@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { NavLink, useLocation } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import {
   Home,
   User,
@@ -19,19 +20,19 @@ interface NavItem {
 
 const NAV_MAP: Record<string, NavItem[]> = {
   FRESHY: [
-    { label: "หน้าหลัก", path: "/home", icon: Home },
-    { label: "โปรไฟล์", path: "/profile", icon: User },
-    { label: "อันดับ", path: "/leaderboard", icon: Trophy },
+    { label: "navbar.home", path: "/home", icon: Home },
+    { label: "navbar.profile", path: "/profile", icon: User },
+    { label: "navbar.leaderboard", path: "/leaderboard", icon: Trophy },
   ],
   STAFF: [
-    { label: "โปรไฟล์", path: "/profile", icon: User },
-    { label: "โอนคะแนน", path: "/transfer", icon: ArrowLeftRight },
-    { label: "อันดับ", path: "/leaderboard", icon: Trophy },
+    { label: "navbar.profile", path: "/profile", icon: User },
+    { label: "navbar.transfer", path: "/transfer", icon: ArrowLeftRight },
+    { label: "navbar.leaderboard", path: "/leaderboard", icon: Trophy },
   ],
   ADMIN: [
-    { label: "แดชบอร์ด", path: "/dashboard", icon: LayoutDashboard },
-    { label: "ระบบจัดการ", path: "/admin/system", icon: Settings },
-    { label: "อันดับ", path: "/leaderboard", icon: Trophy },
+    { label: "navbar.dashboard", path: "/dashboard", icon: LayoutDashboard },
+    { label: "navbar.system", path: "/admin/system", icon: Settings },
+    { label: "navbar.leaderboard", path: "/leaderboard", icon: Trophy },
   ],
 };
 
@@ -40,6 +41,7 @@ function getNavItems(role: string): NavItem[] {
 }
 
 export default function Navbar() {
+  const { t } = useTranslation();
   const { pathname } = useLocation();
   const user = useAuthStore((s) => s.user);
 
@@ -84,6 +86,7 @@ export default function Navbar() {
             width: `${indicatorStyle.width}px`,
           }}
           aria-hidden="true"
+          data-testid="navbar-indicator"
         />
 
         {navItems.map((item) => {
@@ -99,7 +102,7 @@ export default function Navbar() {
               }`}
             >
               <item.icon className="h-5 w-5" strokeWidth={2.5} />
-              <span className="hidden sm:inline">{item.label}</span>
+              <span className="hidden sm:inline">{t(item.label)}</span>
             </NavLink>
           );
         })}

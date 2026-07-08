@@ -87,6 +87,8 @@ const resources = {
       },
       history: {
         title: "ประวัติการรับคะแนน",
+        transferHistoryTitle: "ประวัติการโอนคะแนน",
+        receiveHistoryTitle: "ประวัติการรับคะแนน",
         unknownStation: "ไม่ระบุฐาน",
         unknownUser: "ผู้ใช้ที่ไม่รู้จัก",
         receivedFrom: "ได้รับจาก {{name}}",
@@ -95,6 +97,7 @@ const resources = {
         emptyTitle: "ยังไม่มีประวัติการรับคะแนน",
         emptyDesc: "แวะไปที่ฐานกิจกรรมเพื่อเริ่มสะสม!",
         emptyPoints: "น้อง ๆ ยังไม่มีแต้มเลยย",
+        items: "รายการ",
       },
       home: {
         eventName: "SIT Origin #3",
@@ -267,6 +270,8 @@ const resources = {
       },
       history: {
         title: "Point History",
+        transferHistoryTitle: "Point Transfer History",
+        receiveHistoryTitle: "Point Receive History",
         unknownStation: "Unknown Station",
         unknownUser: "Unknown User",
         receivedFrom: "Received from: {{name}}",
@@ -275,6 +280,7 @@ const resources = {
         emptyTitle: "No point history yet",
         emptyDesc: "Visit an activity station to start earning!",
         emptyPoints: "No points recorded yet!",
+        items: "items",
       },
       home: {
         eventName: "SIT Origin #3",

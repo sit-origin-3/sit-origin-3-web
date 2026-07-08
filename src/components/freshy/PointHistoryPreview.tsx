@@ -23,7 +23,7 @@ export default function PointHistoryPreview({
 
   if (!transactions || transactions.length === 0) {
     return (
-      <div className="mt-4 rounded-[32px] border-2 border-white/60 bg-white/20 p-6 text-center shadow-cartoon backdrop-blur-md">
+      <div className="rounded-[32px] border-2 border-white/60 bg-white/20 p-6 text-center shadow-cartoon backdrop-blur-md">
         <p className="text-body-lg font-bold text-neutral-500">
           {t("history.emptyPoints")}
         </p>
@@ -39,7 +39,7 @@ export default function PointHistoryPreview({
 
   return (
     <div ref={containerRef}>
-      <div className="mt-4 rounded-[32px] border-2 border-white/60 bg-white/40 p-6 shadow-cartoon backdrop-blur-lg">
+      <div className="rounded-[32px] border-2 border-white/60 bg-white/40 p-6 shadow-cartoon backdrop-blur-lg">
         <div className="mb-4 flex items-center justify-between text-zpd-900">
           <div className="flex items-center gap-2">
             <History className="h-5 w-5 text-zpd-500" />
@@ -72,8 +72,8 @@ export default function PointHistoryPreview({
                     </p>
                     <p className="text-caption text-neutral-500">
                       {tx.action === "receive"
-                        ? `${tx.giver?.group ?? "-"}: ${getGroupName(tx.giver?.group as any)?.formatted || t("history.unknownStation")}`
-                        : `${tx.receiver?.group ?? "-"}: ${getGroupName(tx.receiver?.group as any)?.formatted || t("history.unknownStation")}`}
+                        ? tx.giver?.nickname || t("history.unknownUser")
+                        : `${(tx.receiver?.group as any)?.id || "-"}: ${(tx.receiver?.group as any)?.name || t("history.unknownStation")}`}
                       {" • "}
                       {formatTimeGMT7(tx.createdAt)}
                     </p>

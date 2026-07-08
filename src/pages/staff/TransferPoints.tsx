@@ -21,6 +21,7 @@ import { useTransferCart } from "../../hooks/useTransferCart";
 import {
   getUserByCode,
   type ReceiverProfile,
+  type ExceededUser,
 } from "../../services/pointsService";
 import ManualCodeModal from "../../components/staff/ManualCodeModal";
 import TransferBottomSheet from "../../components/staff/TransferBottomSheet";
@@ -73,6 +74,8 @@ export default function TransferPoints() {
     successful: number;
     failed: number;
     total: number;
+    receivers: string[];
+    exceeded: ExceededUser[];
   } | null>(null);
 
   const processedRef = useRef(false);
@@ -190,6 +193,8 @@ export default function TransferPoints() {
     successful: number;
     failed: number;
     total: number;
+    receivers: string[];
+    exceeded: ExceededUser[];
   }) => {
     setShowCartSheet(false);
     clearReceivers();
@@ -220,7 +225,7 @@ export default function TransferPoints() {
               />
             )}
           </div>
-          <div className="text-center">
+          <div className="text-center w-full">
             <h1 className="text-h2 text-zpd-900">
               {isFail
                 ? t("transfer.fail")
@@ -228,19 +233,29 @@ export default function TransferPoints() {
                   ? t("transfer.partialSuccess")
                   : t("transfer.success")}
             </h1>
-            <p className="mt-2 text-body text-neutral-500">
-              {t("transfer.successCount")}{" "}
-              <span className="font-bold text-jungle-500">
-                {transferResults.successful}
+            <p className="mt-2 text-body font-medium text-neutral-600">
+              {t("transfer.successSummary", { count: transferResults.successful })} |{" "}
+              <span className={transferResults.failed > 0 ? "text-pawp-500 font-bold" : ""}>
+                {t("transfer.failSummary", { count: transferResults.failed })}
               </span>
             </p>
-            {transferResults.failed > 0 && (
-              <p className="text-body text-neutral-500">
-                {t("transfer.failCount")}{" "}
-                <span className="font-bold text-pawp-500">
-                  {transferResults.failed}
-                </span>
-              </p>
+
+            {transferResults.exceeded && transferResults.exceeded.length > 0 && (
+              <div className="mt-4 flex max-h-[40vh] w-full flex-col gap-2 overflow-y-auto pr-1">
+                {transferResults.exceeded.map((u) => (
+                  <div
+                    key={u.userCode}
+                    className="flex flex-col items-start justify-between rounded-xl bg-white/40 p-3 shadow-sm backdrop-blur-sm border border-white/50 text-left"
+                  >
+                    <div className="font-bold text-zpd-900">
+                      {u.nickname} ({u.userCode})
+                    </div>
+                    <div className="text-caption font-semibold text-pawp-600 mt-1 bg-white/50 px-2 py-0.5 rounded-md">
+                      {t("transfer.remainingQuota", { remaining: u.remaining })}
+                    </div>
+                  </div>
+                ))}
+              </div>
             )}
           </div>
           <button

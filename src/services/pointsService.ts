@@ -25,6 +25,20 @@ export interface GivePointsPayload {
   amount: number;
 }
 
+export interface ExceededUser {
+  id: number;
+  email: string;
+  firstname: string;
+  lastname: string;
+  nickname: string;
+  userCode: string;
+  role: string;
+  session?: string | null;
+  points: number;
+  group: any;
+  remaining: number;
+}
+
 export interface GivePointsResponse {
   success?: boolean;
   amount?: number;
@@ -33,6 +47,7 @@ export interface GivePointsResponse {
   total?: number;
   receivers?: string[];
   exceededCodes?: string[];
+  exceeded?: ExceededUser[];
 }
 
 export async function getUserByCode(code: string): Promise<ReceiverProfile> {

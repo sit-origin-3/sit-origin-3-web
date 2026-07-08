@@ -66,6 +66,9 @@ const resources = {
         fail: "โอนไม่สำเร็จ",
         successCount: "สำเร็จ",
         failCount: "ล้มเหลว",
+        successSummary: "สำเร็จ {{count}} คน",
+        failSummary: "ล้มเหลว {{count}} คน",
+        remainingQuota: "รับได้อีก {{remaining}} แต้ม",
         backToScan: "กลับไปสแกนต่อ",
         cancel: "ยกเลิก",
       },
@@ -86,7 +89,7 @@ const resources = {
         logoutConfirmDesc: "คุณต้องการออกจากระบบใช่หรือไม่",
         pointHistoryTitle: "ประวัติล่าสุด",
         easterEggBounty:
-          "น้องพี่มีไรจะบอก หาตัวพี่โฮป IT พี่ทรี IT หรือพี่แทน IT ให้เจอ รับไปเลย {{points}} แต้มมม!!",
+          "แคปหน้านี้ไว้ หาตัวพี่โฮป IT พี่ทรี IT หรือพี่แทน IT ให้เจอ รับไปเลย {{points}} แต้มมม!!",
       },
       history: {
         title: "ประวัติการรับคะแนน",
@@ -278,6 +281,9 @@ const resources = {
         fail: "Transfer Failed",
         successCount: "Success",
         failCount: "Failed",
+        successSummary: "Success: {{count}}",
+        failSummary: "Failed: {{count}}",
+        remainingQuota: "Remaining quota: {{remaining}} points",
         backToScan: "Back to Scanner",
         cancel: "Cancel",
       },
@@ -298,7 +304,7 @@ const resources = {
         logoutConfirmDesc: "Are you sure you want to logout?",
         pointHistoryTitle: "Recent History",
         easterEggBounty:
-          "BOUNTY HUNT: Spot P'Hope (IT), P'Three (IT), or P'Tan (IT) in the wild! Catch 'em (gently) for {{points}} juicy points!!",
+          "(CAPTURE THIS!) BOUNTY HUNT: Spot P'Hope (IT), P'Three (IT), or P'Tan (IT) in the wild! Catch 'em (gently) for {{points}} juicy points!!",
       },
       history: {
         title: "Point History",

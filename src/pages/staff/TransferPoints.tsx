@@ -78,20 +78,27 @@ export default function TransferPoints() {
   const processedRef = useRef(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  useGSAP(() => {
-    if (phase === "SCANNING" || phase === "SCANNED") {
-      gsap.fromTo(".gsap-scanner-item", {
-        y: 15,
-        opacity: 0
-      }, {
-        y: 0,
-        opacity: 1,
-        duration: 0.5,
-        stagger: 0.08,
-        ease: "power3.out"
-      });
-    }
-  }, { scope: containerRef, dependencies: [phase] });
+  useGSAP(
+    () => {
+      if (phase === "SCANNING" || phase === "SCANNED") {
+        gsap.fromTo(
+          ".gsap-scanner-item",
+          {
+            y: 15,
+            opacity: 0,
+          },
+          {
+            y: 0,
+            opacity: 1,
+            duration: 0.5,
+            stagger: 0.08,
+            ease: "power3.out",
+          },
+        );
+      }
+    },
+    { scope: containerRef, dependencies: [phase] },
+  );
 
   const lookupUser = useCallback(
     async (code: string, isManual: boolean = false) => {
@@ -253,7 +260,10 @@ export default function TransferPoints() {
   }
 
   return (
-    <div ref={containerRef} className="fixed inset-0 z-0 h-full w-full overflow-hidden bg-black">
+    <div
+      ref={containerRef}
+      className="fixed inset-0 z-0 h-full w-full overflow-hidden bg-black"
+    >
       {/* FULL SCREEN CAMERA */}
       <div
         id={scannerElementId}

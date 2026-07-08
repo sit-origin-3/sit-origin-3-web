@@ -94,8 +94,8 @@ export default function PointHistoryModal({
                       <Clock className="h-3 w-3 shrink-0" />
                       <span className="truncate">
                         {tx.action === "receive"
-                          ? `${tx.giver?.group ?? "-"}: ${getGroupName(tx.giver?.group as any)?.formatted || t("history.unknownStation")}`
-                          : `${tx.receiver?.group ?? "-"}: ${getGroupName(tx.receiver?.group as any)?.formatted || t("history.unknownStation")}`}
+                          ? tx.giver?.nickname || t("history.unknownUser")
+                          : `${(tx.receiver?.group as any)?.id || "-"}: ${(tx.receiver?.group as any)?.name || t("history.unknownStation")}`}
                         {" • "}
                         {formatTimeGMT7(tx.createdAt)}
                       </span>

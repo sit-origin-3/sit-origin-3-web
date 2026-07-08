@@ -34,8 +34,8 @@ const ROLE_STYLES: Record<string, string> = {
 
 const EASTER_EGG_TIERS = [
   { chance: 0.01, points: 67 }, // 0.5% chance
-  { chance: 0.025, points: 67 }, // 1.0% chance
-  { chance: 0.04, points: 67 }, // 2.0% chance
+  { chance: 0.01, points: 67 }, // 1.0% chance
+  { chance: 0.02, points: 67 }, // 2.0% chance
 ];
 
 function RoleBadge({ role }: { role: string }) {
@@ -288,19 +288,18 @@ export default function Profile() {
                 <User className="h-10 w-10 text-white" strokeWidth={2} />
               </div>
 
-              <div className="gsap-profile-item opacity-0 w-full px-4 text-center">
-                {easterEggPoints !== null ? (
-                  <h1
+              <div className="gsap-profile-item opacity-0 w-full px-4 text-center flex flex-col gap-2">
+                {easterEggPoints !== null && (
+                  <h2
                     ref={easterEggRef}
                     className="bg-gradient-to-r from-pawp-500 via-fox-500 to-berry-500 bg-clip-text text-h3 font-black leading-snug text-transparent"
                   >
                     {t("profile.easterEggBounty", { points: easterEggPoints })}
-                  </h1>
-                ) : (
-                  <h1 className="text-h2 text-zpd-900 leading-tight">
-                    {profile.firstname} {profile.lastname} ({profile.nickname})
-                  </h1>
+                  </h2>
                 )}
+                <h1 className="text-h2 text-zpd-900 leading-tight">
+                  {profile.firstname} {profile.lastname} ({profile.nickname})
+                </h1>
               </div>
 
               <div className="gsap-profile-item opacity-0 flex flex-wrap items-center justify-center gap-2">
@@ -368,7 +367,7 @@ export default function Profile() {
 
         {/* Extras outside the unified card */}
         {profile.role !== "ADMIN" && (
-          <div className="gsap-profile-item opacity-0 translate-y-4">
+          <div className="gsap-profile-item opacity-0 flex w-full flex-col">
             <PointHistoryPreview transactions={profile.history || []} />
           </div>
         )}

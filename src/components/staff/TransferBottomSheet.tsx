@@ -9,7 +9,7 @@ import {
   Users,
   Trash2,
 } from "lucide-react";
-import type { ReceiverProfile } from "../../services/pointsService";
+import type { ReceiverProfile, ExceededUser } from "../../services/pointsService";
 import { givePoints } from "../../services/pointsService";
 import ConfirmModal from "../common/ConfirmModal";
 import { getAvatarBg } from "../../utils/avatar";
@@ -26,6 +26,8 @@ interface TransferBottomSheetProps {
     successful: number;
     failed: number;
     total: number;
+    receivers: string[];
+    exceeded: ExceededUser[];
   }) => void;
 }
 
@@ -79,6 +81,8 @@ export default function TransferBottomSheet({
         successful: results.successful ?? receivers.length,
         failed: results.failed ?? 0,
         total: receivers.length,
+        receivers: results.receivers || [],
+        exceeded: results.exceeded || [],
       });
     } catch (err: any) {
       if (axios.isAxiosError(err)) {

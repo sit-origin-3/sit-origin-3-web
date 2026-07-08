@@ -184,12 +184,20 @@ export default function LeaderboardList({ entries, showLeaderboard, isRefreshing
   // Handle Flip animations on subsequent updates
   useGSAP(() => {
     if (flipStateRef.current && listRef.current) {
+      const currentHeight = listRef.current.offsetHeight;
+      listRef.current.style.height = `${currentHeight}px`;
+
       Flip.from(flipStateRef.current, {
         duration: 0.6,
         ease: "power3.out",
         absolute: true,
         stagger: 0.02,
         scale: true,
+        onComplete: () => {
+          if (listRef.current) {
+            listRef.current.style.height = '';
+          }
+        }
       });
       flipStateRef.current = null;
     }

@@ -10,11 +10,12 @@ interface AnimatedNumberProps {
 
 export default function AnimatedNumber({ value }: AnimatedNumberProps) {
   const spanRef = useRef<HTMLSpanElement>(null);
+  const prevValue = useRef(0);
   
   useGSAP(() => {
     if (!spanRef.current) return;
     
-    const obj = { val: 0 };
+    const obj = { val: prevValue.current };
     
     gsap.to(obj, {
       val: value,
@@ -26,7 +27,9 @@ export default function AnimatedNumber({ value }: AnimatedNumberProps) {
         }
       }
     });
+    
+    prevValue.current = value;
   }, [value]);
 
-  return <span ref={spanRef}>0</span>;
+  return <span ref={spanRef}>{prevValue.current.toLocaleString()}</span>;
 }

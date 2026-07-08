@@ -74,7 +74,7 @@ export default function Login() {
         delay: 0.5,
       });
     },
-    { scope: container }
+    { scope: container },
   );
 
   const handleSubmit = useCallback(
@@ -134,7 +134,10 @@ export default function Login() {
   );
 
   return (
-    <main ref={container} className="flex min-h-dvh flex-col items-center justify-center px-4 py-8 relative">
+    <main
+      ref={container}
+      className="flex min-h-dvh flex-col items-center justify-center px-4 py-8 relative"
+    >
       <div className="w-full max-w-sm">
         <div className="mb-6 flex flex-col items-center gap-2">
           <div className="gsap-login-item gsap-float opacity-0 flex h-32 w-32 items-center justify-center rounded-full shadow-hard overflow-hidden bg-white/80 p-2 backdrop-blur-sm border-2 border-white/60">
@@ -144,8 +147,12 @@ export default function Login() {
               className="h-full w-full object-contain drop-shadow-sm"
             />
           </div>
-          <h1 className="gsap-login-item opacity-0 text-h1 text-zpd-900">SIT Origin #3</h1>
-          <p className="gsap-login-item opacity-0 text-caption text-neutral-500">{t("login.title")}</p>
+          <h1 className="gsap-login-item opacity-0 text-h1 text-zpd-900">
+            SIT Origin #3
+          </h1>
+          <p className="gsap-login-item opacity-0 text-caption text-neutral-500">
+            {t("login.title")}
+          </p>
         </div>
 
         <form
@@ -185,7 +192,7 @@ export default function Login() {
                 className={`block w-full rounded-2xl border-2 bg-white/60 px-4 py-3 text-body text-zpd-900 outline-none transition-colors placeholder:text-neutral-400 focus:border-zpd-500 focus:ring-2 focus:ring-zpd-500/30 ${
                   errors.identifier ? "border-pawp-500" : "border-white/60"
                 }`}
-                placeholder="email@sit.kmutt.ac.th"
+                placeholder="example@email.com"
               />
               {errors.identifier && (
                 <p

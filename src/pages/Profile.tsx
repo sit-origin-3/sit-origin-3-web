@@ -6,7 +6,6 @@ import {
   User,
   Shield,
   GraduationCap,
-  Loader2,
   AlertTriangle,
   LogOut,
   RefreshCw,
@@ -23,6 +22,7 @@ import type { UserProfile } from "../types/user";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 import AnimatedNumber from "../components/ui/AnimatedNumber";
+import ProfileSkeleton from "../components/profile/ProfileSkeleton";
 
 gsap.registerPlugin(useGSAP);
 
@@ -70,19 +70,6 @@ function MajorBadge({ major }: { major: string }) {
     </span>
   );
 }
-
-function ProfileSkeleton() {
-  const { t } = useTranslation();
-  return (
-    <main className="flex min-h-[calc(100dvh-4rem)] items-center justify-center px-4 py-8">
-      <div className="flex flex-col items-center gap-3">
-        <Loader2 className="h-10 w-10 animate-spin text-zpd-500" />
-        <p className="text-body text-zpd-700">{t("common.loading")}</p>
-      </div>
-    </main>
-  );
-}
-
 function ProfileError({
   message,
   onRetry,

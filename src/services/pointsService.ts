@@ -26,9 +26,13 @@ export interface GivePointsPayload {
 }
 
 export interface GivePointsResponse {
-  successful: number;
-  failed: number;
-  total: number;
+  success?: boolean;
+  amount?: number;
+  successful?: number;
+  failed?: number;
+  total?: number;
+  receivers?: string[];
+  exceededCodes?: string[];
 }
 
 export async function getUserByCode(code: string): Promise<ReceiverProfile> {

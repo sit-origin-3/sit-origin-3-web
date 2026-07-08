@@ -28,6 +28,10 @@ import ConfirmModal from "../../components/common/ConfirmModal";
 import { getAvatarBg } from "../../utils/avatar";
 import { useTranslation } from "react-i18next";
 import { useGroupName } from "../../hooks/useGroupName";
+import gsap from "gsap";
+import { useGSAP } from "@gsap/react";
+
+gsap.registerPlugin(useGSAP);
 
 type Phase = "SCANNING" | "SCANNED" | "RESULTS";
 
@@ -72,6 +76,22 @@ export default function TransferPoints() {
   } | null>(null);
 
   const processedRef = useRef(false);
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  useGSAP(() => {
+    if (phase === "SCANNING" || phase === "SCANNED") {
+      gsap.fromTo(".gsap-scanner-item", {
+        y: 15,
+        opacity: 0
+      }, {
+        y: 0,
+        opacity: 1,
+        duration: 0.5,
+        stagger: 0.08,
+        ease: "power3.out"
+      });
+    }
+  }, { scope: containerRef, dependencies: [phase] });
 
   const lookupUser = useCallback(
     async (code: string, isManual: boolean = false) => {
@@ -233,7 +253,7 @@ export default function TransferPoints() {
   }
 
   return (
-    <div className="fixed inset-0 z-0 h-full w-full overflow-hidden bg-black">
+    <div ref={containerRef} className="fixed inset-0 z-0 h-full w-full overflow-hidden bg-black">
       {/* FULL SCREEN CAMERA */}
       <div
         id={scannerElementId}
@@ -256,7 +276,7 @@ export default function TransferPoints() {
 
       {/* Floating Top Bar (Idle/Scanning) */}
       {(phase === "SCANNING" || phase === "SCANNED") && (
-        <div className="absolute inset-x-0 top-0 z-20 flex items-center justify-between bg-gradient-to-b from-black/50 to-transparent p-4 pt-safe">
+        <div className="gsap-scanner-item absolute inset-x-0 top-0 z-20 flex items-center justify-between bg-gradient-to-b from-black/50 to-transparent p-4 pt-safe">
           <h1 className="text-h3 text-white drop-shadow-md">
             {t("transfer.title")}
           </h1>
@@ -268,13 +288,18 @@ export default function TransferPoints() {
         <div className="pointer-events-none absolute h-[100vh] inset-0 z-10 flex flex-col items-center justify-center -translate-y-8 md:-translate-y-16 overflow-hidden">
           {/* CUSTOM FRIENDLY SCANNING RETICLE */}
           {!isInitializing && !cameraError ? (
-            <div className="h-[250px] w-[250px] shrink-0 rounded-[32px] border-4 border-white/80 shadow-[0_0_0_99999px_rgba(0,0,0,0.7),0_0_20px_rgba(0,0,0,0.3)_inset]" />
+            <div className="gsap-scanner-item relative h-[250px] w-[250px] shrink-0 rounded-[32px] shadow-[0_0_0_99999px_rgba(0,0,0,0.7),0_0_20px_rgba(0,0,0,0.3)_inset]">
+              <div className="absolute top-0 left-0 w-6 h-6 border-t-4 border-l-4 border-pawp-500 rounded-tl-xl" />
+              <div className="absolute top-0 right-0 w-6 h-6 border-t-4 border-r-4 border-pawp-500 rounded-tr-xl" />
+              <div className="absolute bottom-0 left-0 w-6 h-6 border-b-4 border-l-4 border-pawp-500 rounded-bl-xl" />
+              <div className="absolute bottom-0 right-0 w-6 h-6 border-b-4 border-r-4 border-pawp-500 rounded-br-xl" />
+            </div>
           ) : (
-            <div className="h-[250px] w-[250px] shrink-0" />
+            <div className="gsap-scanner-item h-[250px] w-[250px] shrink-0" />
           )}
 
           {/* Control Buttons */}
-          <div className="pointer-events-auto mt-8 flex w-full items-center justify-center gap-3 px-4">
+          <div className="gsap-scanner-item pointer-events-auto mt-8 flex w-full items-center justify-center gap-3 px-4">
             <button
               type="button"
               onClick={() => {

@@ -15,6 +15,7 @@ import ConfirmModal from "../common/ConfirmModal";
 import { getAvatarBg } from "../../utils/avatar";
 import { useTranslation } from "react-i18next";
 import { useGroupName } from "../../hooks/useGroupName";
+import toast from "react-hot-toast";
 
 interface TransferBottomSheetProps {
   isOpen: boolean;
@@ -65,6 +66,15 @@ export default function TransferBottomSheet({
     try {
       const results = await givePoints(payload);
 
+      const hasReceivers = (results.receivers || []).length > 0;
+      const exceededCodes = results.exceededCodes || [];
+
+      if (hasReceivers && exceededCodes.length === 0) {
+        toast.success(t("transfer.transferSuccessToast"));
+      } else if (hasReceivers && exceededCodes.length > 0) {
+        toast.error(t("transfer.transferPartialSuccess", { codes: exceededCodes.join(", ") }));
+      }
+
       onTransferComplete({
         successful: results.successful ?? receivers.length,
         failed: results.failed ?? 0,
@@ -79,6 +89,14 @@ export default function TransferBottomSheet({
         }
         
         if (err.response?.status === 400) {
+          const exceededCodes = err.response?.data?.exceededCodes || [];
+          if (exceededCodes.length > 0) {
+            toast.error(t("transfer.transferAllExceeded", { codes: exceededCodes.join(", ") }));
+            setError(t("transfer.transferAllExceeded", { codes: exceededCodes.join(", ") }));
+            setIsSending(false);
+            return;
+          }
+          
           const backendError = err.response?.data?.error;
           if (typeof backendError === "string" && backendError.includes("Exceeded limit for:")) {
             const code = backendError.split(": ")[1]?.trim();

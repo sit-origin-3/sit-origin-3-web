@@ -18,40 +18,61 @@ export default function Home() {
   const [activeTab, setActiveTab] = useState<string>("A1");
 
   useEffect(() => {
-    if (user && user.role === "FRESHY" && user.group) {
-      if (["A1", "A2", "A3", "A4", "A5"].includes(user.group as unknown as string)) {
-        setActiveTab(user.group as unknown as string);
-      }
+    const groupId = typeof user?.group === "object" ? (user.group as any)?.id : user?.group;
+    if (groupId && typeof groupId === "string" && groupId.startsWith("A")) {
+      setActiveTab(groupId);
     }
   }, [user]);
 
   const schedule = getScheduleForGroup(activeTab);
   const isSessionB = user?.session === "B";
 
-  const { contextSafe } = useGSAP(
+  // Initial Page Load Animation
+  useGSAP(
     () => {
-      gsap.from(".gsap-item", {
-        y: 15,
-        opacity: 0,
-        scale: 0.98,
-        duration: 0.6,
-        stagger: 0.08,
-        ease: "power3.out",
-      });
+      gsap.fromTo(
+        ".gsap-item:not(.gsap-schedule-item)",
+        { y: 15, opacity: 0, scale: 0.98 },
+        {
+          y: 0,
+          opacity: 1,
+          scale: 1,
+          duration: 0.6,
+          stagger: 0.08,
+          ease: "power3.out",
+          overwrite: "auto",
+        }
+      );
     },
-    { scope: container },
+    { scope: container }
   );
 
-  const handleTabChange = contextSafe((group: string) => {
+  // Dynamic Schedule Animation
+  useGSAP(
+    () => {
+      if (!schedule.length) return;
+
+      gsap.fromTo(
+        ".gsap-schedule-item",
+        { y: 15, opacity: 0 },
+        {
+          y: 0,
+          opacity: 1,
+          duration: 0.4,
+          stagger: 0.05,
+          ease: "power3.out",
+          overwrite: "auto",
+        }
+      );
+    },
+    { scope: container, dependencies: [activeTab, schedule] }
+  );
+
+  const handleTabChange = (group: string) => {
     if (group === activeTab) return;
+    gsap.killTweensOf(".gsap-schedule-item");
     setActiveTab(group);
-    
-    gsap.fromTo(
-      ".gsap-schedule-item",
-      { y: 15, opacity: 0 },
-      { y: 0, opacity: 1, duration: 0.5, stagger: 0.05, ease: "power3.out" }
-    );
-  });
+  };
 
   return (
     <main
@@ -104,7 +125,7 @@ export default function Home() {
                   {part}
                   {i < arr.length - 1 && (
                     <span>
-                      <AnimatedNumber value={500} />+
+                      <AnimatedNumber value={157} />
                     </span>
                   )}
                 </span>
@@ -149,20 +170,29 @@ export default function Home() {
               {schedule.map((item) => (
                 <div
                   key={item.id}
-                  className="gsap-item gsap-schedule-item flex flex-col rounded-2xl border border-white/60 bg-white/50 p-4 shadow-sm backdrop-blur-md transition-all hover:bg-white/70"
+                  className="gsap-item gsap-schedule-item flex flex-row items-center gap-4 rounded-2xl border border-white/60 bg-white/50 p-4 shadow-sm backdrop-blur-md transition-all hover:bg-white/70"
                 >
-                  <div className="mb-2 flex items-center gap-2 text-zpd-600">
-                    <Clock className="h-4 w-4 shrink-0" />
-                    <span className="font-mono text-body font-bold">
-                      {item.time}
-                    </span>
+                  <div className="flex w-20 shrink-0 flex-col items-center justify-center border-r border-white/40 pr-4">
+                    <div className="flex flex-col items-center text-center leading-tight text-zpd-800">
+                      <span className="text-sm font-bold">
+                        {item.time.split(" - ")[0]}
+                      </span>
+                      {item.time.includes(" - ") && (
+                        <span className="text-xs font-semibold text-zpd-600/70">
+                          {item.time.split(" - ")[1]}
+                        </span>
+                      )}
+                    </div>
                   </div>
-                  <h3 className="mb-1 text-body-lg font-bold text-zpd-900">
-                    {t(item.titleKey)}
-                  </h3>
-                  <div className="flex items-center gap-1.5 text-caption font-semibold text-neutral-500">
-                    <MapPin className="h-3 w-3 shrink-0" />
-                    <span>{t(item.locationKey)}</span>
+                  
+                  <div className="flex flex-1 flex-col">
+                    <h3 className="mb-0.5 text-body font-bold text-zpd-900 leading-tight">
+                      {t(item.titleKey)}
+                    </h3>
+                    <div className="flex items-center gap-1 text-xs text-neutral-600">
+                      <MapPin className="h-3 w-3 shrink-0" />
+                      <span>{t(item.locationKey)}</span>
+                    </div>
                   </div>
                 </div>
               ))}

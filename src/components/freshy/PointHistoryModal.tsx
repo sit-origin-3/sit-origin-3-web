@@ -1,9 +1,10 @@
 import { createPortal } from "react-dom";
-import { X, Clock, MapPin, Inbox, User } from "lucide-react";
+import { X, Clock, MapPin, Inbox, User, ArrowRight } from "lucide-react";
 import type { TransactionHistory } from "../../types/user";
 import { formatTimeGMT7 } from "../../utils/date";
 import { useTranslation } from "react-i18next";
 import { useGroupName } from "../../hooks/useGroupName";
+import { useAuthStore } from "../../store/useAuthStore";
 
 interface PointHistoryModalProps {
   isOpen: boolean;
@@ -18,8 +19,11 @@ export default function PointHistoryModal({
 }: PointHistoryModalProps) {
   const { t } = useTranslation();
   const getGroupName = useGroupName();
+  const user = useAuthStore((s) => s.user);
 
   if (!isOpen) return null;
+
+  const historyTitle = user?.role === "STAFF" ? t("history.transferHistoryTitle") : t("history.receiveHistoryTitle");
 
   return createPortal(
     <div
@@ -33,7 +37,12 @@ export default function PointHistoryModal({
       >
         {/* Sticky Header */}
         <div className="flex shrink-0 items-center justify-between border-b border-white/40 bg-white/50 px-6 py-4">
-          <h2 className="text-h3 text-zpd-900">{t("history.title")}</h2>
+          <div className="flex items-center gap-3">
+            <h2 className="text-h3 text-zpd-900">{historyTitle}</h2>
+            <span className="text-sm font-medium opacity-75 text-zpd-900">
+              {transactions.length} {t("history.items")}
+            </span>
+          </div>
           <button
             type="button"
             onClick={onClose}
@@ -62,41 +71,37 @@ export default function PointHistoryModal({
                   key={`${tx.createdAt}-${index}`}
                   className="flex items-center justify-between rounded-2xl border border-white/60 bg-white/60 p-4 shadow-sm backdrop-blur-md"
                 >
-                  <div className="flex flex-col gap-1">
+                  <div className="flex flex-col gap-1 min-w-0 flex-1">
                     <div className="flex items-center gap-1.5 text-zpd-900">
                       {tx.action === "receive" ? (
-                        <MapPin className="h-4 w-4 text-zpd-500" />
+                        <MapPin className="h-4 w-4 shrink-0 text-zpd-500" />
                       ) : (
-                        <User className="h-4 w-4 text-pawp-500" />
+                        <User className="h-4 w-4 shrink-0 text-pawp-500" />
                       )}
-                      <span className="text-body-lg font-bold">
-                        {tx.action === "receive"
-                          ? getGroupName(tx.giver?.group as any)?.formatted || t("history.unknownStation")
-                          : t("history.staffGaveTo", {
-                              giver: tx.giver?.nickname || t("history.unknownUser"),
-                              receiver: tx.receiver?.nickname || t("history.unknownUser"),
-                            })}
+                      <span className="text-body-lg font-bold flex items-center gap-1 truncate">
+                        {tx.action === "receive" ? (
+                          getGroupName(tx.giver?.group as any)?.formatted || t("history.unknownStation")
+                        ) : (
+                          <>
+                            <span className="truncate">{tx.giver?.nickname || t("history.unknownUser")}</span>
+                            <ArrowRight className="h-4 w-4 shrink-0" />
+                            <span className="truncate">{tx.receiver?.nickname || t("history.unknownUser")}</span>
+                          </>
+                        )}
                       </span>
                     </div>
-                    <div className="flex items-center gap-1 text-caption text-neutral-500">
-                      <Clock className="h-3 w-3" />
-                      <span>
+                    <div className="flex items-center gap-1 text-caption text-neutral-500 truncate">
+                      <Clock className="h-3 w-3 shrink-0" />
+                      <span className="truncate">
                         {tx.action === "receive"
-                          ? t("history.receivedFrom", {
-                              name:
-                                tx.giver?.nickname || t("history.unknownUser"),
-                            })
-                          : t("history.givenTo", {
-                              group:
-                                getGroupName(tx.receiver?.group as any)?.formatted ||
-                                t("history.unknownStation"),
-                            })}
+                          ? `${tx.giver?.group ?? "-"}: ${getGroupName(tx.giver?.group as any)?.formatted || t("history.unknownStation")}`
+                          : `${tx.receiver?.group ?? "-"}: ${getGroupName(tx.receiver?.group as any)?.formatted || t("history.unknownStation")}`}
                         {" • "}
                         {formatTimeGMT7(tx.createdAt)}
                       </span>
                     </div>
                   </div>
-                  <div className="flex shrink-0 flex-col items-end">
+                  <div className="flex shrink-0 flex-col items-end ml-3">
                     <span
                       className={`font-mono text-h3 font-black ${tx.action === "receive" ? "text-jungle-500" : "text-pawp-500"}`}
                     >

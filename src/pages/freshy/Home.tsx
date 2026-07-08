@@ -155,7 +155,7 @@ export default function Home() {
         </h2>
 
         <>
-          <div className="gsap-item flex w-full gap-2 overflow-x-auto pb-2 scrollbar-hide px-2">
+          <div className="gsap-item grid w-full grid-cols-5 gap-2 px-2 pb-2">
             {[
               { id: "1", name: "HORSE" },
               { id: "2", name: "SLOTH" },
@@ -173,14 +173,14 @@ export default function Home() {
                   key={groupId}
                   type="button"
                   onClick={() => handleTabChange(groupId)}
-                  className={`shrink-0 flex flex-col items-center justify-center gap-0.5 rounded-2xl px-4 py-2 transition-all shadow-sm ${
+                  className={`w-full flex flex-col items-center justify-center gap-0.5 rounded-2xl px-1 py-2 transition-all shadow-sm ${
                     activeTab === groupId
                       ? "bg-zpd-500 text-white border border-zpd-600 scale-105 shadow-md"
                       : "bg-white/60 text-zpd-900 border border-white/60 hover:bg-white/80 backdrop-blur-sm"
                   }`}
                 >
                   <span className="text-sm md:text-base font-bold">{groupId}</span>
-                  <span className="text-[10px] font-semibold uppercase tracking-wider opacity-75">{grp.name}</span>
+                  <span className="w-full truncate text-center text-[10px] font-semibold uppercase tracking-wider opacity-75">{grp.name}</span>
                 </button>
               );
             })}

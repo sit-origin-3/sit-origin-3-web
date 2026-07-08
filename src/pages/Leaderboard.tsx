@@ -100,7 +100,7 @@ export default function Leaderboard() {
         {showSkeleton ? (
           <LeaderboardSkeleton />
         ) : (
-          <LeaderboardList entries={entries} showLeaderboard={showLeaderboard} />
+          <LeaderboardList entries={entries} showLeaderboard={showLeaderboard} isRefreshing={isSpinning} />
         )}
       </div>
 

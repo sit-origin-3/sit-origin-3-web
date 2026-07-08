@@ -52,18 +52,15 @@ export default function Home() {
     () => {
       if (!schedule.length) return;
 
-      gsap.fromTo(
-        ".gsap-schedule-item",
-        { y: 15, opacity: 0 },
-        {
-          y: 0,
-          opacity: 1,
-          duration: 0.4,
-          stagger: 0.05,
-          ease: "power3.out",
-          overwrite: "auto",
-        }
-      );
+      gsap.to(".gsap-schedule-item", {
+        y: 0,
+        opacity: 1,
+        duration: 0.4,
+        stagger: 0.05,
+        ease: "power3.out",
+        overwrite: "auto",
+        clearProps: "transform",
+      });
     },
     { scope: container, dependencies: [activeTab, schedule] }
   );
@@ -169,8 +166,8 @@ export default function Home() {
             <div className="flex flex-col gap-3">
               {schedule.map((item) => (
                 <div
-                  key={item.id}
-                  className="gsap-item gsap-schedule-item flex flex-row items-center gap-4 rounded-2xl border border-white/60 bg-white/50 p-4 shadow-sm backdrop-blur-md transition-all hover:bg-white/70"
+                  key={`${activeTab}-${item.id}`}
+                  className="gsap-item gsap-schedule-item opacity-0 translate-y-4 flex flex-row items-center gap-4 rounded-2xl border border-white/60 bg-white/50 p-4 shadow-sm backdrop-blur-md transition-all hover:bg-white/70"
                 >
                   <div className="flex w-20 shrink-0 flex-col items-center justify-center border-r border-white/40 pr-4">
                     <div className="flex flex-col items-center text-center leading-tight text-zpd-800">

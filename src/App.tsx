@@ -3,6 +3,7 @@ import {
   RouterProvider,
   Navigate,
   Outlet,
+  useLocation,
 } from "react-router-dom";
 import { Loader2 } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -17,6 +18,25 @@ import Navbar from "./components/common/Navbar";
 import AppLayout from "./components/layout/AppLayout";
 import { useAuthStore } from "./store/useAuthStore";
 import { getMe } from "./services/userService";
+
+function ScrollToTop() {
+  const { pathname } = useLocation();
+
+  useEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: "instant" });
+  }, [pathname]);
+
+  return null;
+}
+
+function RootLayout() {
+  return (
+    <>
+      <ScrollToTop />
+      <Outlet />
+    </>
+  );
+}
 
 function ProtectedLayout() {
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
@@ -76,22 +96,27 @@ function AuthInitializer({ children }: { children: React.ReactNode }) {
 
 const router = createBrowserRouter([
   {
-    path: "/login",
-    element: <Login />,
-  },
-  {
-    element: <ProtectedLayout />,
+    element: <RootLayout />,
     children: [
-      { path: "/profile", element: <Profile /> },
-      { path: "/home", element: <Home /> },
-      { path: "/leaderboard", element: <Leaderboard /> },
-      { path: "/transfer", element: <TransferPoints /> },
-      { path: "/dashboard", element: <Dashboard /> },
-      { path: "/admin/system", element: <SystemControl /> },
+      {
+        path: "/login",
+        element: <Login />,
+      },
+      {
+        element: <ProtectedLayout />,
+        children: [
+          { path: "/profile", element: <Profile /> },
+          { path: "/home", element: <Home /> },
+          { path: "/leaderboard", element: <Leaderboard /> },
+          { path: "/transfer", element: <TransferPoints /> },
+          { path: "/dashboard", element: <Dashboard /> },
+          { path: "/admin/system", element: <SystemControl /> },
+        ],
+      },
+      { path: "/", element: <HomeRedirect /> },
+      { path: "*", element: <HomeRedirect /> },
     ],
   },
-  { path: "/", element: <HomeRedirect /> },
-  { path: "*", element: <HomeRedirect /> },
 ]);
 
 import { Toaster } from "react-hot-toast";

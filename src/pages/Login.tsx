@@ -55,6 +55,8 @@ export default function Login() {
 
   useGSAP(
     () => {
+      gsap.set(".gsap-login-item", { y: 30, opacity: 0 });
+
       gsap.to(".gsap-login-item", {
         y: 0,
         opacity: 1,
@@ -135,21 +137,21 @@ export default function Login() {
     <main ref={container} className="flex min-h-dvh flex-col items-center justify-center px-4 py-8 relative">
       <div className="w-full max-w-sm">
         <div className="mb-6 flex flex-col items-center gap-2">
-          <div className="gsap-login-item gsap-float opacity-0 translate-y-8 flex h-32 w-32 items-center justify-center rounded-full shadow-hard overflow-hidden bg-white/80 p-2 backdrop-blur-sm border-2 border-white/60">
+          <div className="gsap-login-item gsap-float opacity-0 flex h-32 w-32 items-center justify-center rounded-full shadow-hard overflow-hidden bg-white/80 p-2 backdrop-blur-sm border-2 border-white/60">
             <img
               src={originLogo}
               alt="SIT Origin"
               className="h-full w-full object-contain drop-shadow-sm"
             />
           </div>
-          <h1 className="gsap-login-item opacity-0 translate-y-8 text-h1 text-zpd-900">SIT Origin #3</h1>
-          <p className="gsap-login-item opacity-0 translate-y-8 text-caption text-neutral-500">{t("login.title")}</p>
+          <h1 className="gsap-login-item opacity-0 text-h1 text-zpd-900">SIT Origin #3</h1>
+          <p className="gsap-login-item opacity-0 text-caption text-neutral-500">{t("login.title")}</p>
         </div>
 
         <form
           onSubmit={handleSubmit}
           noValidate
-          className="gsap-login-item opacity-0 translate-y-8 rounded-[32px] border-2 border-white/60 bg-white/40 p-6 shadow-cartoon backdrop-blur-lg"
+          className="gsap-login-item opacity-0 rounded-[32px] border-2 border-white/60 bg-white/40 p-6 shadow-cartoon backdrop-blur-lg"
         >
           {errors.general && (
             <div

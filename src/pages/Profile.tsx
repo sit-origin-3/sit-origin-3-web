@@ -144,7 +144,7 @@ export default function Profile() {
         // Step 1: ID Card drops in
         tl.fromTo(
           ".gsap-id-card",
-          { y: -100, opacity: 0 },
+          { y: -150, opacity: 0 },
           { y: 0, opacity: 1, duration: 0.7, ease: "back.out(1.2)", clearProps: "transform" }
         )
         // Step 2: Content stagger in
@@ -152,7 +152,7 @@ export default function Profile() {
           ".gsap-profile-item",
           { y: 15, opacity: 0 },
           { y: 0, opacity: 1, stagger: 0.08, duration: 0.5, ease: "power3.out", clearProps: "transform" },
-          "-=0.2"
+          "-=0.3"
         );
       }
     },
@@ -245,12 +245,12 @@ export default function Profile() {
             {/* HEADER (Identity) */}
             <div className="flex flex-col items-center gap-3 p-6 pb-5">
               <div
-                className={`gsap-profile-item opacity-0 translate-y-4 flex h-20 w-20 items-center justify-center rounded-full border-4 border-white/70 shadow-hard ${avatarBg}`}
+                className={`gsap-profile-item opacity-0 flex h-20 w-20 items-center justify-center rounded-full border-4 border-white/70 shadow-hard ${avatarBg}`}
               >
                 <User className="h-10 w-10 text-white" strokeWidth={2} />
               </div>
 
-              <div className="gsap-profile-item opacity-0 translate-y-4 w-full px-4 text-center">
+              <div className="gsap-profile-item opacity-0 w-full px-4 text-center">
               {easterEggPoints !== null ? (
                 <h1
                   ref={easterEggRef}
@@ -265,7 +265,7 @@ export default function Profile() {
               )}
             </div>
 
-            <div className="gsap-profile-item opacity-0 translate-y-4 flex flex-wrap items-center justify-center gap-2">
+            <div className="gsap-profile-item opacity-0 flex flex-wrap items-center justify-center gap-2">
               <RoleBadge role={profile.role} />
               <MajorBadge major={profile.major} />
             </div>
@@ -274,7 +274,7 @@ export default function Profile() {
           {/* BODY (Statistics) */}
           <div className="flex flex-col gap-3 border-y border-white/40 bg-white/30 px-6 py-5">
             {/* ROW 1: Group */}
-            <div className="gsap-profile-item opacity-0 translate-y-4 flex flex-col items-center justify-center rounded-2xl border border-white/60 bg-white/60 px-4 py-3 shadow-sm backdrop-blur-sm">
+            <div className="gsap-profile-item opacity-0 flex flex-col items-center justify-center rounded-2xl border border-white/60 bg-white/60 px-4 py-3 shadow-sm backdrop-blur-sm">
               <p className="text-caption font-semibold uppercase tracking-wider text-neutral-500">
                 {t("profile.groupLabel")}
               </p>
@@ -283,7 +283,7 @@ export default function Profile() {
 
             {/* ROW 2: Points & Rank */}
             <div className="flex gap-3">
-              <div className="gsap-profile-item opacity-0 translate-y-4 flex flex-1 flex-col items-center justify-center rounded-2xl border border-white/40 bg-white/40 px-4 py-3 shadow-inner backdrop-blur-sm text-center">
+              <div className="gsap-profile-item opacity-0 flex flex-1 flex-col items-center justify-center rounded-2xl border border-white/40 bg-white/40 px-4 py-3 shadow-inner backdrop-blur-sm text-center">
                 <p className="text-caption font-semibold text-neutral-500">
                   {profile.role === "FRESHY"
                     ? t("profile.pointsLabel")
@@ -294,7 +294,7 @@ export default function Profile() {
                 </p>
               </div>
               {profile.rank !== null && (
-                <div className="gsap-profile-item opacity-0 translate-y-4 flex flex-1 flex-col items-center justify-center rounded-2xl border border-white/40 bg-white/40 px-4 py-3 shadow-inner backdrop-blur-sm text-center">
+                <div className="gsap-profile-item opacity-0 flex flex-1 flex-col items-center justify-center rounded-2xl border border-white/40 bg-white/40 px-4 py-3 shadow-inner backdrop-blur-sm text-center">
                   <p className="text-caption font-semibold text-neutral-500">
                     {t("profile.rankLabel")}
                   </p>
@@ -308,7 +308,7 @@ export default function Profile() {
 
           {/* FOOTER (QR & Code) - Hidden for STAFF & ADMIN */}
           {profile.role === "FRESHY" && (
-            <div className="gsap-profile-item opacity-0 translate-y-4 flex flex-col items-center p-6 pt-5 bg-white/20">
+            <div className="gsap-profile-item opacity-0 flex flex-col items-center p-6 pt-5 bg-white/20">
               <div className="mb-3 flex justify-center rounded-2xl bg-white p-4 shadow-sm">
                 <QRCodeSVG
                   value={profile.userCode}
@@ -339,7 +339,7 @@ export default function Profile() {
           <button
             type="button"
             onClick={() => setShowLogoutModal(true)}
-            className="gsap-profile-item opacity-0 translate-y-4 flex min-h-[44px] w-full items-center justify-center gap-2 rounded-2xl border-2 border-pawp-500/30 bg-white/40 px-4 py-3 text-body-lg font-bold text-pawp-500 shadow-cartoon backdrop-blur-lg transition-all hover:bg-pawp-500/10 active:translate-y-0.5 active:shadow-none"
+            className="gsap-profile-item opacity-0 flex min-h-[44px] w-full items-center justify-center gap-2 rounded-2xl border-2 border-pawp-500/30 bg-white/40 px-4 py-3 text-body-lg font-bold text-pawp-500 shadow-cartoon backdrop-blur-lg transition-all hover:bg-pawp-500/10 active:translate-y-0.5 active:shadow-none"
           >
             <LogOut className="h-5 w-5" />
             {t("common.logout")}

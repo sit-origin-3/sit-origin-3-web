@@ -1,7 +1,7 @@
 import { useRef } from "react";
 import { useTranslation } from "react-i18next";
 import originLogo from "../../assets/origin_logo.png";
-import { MapPin, CalendarDays, Users } from "lucide-react";
+import { MapPin, CalendarDays, Users, Building, Clock } from "lucide-react";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 import AnimatedNumber from "../../components/ui/AnimatedNumber";
@@ -43,14 +43,22 @@ export default function Home() {
         <h1 className="gsap-item mb-8 text-h1 text-zpd-900 drop-shadow-sm">
           {t("home.eventName")}
         </h1>
-        <div className="gsap-item flex flex-col gap-2 rounded-2xl border-2 border-white/60 bg-white/30 p-4 shadow-sm backdrop-blur-md">
-          <div className="flex items-center gap-2 text-body font-semibold text-neutral-600">
-            <MapPin className="h-5 w-5 text-berry-500" />
-            <span>{t("home.eventLocation")}</span>
+        <div className="gsap-item flex flex-col gap-3 rounded-2xl border-2 border-white/60 bg-white/30 p-5 shadow-sm backdrop-blur-md">
+          <div className="flex items-center gap-3 text-body font-semibold text-neutral-600">
+            <MapPin className="h-5 w-5 text-berry-500 shrink-0" />
+            <span className="text-left">{t("home.eventLocation")}</span>
           </div>
-          <div className="flex items-center gap-2 text-body font-semibold text-neutral-600">
-            <CalendarDays className="h-5 w-5 text-pawp-500" />
-            <span>{t("home.eventDateTime")}</span>
+          <div className="flex items-center gap-3 text-body font-semibold text-neutral-600">
+            <Building className="h-5 w-5 text-fox-500 shrink-0" />
+            <span className="text-left">LX Building (Placeholder)</span>
+          </div>
+          <div className="flex items-center gap-3 text-body font-semibold text-neutral-600">
+            <CalendarDays className="h-5 w-5 text-pawp-500 shrink-0" />
+            <span className="text-left">{t("home.eventDateTime")}</span>
+          </div>
+          <div className="flex items-center gap-3 text-body font-semibold text-neutral-600">
+            <Clock className="h-5 w-5 text-zpd-500 shrink-0" />
+            <span className="text-left">08:00 - 17:00 (Placeholder)</span>
           </div>
         </div>
       </section>

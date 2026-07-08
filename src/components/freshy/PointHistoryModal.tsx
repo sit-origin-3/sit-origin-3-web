@@ -71,7 +71,7 @@ export default function PointHistoryModal({
                       )}
                       <span className="text-body-lg font-bold">
                         {tx.action === "receive"
-                          ? getGroupName(tx.giver?.group as any) || t("history.unknownStation")
+                          ? getGroupName(tx.giver?.group as any)?.formatted || t("history.unknownStation")
                           : t("history.staffGaveTo", {
                               giver: tx.giver?.nickname || t("history.unknownUser"),
                               receiver: tx.receiver?.nickname || t("history.unknownUser"),
@@ -88,7 +88,7 @@ export default function PointHistoryModal({
                             })
                           : t("history.givenTo", {
                               group:
-                                getGroupName(tx.receiver?.group as any) ||
+                                getGroupName(tx.receiver?.group as any)?.formatted ||
                                 t("history.unknownStation"),
                             })}
                         {" • "}

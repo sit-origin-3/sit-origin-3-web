@@ -33,9 +33,9 @@ const ROLE_STYLES: Record<string, string> = {
 };
 
 const EASTER_EGG_TIERS = [
-  { chance: 0.5, points: 47 }, // 0.5% chance
-  { chance: 0.01, points: 26 }, // 1.0% chance
-  { chance: 0.02, points: 11 }, // 2.0% chance
+  { chance: 0.01, points: 47 }, // 0.5% chance
+  { chance: 0.02, points: 26 }, // 1.0% chance
+  { chance: 0.035, points: 11 }, // 2.0% chance
 ];
 
 function RoleBadge({ role }: { role: string }) {
@@ -152,10 +152,14 @@ export default function Profile() {
   useGSAP(
     () => {
       if (profile) {
-        gsap.from(".gsap-profile-item", {
+        gsap.fromTo(".gsap-profile-item", {
           y: 15,
           opacity: 0,
           scale: 0.98,
+        }, {
+          y: 0,
+          opacity: 1,
+          scale: 1,
           duration: 0.6,
           stagger: 0.08,
           ease: "power3.out",
@@ -230,10 +234,8 @@ export default function Profile() {
     );
   }
 
-  const groupId = profile.group?.id || String(profile.group || null);
-  const groupName = getGroupName(profile.group as any) || "-";
-  const actualGroup =
-    groupId === null || groupId === "-" ? "-" : `${groupId}: ${groupName}`;
+  const groupName = getGroupName(profile.group as any)?.name || "-";
+  const actualGroup = getGroupName(profile.group as any)?.formatted || "-";
   const avatarBg = getAvatarBg(profile.role, profile.session, groupName);
 
   return (
@@ -255,7 +257,7 @@ export default function Profile() {
               {easterEggPoints !== null ? (
                 <h1
                   ref={easterEggRef}
-                  className="animate-pulse bg-gradient-to-r from-pawp-500 via-fox-500 to-berry-500 bg-clip-text text-h3 font-black leading-snug text-transparent drop-shadow-sm"
+                  className="bg-gradient-to-r from-pawp-500 via-fox-500 to-berry-500 bg-clip-text text-h3 font-black leading-snug text-transparent"
                 >
                   {t("profile.easterEggBounty", { points: easterEggPoints })}
                 </h1>

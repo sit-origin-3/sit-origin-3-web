@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useMemo } from "react";
 import { useTranslation } from "react-i18next";
-import { Loader2, Search, User, Star, Activity, Users, FilterX } from "lucide-react";
+import { Loader2, Search, User, Star, Activity, FilterX } from "lucide-react";
 import type { UserProfile } from "../../types/user";
 import { getUsers } from "../../services/userService";
 import UserEditModal from "./UserEditModal";
@@ -48,26 +48,28 @@ export default function UserManagementTab() {
     const groups = new Map<string, string>();
     users.forEach((u) => {
       if (u.group && u.group.id) {
-        groups.set(u.group.id, getGroupName(u.group as any));
+        groups.set(u.group.id, getGroupName(u.group as any)?.formatted || "");
       }
     });
-    return Array.from(groups.entries()).sort((a, b) => a[1].localeCompare(b[1]));
+    return Array.from(groups.entries()).sort((a, b) =>
+      a[1].localeCompare(b[1]),
+    );
   }, [users, getGroupName]);
 
   const filteredUsers = useMemo(() => {
     let result = users;
 
     if (filterRole !== "ALL") {
-      result = result.filter(u => u.role === filterRole);
+      result = result.filter((u) => u.role === filterRole);
     }
     if (filterSession !== "ALL") {
-      result = result.filter(u => (u.session || "NONE") === filterSession);
+      result = result.filter((u) => (u.session || "NONE") === filterSession);
     }
     if (filterMajor !== "ALL") {
-      result = result.filter(u => u.major === filterMajor);
+      result = result.filter((u) => u.major === filterMajor);
     }
     if (filterGroup !== "ALL") {
-      result = result.filter(u => u.group?.id === filterGroup);
+      result = result.filter((u) => u.group?.id === filterGroup);
     }
 
     if (searchQuery.trim()) {
@@ -78,12 +80,22 @@ export default function UserManagementTab() {
           u.firstname.toLowerCase().includes(q) ||
           u.lastname.toLowerCase().includes(q) ||
           (u.nickname && u.nickname.toLowerCase().includes(q)) ||
-          (getGroupName(u.group as any).toLowerCase().includes(q))
+          (getGroupName(u.group as any)?.formatted || "")
+            .toLowerCase()
+            .includes(q)
         );
       });
     }
     return result;
-  }, [users, searchQuery, getGroupName, filterRole, filterSession, filterMajor, filterGroup]);
+  }, [
+    users,
+    searchQuery,
+    getGroupName,
+    filterRole,
+    filterSession,
+    filterMajor,
+    filterGroup,
+  ]);
 
   return (
     <div className="flex flex-col gap-6 animate-in fade-in zoom-in-95">
@@ -105,7 +117,9 @@ export default function UserManagementTab() {
             onChange={(e) => setFilterRole(e.target.value)}
             className="rounded-xl border-2 border-white/60 bg-white/60 px-3 py-2 text-caption font-medium text-zpd-900 shadow-sm outline-none transition-all focus:border-zpd-400 cursor-pointer"
           >
-            <option value="ALL">{t("adminSystem.filterRole")}: {t("adminSystem.filterAll")}</option>
+            <option value="ALL">
+              {t("adminSystem.filterRole")}: {t("adminSystem.filterAll")}
+            </option>
             <option value="FRESHY">FRESHY</option>
             <option value="STAFF">STAFF</option>
             <option value="ADMIN">ADMIN</option>
@@ -115,7 +129,9 @@ export default function UserManagementTab() {
             onChange={(e) => setFilterSession(e.target.value)}
             className="rounded-xl border-2 border-white/60 bg-white/60 px-3 py-2 text-caption font-medium text-zpd-900 shadow-sm outline-none transition-all focus:border-zpd-400 cursor-pointer"
           >
-            <option value="ALL">{t("adminSystem.filterSession")}: {t("adminSystem.filterAll")}</option>
+            <option value="ALL">
+              {t("adminSystem.filterSession")}: {t("adminSystem.filterAll")}
+            </option>
             <option value="A">Session A</option>
             <option value="B">Session B</option>
           </select>
@@ -124,18 +140,30 @@ export default function UserManagementTab() {
             onChange={(e) => setFilterMajor(e.target.value)}
             className="rounded-xl border-2 border-white/60 bg-white/60 px-3 py-2 text-caption font-medium text-zpd-900 shadow-sm outline-none transition-all focus:border-zpd-400 cursor-pointer"
           >
-            <option value="ALL">{t("adminSystem.filterMajor")}: {t("adminSystem.filterAll")}</option>
-            {uniqueMajors.map(m => <option key={m} value={m}>{m}</option>)}
+            <option value="ALL">
+              {t("adminSystem.filterMajor")}: {t("adminSystem.filterAll")}
+            </option>
+            {uniqueMajors.map((m) => (
+              <option key={m} value={m}>
+                {m}
+              </option>
+            ))}
           </select>
           <select
             value={filterGroup}
             onChange={(e) => setFilterGroup(e.target.value)}
             className="rounded-xl border-2 border-white/60 bg-white/60 px-3 py-2 text-caption font-medium text-zpd-900 shadow-sm outline-none transition-all focus:border-zpd-400 cursor-pointer max-w-[150px] truncate"
           >
-            <option value="ALL">{t("adminSystem.filterGroup")}: {t("adminSystem.filterAll")}</option>
-            {uniqueGroups.map(([id, name]) => <option key={id} value={id}>{name}</option>)}
+            <option value="ALL">
+              {t("adminSystem.filterGroup")}: {t("adminSystem.filterAll")}
+            </option>
+            {uniqueGroups.map(([id, name]) => (
+              <option key={id} value={id}>
+                {name}
+              </option>
+            ))}
           </select>
-          
+
           <button
             type="button"
             onClick={() => {
@@ -170,10 +198,12 @@ export default function UserManagementTab() {
               <div
                 key={u.id}
                 onClick={() => setSelectedUser(u)}
-                className="group flex cursor-pointer flex-col gap-3 rounded-2xl border border-white/50 bg-white/60 p-4 shadow-sm backdrop-blur-sm transition-all hover:-translate-y-1 hover:bg-white hover:shadow-md"
+                className="group flex cursor-pointer justify-between gap-3 rounded-2xl border border-white/50 bg-white/60 p-4 shadow-sm backdrop-blur-sm transition-all hover:-translate-y-1 hover:bg-white hover:shadow-md"
               >
                 <div className="flex items-start gap-3">
-                  <div className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-full ${getAvatarBg(u.role, u.session, u.group?.name)} text-white shadow-sm transition-transform group-hover:scale-105`}>
+                  <div
+                    className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-full ${getAvatarBg(u.role, u.session, u.group?.name)} text-white shadow-sm transition-transform group-hover:scale-105`}
+                  >
                     <User className="h-6 w-6" />
                   </div>
                   <div className="min-w-0 flex-1 flex flex-col">
@@ -188,21 +218,28 @@ export default function UserManagementTab() {
                         {u.role}
                       </span>
                       {u.session && (
-                        <span className={`inline-flex rounded-full border border-white/40 px-2 py-0.5 text-[10px] font-bold text-white shadow-sm ${u.session === 'A' ? 'bg-berry-500/80' : 'bg-pawp-500/80'}`}>
+                        <span
+                          className={`inline-flex rounded-full border border-white/40 px-2 py-0.5 text-[10px] font-bold text-white shadow-sm ${u.session === "A" ? "bg-berry-500/80" : "bg-pawp-500/80"}`}
+                        >
                           {u.session}
                         </span>
                       )}
+                      <span className="inline-flex rounded-full border border-white/40 bg-white/40 px-2 py-0.5 text-[10px] font-bold text-zpd-700 shadow-sm">
+                        <span className="truncate">
+                          {getGroupName(u.group as any)?.formatted ||
+                            "No Group"}
+                        </span>
+                      </span>
                     </div>
                   </div>
                 </div>
 
                 <div className="flex items-center justify-between border-t border-white/40 pt-3">
-                  <span className="flex items-center gap-1 text-caption font-bold text-neutral-500 truncate max-w-[120px]">
-                    <Users className="h-3.5 w-3.5 shrink-0" />
-                    <span className="truncate">{getGroupName(u.group as any) || "No Group"}</span>
-                  </span>
                   <div className="flex items-center gap-1 rounded-full bg-fox-500/10 px-2 py-0.5 border border-fox-500/20 shrink-0">
-                    <Star className="h-3.5 w-3.5 text-fox-500" fill="currentColor" />
+                    <Star
+                      className="h-3.5 w-3.5 text-fox-500"
+                      fill="currentColor"
+                    />
                     <span className="font-mono text-caption font-bold text-fox-500">
                       {u.points}
                     </span>

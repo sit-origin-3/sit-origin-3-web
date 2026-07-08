@@ -123,7 +123,7 @@ export default function UserEditModal({
             </div>
             <div className="rounded-xl border border-white/40 bg-white/30 p-3 overflow-hidden">
               <span className="block font-bold text-neutral-500">{t("adminSystem.userDetailGroup")}</span>
-              <span className="truncate block">{user.group ? `${user.group.id}: ${getGroupName(user.group as any)}` : "-"}</span>
+              <span className="truncate block">{user.group ? getGroupName(user.group as any)?.formatted || "-" : "-"}</span>
             </div>
           </div>
 

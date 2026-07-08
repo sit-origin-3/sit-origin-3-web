@@ -72,7 +72,7 @@ export default function PointHistoryPreview({
                   <div className="min-w-0 flex-1">
                     <p className="truncate text-body-lg font-bold text-zpd-900">
                       {tx.action === "receive"
-                        ? getGroupName(tx.giver?.group as any) || t("history.unknownStation")
+                        ? getGroupName(tx.giver?.group as any)?.formatted || t("history.unknownStation")
                         : t("history.staffGaveTo", {
                             giver: tx.giver?.nickname || t("history.unknownUser"),
                             receiver: tx.receiver?.nickname || t("history.unknownUser"),
@@ -86,7 +86,7 @@ export default function PointHistoryPreview({
                           })
                         : t("history.givenTo", {
                             group:
-                              getGroupName(tx.receiver?.group as any) ||
+                              getGroupName(tx.receiver?.group as any)?.formatted ||
                               t("history.unknownStation"),
                           })}
                       {" • "}

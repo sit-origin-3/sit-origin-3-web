@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from "react";
-import { Trophy, WifiOff, RefreshCw } from "lucide-react";
+import { Trophy, WifiOff, RefreshCw, Download } from "lucide-react";
 import { fetchLeaderboard } from "../services/leaderboardService";
 import { useAuthStore } from "../store/useAuthStore";
 import { useSmartRefresh } from "../hooks/useSmartRefresh";
@@ -47,6 +47,31 @@ export default function Leaderboard() {
     fetchLogs();
   }, [fetchLogs]);
 
+  const handleExportTop10CSV = useCallback(() => {
+    const top10 = entries.slice(0, 10);
+    const headers = ["Rank", "User Code", "Nickname", "Group ID", "Group Name", "Points"];
+    
+    const rows = top10.map((user, index) => {
+      const groupId = typeof user.group === "object" ? (user.group as any).id : (user.group || "");
+      const groupName = typeof user.group === "object" ? (user.group as any).name : (user.groupAlt || user.group || "");
+      
+      return `"${index + 1}","${user.userCode || ""}","${user.nickname || ""}","${groupId}","${groupName}","${user.points}"`;
+    });
+
+    const csvContent = [headers.map(h => `"${h}"`).join(","), ...rows].join("\n");
+    const blob = new Blob(["\uFEFF" + csvContent], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "leaderboard_top10.csv";
+    link.style.display = "none";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  }, [entries]);
+
   if (error && entries.length === 0) {
     return (
       <main className="flex min-h-[calc(100dvh-6rem)] items-center justify-center px-4 py-8">
@@ -79,15 +104,27 @@ export default function Leaderboard() {
           <Trophy className="h-6 w-6 text-fox-500" />
           <h1 className="text-h2 text-zpd-900">{t("leaderboard.title")}</h1>
         </div>
-        <button
-          type="button"
-          onClick={triggerManualRefresh}
-          className="flex h-[44px] w-[44px] items-center justify-center rounded-full border border-zpd-500/40 bg-white/40 text-zpd-600 shadow-cartoon backdrop-blur-md transition-all hover:bg-zpd-50 active:scale-95"
-        >
-          <RefreshCw
-            className={`h-5 w-5 ${isSpinning ? "animate-spin" : ""}`}
-          />
-        </button>
+        <div className="flex items-center gap-2">
+          {isAdmin && entries.length > 0 && (
+            <button
+              type="button"
+              onClick={handleExportTop10CSV}
+              className="flex h-[44px] items-center gap-2 rounded-2xl bg-white/60 px-4 py-2 text-body font-bold text-zpd-800 shadow-sm transition-all hover:bg-white/80 active:scale-95 border border-white/60 backdrop-blur-md"
+            >
+              <Download className="h-4 w-4" />
+              <span className="hidden sm:inline">{t("leaderboard.exportTop10", "Export Top 10")}</span>
+            </button>
+          )}
+          <button
+            type="button"
+            onClick={triggerManualRefresh}
+            className="flex h-[44px] w-[44px] shrink-0 items-center justify-center rounded-2xl border border-zpd-500/40 bg-white/40 text-zpd-600 shadow-cartoon backdrop-blur-md transition-all hover:bg-zpd-50 active:scale-95"
+          >
+            <RefreshCw
+              className={`h-5 w-5 ${isSpinning ? "animate-spin" : ""}`}
+            />
+          </button>
+        </div>
       </div>
 
       {!showLeaderboard && !showSkeleton && (

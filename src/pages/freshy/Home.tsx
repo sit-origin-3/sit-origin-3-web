@@ -20,12 +20,13 @@ export default function Home() {
 
   useEffect(() => {
     if (!user) return; // Wait for data
-    if (user.role === "FRESHY" && user.group?.id) {
-      setActiveTab(user.group.id); // Explicitly set their exact group
+    const groupId = typeof user.group === "object" ? (user.group as any)?.id : user.group;
+    if (user.role === "FRESHY" && groupId) {
+      setActiveTab(groupId); // Explicitly set their exact group
     } else if (user.role !== "FRESHY" && !activeTab) {
       setActiveTab("A1"); // Only fallback to A1 if Staff/Admin and no tab is selected
     }
-  }, [user]);
+  }, [user, activeTab]);
 
   const schedule = activeTab ? getScheduleForGroup(activeTab) : [];
 

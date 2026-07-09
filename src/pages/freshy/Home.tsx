@@ -15,28 +15,17 @@ export default function Home() {
   const container = useRef<HTMLElement>(null);
   const user = useAuthStore((s) => s.user);
 
-  const initialGroupId =
-    typeof user?.group === "object" ? (user.group as any)?.id : user?.group;
-  const validInitialGroupId =
-    initialGroupId &&
-    typeof initialGroupId === "string" &&
-    (initialGroupId.startsWith("A") || initialGroupId.startsWith("B"))
-      ? initialGroupId
-      : "";
-
-  const [activeTab, setActiveTab] = useState<string>(validInitialGroupId);
+  const [activeTab, setActiveTab] = useState<string>("");
   const [adminSessionView, setAdminSessionView] = useState<"A" | "B">("A");
 
-  const currentGroupId =
-    typeof user?.group === "object" ? (user.group as any)?.id : user?.group;
-
   useEffect(() => {
-    if (user && user.role === "FRESHY" && currentGroupId) {
-      setActiveTab(currentGroupId);
-    } else if (user && user.role !== "FRESHY" && !activeTab) {
-      setActiveTab("A1"); // Admin/Staff
+    if (!user) return; // Wait for data
+    if (user.role === "FRESHY" && user.group?.id) {
+      setActiveTab(user.group.id); // Explicitly set their exact group
+    } else if (user.role !== "FRESHY" && !activeTab) {
+      setActiveTab("A1"); // Only fallback to A1 if Staff/Admin and no tab is selected
     }
-  }, [user, currentGroupId]); // Explicitly depend on user and currentGroupId
+  }, [user]);
 
   const schedule = activeTab ? getScheduleForGroup(activeTab) : [];
 
@@ -188,19 +177,13 @@ export default function Home() {
                 { id: "4", nameA: "SNAKE", nameB: "ARCTIC SHREW" },
                 { id: "5", nameA: "GAZELLE", nameB: "QUOKKA" },
               ].map((grp) => {
-                const currentPrefix = activeTab
-                  ? activeTab.charAt(0)
-                  : currentGroupId && typeof currentGroupId === "string"
-                    ? currentGroupId.charAt(0)
-                    : "A";
-                const sessionPrefix =
+                const currentSession =
                   user && ["ADMIN", "STAFF"].includes(user.role.toUpperCase())
                     ? adminSessionView
-                    : currentPrefix === "B"
-                      ? "B"
-                      : "A";
-              const groupId = `${sessionPrefix}${grp.id}`;
-              const groupName = sessionPrefix === "B" ? grp.nameB : grp.nameA;
+                    : activeTab.charAt(0);
+                
+                const groupId = `${currentSession}${grp.id}`;
+                const groupName = currentSession === "B" ? grp.nameB : grp.nameA;
 
               return (
                 <button

@@ -35,7 +35,7 @@ const ROLE_STYLES: Record<string, string> = {
 const EASTER_EGG_TIERS = [
   { chance: 0.01, points: 67 }, // 0.5% chance
   { chance: 0.01, points: 67 }, // 1.0% chance
-  { chance: 0.02, points: 67 }, // 2.0% chance
+  { chance: 0.01, points: 67 }, // 2.0% chance
 ];
 
 function RoleBadge({ role }: { role: string }) {

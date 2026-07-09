@@ -22,22 +22,25 @@ export default function Home() {
     typeof initialGroupId === "string" &&
     (initialGroupId.startsWith("A") || initialGroupId.startsWith("B"))
       ? initialGroupId
-      : "A1";
+      : "";
 
   const [activeTab, setActiveTab] = useState<string>(validInitialGroupId);
   const [adminSessionView, setAdminSessionView] = useState<"A" | "B">("A");
 
+  const currentGroupId =
+    typeof user?.group === "object" ? (user.group as any)?.id : user?.group;
+
   useEffect(() => {
-    const groupId =
-      typeof user?.group === "object" ? (user.group as any)?.id : user?.group;
     if (
-      groupId &&
-      typeof groupId === "string" &&
-      (groupId.startsWith("A") || groupId.startsWith("B"))
+      currentGroupId &&
+      typeof currentGroupId === "string" &&
+      (currentGroupId.startsWith("A") || currentGroupId.startsWith("B"))
     ) {
-      setActiveTab(groupId);
+      setActiveTab(currentGroupId);
+    } else if (!activeTab) {
+      setActiveTab("A1");
     }
-  }, [user]);
+  }, [currentGroupId, activeTab]);
 
   const schedule = getScheduleForGroup(activeTab);
 
@@ -187,7 +190,7 @@ export default function Home() {
               const sessionPrefix =
                 user && ["ADMIN", "STAFF"].includes(user.role.toUpperCase())
                   ? adminSessionView
-                  : activeTab.charAt(0) === "B"
+                  : currentGroupId && typeof currentGroupId === "string" && currentGroupId.startsWith("B")
                     ? "B"
                     : "A";
               const groupId = `${sessionPrefix}${grp.id}`;

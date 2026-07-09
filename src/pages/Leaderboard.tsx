@@ -48,12 +48,10 @@ export default function Leaderboard() {
   }, [fetchLogs]);
 
   const handleExportCSV = useCallback(() => {
-    const headers = ["Rank", "ID", "Firstname", "Lastname", "Nickname", "Points", "Group"];
+    const headers = ["Rank", "User Code", "Firstname", "Lastname", "Nickname", "Major", "Group ID", "Group Name", "Points"];
     
     const rows = entries.map((user) => {
-      const groupStr = typeof user.group === "object" ? (user.group as any).id : (user.group || "");
-      
-      return `"${user.rank}","${user.id || ""}","${user.firstname || ""}","${user.lastname || ""}","${user.nickname || ""}","${user.points}","${groupStr}"`;
+      return `"${user.rank}","${user.userCode || ""}","${user.firstname || ""}","${user.lastname || ""}","${user.nickname || ""}","${user.major || ""}","${user.groupId || ""}","${user.group || ""}","${user.points}"`;
     });
 
     const csvContent = [headers.map(h => `"${h}"`).join(","), ...rows].join("\n");

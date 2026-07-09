@@ -21,7 +21,7 @@ import { useGroupName } from "../hooks/useGroupName";
 import type { UserProfile } from "../types/user";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
-import AnimatedNumber from "../components/ui/AnimatedNumber";
+
 import ProfileSkeleton from "../components/profile/ProfileSkeleton";
 
 gsap.registerPlugin(useGSAP);
@@ -112,6 +112,10 @@ export default function Profile() {
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   const [easterEggPoints, setEasterEggPoints] = useState<number | null>(null);
+  
+  const [displayPoints, setDisplayPoints] = useState(0);
+  const [displayRank, setDisplayRank] = useState(0);
+
   const containerRef = useRef<HTMLElement>(null);
   const easterEggRef = useRef<HTMLHeadingElement>(null);
 
@@ -194,8 +198,34 @@ export default function Profile() {
           );
       }
     },
-    { scope: containerRef, dependencies: [profile] },
+    { scope: containerRef, dependencies: [!!profile] },
   );
+
+  useEffect(() => {
+    if (profile) {
+      const target = { val: displayPoints };
+      gsap.to(target, {
+        val: profile.points,
+        duration: 1,
+        ease: "power2.out",
+        onUpdate: () => setDisplayPoints(Math.floor(target.val)),
+      });
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [profile?.points]);
+
+  useEffect(() => {
+    if (profile && profile.rank !== null) {
+      const target = { val: displayRank };
+      gsap.to(target, {
+        val: profile.rank,
+        duration: 1,
+        ease: "power2.out",
+        onUpdate: () => setDisplayRank(Math.floor(target.val)),
+      });
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [profile?.rank]);
 
   useGSAP(
     () => {
@@ -238,9 +268,27 @@ export default function Profile() {
       .finally(() => setIsLoading(false));
   }, [clearAuth, navigate, t]);
 
+  const fetchProfileSilent = useCallback(() => {
+    getMe()
+      .then(({ user, token }) => {
+        setProfile(user);
+        if (token) {
+          useAuthStore.getState().setAuth(token, user);
+        }
+      })
+      .catch((err: unknown) => {
+        if (err instanceof AxiosError && err.response?.status === 401) {
+          clearAuth();
+          navigate("/login", { replace: true });
+        }
+      });
+  }, [clearAuth, navigate]);
+
   useEffect(() => {
     fetchProfile();
-  }, [fetchProfile]);
+    const interval = setInterval(fetchProfileSilent, 5000);
+    return () => clearInterval(interval);
+  }, [fetchProfile, fetchProfileSilent]);
 
   const handleLogout = useCallback(async () => {
     setIsLoggingOut(true);
@@ -327,7 +375,7 @@ export default function Profile() {
                       : t("profile.remainingGroupPoints")}
                   </p>
                   <p className="font-mono text-h3 font-black text-fox-500">
-                    <AnimatedNumber value={profile.points} />
+                    {displayPoints.toLocaleString()}
                   </p>
                 </div>
                 {profile.rank !== null && (
@@ -336,7 +384,7 @@ export default function Profile() {
                       {t("profile.rankLabel")}
                     </p>
                     <p className="font-mono text-h3 font-black text-zpd-900">
-                      #{profile.rank}
+                      #{displayRank.toLocaleString()}
                     </p>
                   </div>
                 )}

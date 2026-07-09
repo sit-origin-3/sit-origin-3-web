@@ -8,6 +8,7 @@ export interface LeaderboardEntry {
   group?: string | null;
   groupAlt?: string | null;
   reachedAt?: string | null;
+  userCode?: string | null;
 }
 
 export interface LeaderboardResponse {

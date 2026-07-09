@@ -15,21 +15,31 @@ export default function Home() {
   const container = useRef<HTMLElement>(null);
   const user = useAuthStore((s) => s.user);
 
-  const initialGroupId = typeof user?.group === "object" ? (user.group as any)?.id : user?.group;
-  const validInitialGroupId = (initialGroupId && typeof initialGroupId === "string" && (initialGroupId.startsWith("A") || initialGroupId.startsWith("B"))) ? initialGroupId : "A1";
+  const initialGroupId =
+    typeof user?.group === "object" ? (user.group as any)?.id : user?.group;
+  const validInitialGroupId =
+    initialGroupId &&
+    typeof initialGroupId === "string" &&
+    (initialGroupId.startsWith("A") || initialGroupId.startsWith("B"))
+      ? initialGroupId
+      : "A1";
 
   const [activeTab, setActiveTab] = useState<string>(validInitialGroupId);
   const [adminSessionView, setAdminSessionView] = useState<"A" | "B">("A");
 
   useEffect(() => {
-    const groupId = typeof user?.group === "object" ? (user.group as any)?.id : user?.group;
-    if (groupId && typeof groupId === "string" && (groupId.startsWith("A") || groupId.startsWith("B"))) {
+    const groupId =
+      typeof user?.group === "object" ? (user.group as any)?.id : user?.group;
+    if (
+      groupId &&
+      typeof groupId === "string" &&
+      (groupId.startsWith("A") || groupId.startsWith("B"))
+    ) {
       setActiveTab(groupId);
     }
   }, [user]);
 
   const schedule = getScheduleForGroup(activeTab);
-  const isSessionB = user?.session === "B";
 
   // Initial Page Load Animation
   useGSAP(
@@ -45,10 +55,10 @@ export default function Home() {
           stagger: 0.08,
           ease: "power3.out",
           overwrite: "auto",
-        }
+        },
       );
     },
-    { scope: container }
+    { scope: container },
   );
 
   // Dynamic Schedule Animation
@@ -66,7 +76,7 @@ export default function Home() {
         clearProps: "transform",
       });
     },
-    { scope: container, dependencies: [activeTab, schedule] }
+    { scope: container, dependencies: [activeTab, schedule] },
   );
 
   const handleTabChange = (group: string) => {
@@ -99,7 +109,7 @@ export default function Home() {
           </div>
           <div className="flex items-center gap-3 text-body font-semibold text-neutral-600">
             <Building className="h-5 w-5 text-fox-500 shrink-0" />
-            <span className="text-left">LX Building</span>
+            <span className="text-left">LX (N16), CB2 (N17)</span>
           </div>
           <div className="flex items-center gap-3 text-body font-semibold text-neutral-600">
             <CalendarDays className="h-5 w-5 text-pawp-500 shrink-0" />
@@ -143,13 +153,21 @@ export default function Home() {
             <div className="flex bg-white/40 rounded-lg p-1 text-sm font-semibold border border-white/60 shadow-sm backdrop-blur-sm">
               <button
                 className={`px-3 py-1 rounded-md transition-colors ${adminSessionView === "A" ? "bg-zpd-500 text-white shadow-sm" : "text-zpd-700 hover:bg-white/50"}`}
-                onClick={() => { setAdminSessionView("A"); setActiveTab("A1"); gsap.killTweensOf(".gsap-schedule-item"); }}
+                onClick={() => {
+                  setAdminSessionView("A");
+                  setActiveTab("A1");
+                  gsap.killTweensOf(".gsap-schedule-item");
+                }}
               >
                 A
               </button>
               <button
                 className={`px-3 py-1 rounded-md transition-colors ${adminSessionView === "B" ? "bg-zpd-500 text-white shadow-sm" : "text-zpd-700 hover:bg-white/50"}`}
-                onClick={() => { setAdminSessionView("B"); setActiveTab("B1"); gsap.killTweensOf(".gsap-schedule-item"); }}
+                onClick={() => {
+                  setAdminSessionView("B");
+                  setActiveTab("B1");
+                  gsap.killTweensOf(".gsap-schedule-item");
+                }}
               >
                 B
               </button>
@@ -166,9 +184,12 @@ export default function Home() {
               { id: "4", nameA: "SNAKE", nameB: "ARCTIC SHREW" },
               { id: "5", nameA: "GAZELLE", nameB: "QUOKKA" },
             ].map((grp) => {
-              const sessionPrefix = user && ["ADMIN", "STAFF"].includes(user.role.toUpperCase())
-                ? adminSessionView
-                : isSessionB ? "B" : "A";
+              const sessionPrefix =
+                user && ["ADMIN", "STAFF"].includes(user.role.toUpperCase())
+                  ? adminSessionView
+                  : activeTab.charAt(0) === "B"
+                    ? "B"
+                    : "A";
               const groupId = `${sessionPrefix}${grp.id}`;
               const groupName = sessionPrefix === "B" ? grp.nameB : grp.nameA;
 
@@ -183,45 +204,49 @@ export default function Home() {
                       : "bg-white/60 text-zpd-900 border border-white/60 hover:bg-white/80 backdrop-blur-sm"
                   }`}
                 >
-                  <span className="text-sm md:text-base font-bold">{groupId}</span>
-                  <span className="w-full truncate text-center text-[10px] font-semibold uppercase tracking-wider opacity-75">{groupName}</span>
+                  <span className="text-sm md:text-base font-bold">
+                    {groupId}
+                  </span>
+                  <span className="w-full truncate text-center text-[10px] font-semibold uppercase tracking-wider opacity-75">
+                    {groupName}
+                  </span>
                 </button>
               );
             })}
           </div>
 
-            <div className="flex flex-col gap-3">
-              {schedule.map((item) => (
-                <div
-                  key={`${activeTab}-${item.id}`}
-                  className="gsap-item gsap-schedule-item opacity-0 translate-y-4 flex flex-row items-center gap-4 rounded-2xl border border-white/60 bg-white/50 p-4 shadow-sm backdrop-blur-md transition-all hover:bg-white/70"
-                >
-                  <div className="flex w-20 shrink-0 flex-col items-center justify-center border-r border-white/40 pr-4">
-                    <div className="flex flex-col items-center text-center leading-tight text-zpd-800">
-                      <span className="text-sm font-bold">
-                        {item.time.split(" - ")[0]}
+          <div className="flex flex-col gap-3">
+            {schedule.map((item) => (
+              <div
+                key={`${activeTab}-${item.id}`}
+                className="gsap-item gsap-schedule-item opacity-0 translate-y-4 flex flex-row items-center gap-4 rounded-2xl border border-white/60 bg-white/50 p-4 shadow-sm backdrop-blur-md transition-all hover:bg-white/70"
+              >
+                <div className="flex w-20 shrink-0 flex-col items-center justify-center border-r border-white/40 pr-4">
+                  <div className="flex flex-col items-center text-center leading-tight text-zpd-800">
+                    <span className="text-sm font-bold">
+                      {item.time.split(" - ")[0]}
+                    </span>
+                    {item.time.includes(" - ") && (
+                      <span className="text-xs font-semibold text-zpd-600/70">
+                        {item.time.split(" - ")[1]}
                       </span>
-                      {item.time.includes(" - ") && (
-                        <span className="text-xs font-semibold text-zpd-600/70">
-                          {item.time.split(" - ")[1]}
-                        </span>
-                      )}
-                    </div>
-                  </div>
-                  
-                  <div className="flex flex-1 flex-col">
-                    <h3 className="mb-0.5 text-body font-bold text-zpd-900 leading-tight">
-                      {t(item.titleKey)}
-                    </h3>
-                    <div className="flex items-center gap-1 text-xs text-neutral-600">
-                      <MapPin className="h-3 w-3 shrink-0" />
-                      <span>{t(item.locationKey)}</span>
-                    </div>
+                    )}
                   </div>
                 </div>
-              ))}
-            </div>
-          </>
+
+                <div className="flex flex-1 flex-col">
+                  <h3 className="mb-0.5 text-body font-bold text-zpd-900 leading-tight">
+                    {t(item.titleKey)}
+                  </h3>
+                  <div className="flex items-center gap-1 text-xs text-neutral-600">
+                    <MapPin className="h-3 w-3 shrink-0" />
+                    <span>{t(item.locationKey)}</span>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </>
       </section>
     </main>
   );

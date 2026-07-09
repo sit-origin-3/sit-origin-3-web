@@ -8,6 +8,7 @@ import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 import originLogo from "../assets/origin_logo.png";
 import { login as loginApi } from "../services/authService";
+import { getMe } from "../services/userService";
 import { useAuthStore } from "../store/useAuthStore";
 
 gsap.registerPlugin(useGSAP);
@@ -90,11 +91,12 @@ export default function Login() {
 
       setIsLoading(true);
       try {
-        const { user } = await loginApi({
+        await loginApi({
           identifier: identifier.trim(),
           password,
         });
-        setAuth("cookie", user as any);
+        const { user: fullUser } = await getMe();
+        setAuth("cookie", fullUser as any);
         navigate("/", { replace: true });
       } catch (err) {
         if (err instanceof AxiosError && err.response) {

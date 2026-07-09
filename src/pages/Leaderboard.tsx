@@ -47,15 +47,13 @@ export default function Leaderboard() {
     fetchLogs();
   }, [fetchLogs]);
 
-  const handleExportTop10CSV = useCallback(() => {
-    const top10 = entries.slice(0, 10);
-    const headers = ["Rank", "User Code", "Nickname", "Group ID", "Group Name", "Points"];
+  const handleExportCSV = useCallback(() => {
+    const headers = ["Rank", "ID", "Firstname", "Lastname", "Nickname", "Points", "Group"];
     
-    const rows = top10.map((user, index) => {
-      const groupId = typeof user.group === "object" ? (user.group as any).id : (user.group || "");
-      const groupName = typeof user.group === "object" ? (user.group as any).name : (user.groupAlt || user.group || "");
+    const rows = entries.map((user) => {
+      const groupStr = typeof user.group === "object" ? (user.group as any).id : (user.group || "");
       
-      return `"${index + 1}","${user.userCode || ""}","${user.nickname || ""}","${groupId}","${groupName}","${user.points}"`;
+      return `"${user.rank}","${user.id || ""}","${user.firstname || ""}","${user.lastname || ""}","${user.nickname || ""}","${user.points}","${groupStr}"`;
     });
 
     const csvContent = [headers.map(h => `"${h}"`).join(","), ...rows].join("\n");
@@ -64,7 +62,7 @@ export default function Leaderboard() {
     
     const link = document.createElement("a");
     link.href = url;
-    link.download = "leaderboard_top10.csv";
+    link.download = "leaderboard_all.csv";
     link.style.display = "none";
     document.body.appendChild(link);
     link.click();
@@ -108,11 +106,11 @@ export default function Leaderboard() {
           {isAdmin && entries.length > 0 && (
             <button
               type="button"
-              onClick={handleExportTop10CSV}
+              onClick={handleExportCSV}
               className="flex h-[44px] items-center gap-2 rounded-2xl bg-white/60 px-4 py-2 text-body font-bold text-zpd-800 shadow-sm transition-all hover:bg-white/80 active:scale-95 border border-white/60 backdrop-blur-md"
             >
               <Download className="h-4 w-4" />
-              <span className="hidden sm:inline">{t("leaderboard.exportTop10", "Export Top 10")}</span>
+              <span className="hidden sm:inline">{t("leaderboard.exportCSV", "Export CSV")}</span>
             </button>
           )}
           <button

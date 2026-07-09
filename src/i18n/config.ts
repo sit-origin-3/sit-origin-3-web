@@ -37,7 +37,7 @@ const resources = {
         title: "อันดับ",
         rank: "อันดับ",
         points: "คะแนน",
-        exportTop10: "ส่งออก Top 10",
+        exportCSV: "ส่งออก CSV",
         anonymousUser: "ใครกันน้า??",
         hiddenData: "ข้อมูลถูกซ่อน",
         anonymousWarning:
@@ -255,7 +255,7 @@ const resources = {
         title: "Leaderboard",
         rank: "Rank",
         points: "Points",
-        exportTop10: "Export Top 10",
+        exportCSV: "Export CSV",
         anonymousUser: "Anonymous",
         hiddenData: "Data Hidden",
         anonymousWarning:

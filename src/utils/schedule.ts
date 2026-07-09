@@ -24,11 +24,11 @@ export function getScheduleForGroup(group: string): ScheduleItem[] {
   };
 
   const groupOrders: Record<string, (keyof typeof stations)[]> = {
-    "1": ["S1", "S2", "S3", "S4", "S5"],
-    "2": ["S2", "S3", "S4", "S5", "S1"],
-    "3": ["S3", "S4", "S5", "S1", "S2"],
-    "4": ["S4", "S5", "S1", "S2", "S3"],
-    "5": ["S5", "S1", "S2", "S3", "S4"],
+    "1": ["S1", "S5", "S2", "S4", "S3"],
+    "2": ["S2", "S4", "S3", "S1", "S5"],
+    "3": ["S3", "S1", "S5", "S2", "S4"],
+    "4": ["S4", "S3", "S1", "S5", "S2"],
+    "5": ["S5", "S2", "S4", "S3", "S1"],
   };
 
   const getStationItems = (sessionB: boolean) => {

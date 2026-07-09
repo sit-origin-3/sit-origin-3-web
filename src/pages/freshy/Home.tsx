@@ -15,7 +15,10 @@ export default function Home() {
   const container = useRef<HTMLElement>(null);
   const user = useAuthStore((s) => s.user);
 
-  const [activeTab, setActiveTab] = useState<string>("A1");
+  const initialGroupId = typeof user?.group === "object" ? (user.group as any)?.id : user?.group;
+  const validInitialGroupId = (initialGroupId && typeof initialGroupId === "string" && (initialGroupId.startsWith("A") || initialGroupId.startsWith("B"))) ? initialGroupId : "A1";
+
+  const [activeTab, setActiveTab] = useState<string>(validInitialGroupId);
   const [adminSessionView, setAdminSessionView] = useState<"A" | "B">("A");
 
   useEffect(() => {
@@ -157,16 +160,17 @@ export default function Home() {
         <>
           <div className="gsap-item grid w-full grid-cols-5 gap-2 px-2 pb-2">
             {[
-              { id: "1", name: "HORSE" },
-              { id: "2", name: "SLOTH" },
-              { id: "3", name: "SHEEP" },
-              { id: "4", name: "ARCTIC SHREW" },
-              { id: "5", name: "TIGER" },
+              { id: "1", nameA: "CHEETAH", nameB: "FENNEC FOX" },
+              { id: "2", nameA: "HORSE", nameB: "SLOTH" },
+              { id: "3", nameA: "SHEEP", nameB: "BEAVER" },
+              { id: "4", nameA: "SNAKE", nameB: "ARCTIC SHREW" },
+              { id: "5", nameA: "GAZELLE", nameB: "QUOKKA" },
             ].map((grp) => {
               const sessionPrefix = user && ["ADMIN", "STAFF"].includes(user.role.toUpperCase())
                 ? adminSessionView
                 : isSessionB ? "B" : "A";
               const groupId = `${sessionPrefix}${grp.id}`;
+              const groupName = sessionPrefix === "B" ? grp.nameB : grp.nameA;
 
               return (
                 <button
@@ -180,7 +184,7 @@ export default function Home() {
                   }`}
                 >
                   <span className="text-sm md:text-base font-bold">{groupId}</span>
-                  <span className="w-full truncate text-center text-[10px] font-semibold uppercase tracking-wider opacity-75">{grp.name}</span>
+                  <span className="w-full truncate text-center text-[10px] font-semibold uppercase tracking-wider opacity-75">{groupName}</span>
                 </button>
               );
             })}

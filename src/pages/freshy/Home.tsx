@@ -31,18 +31,14 @@ export default function Home() {
     typeof user?.group === "object" ? (user.group as any)?.id : user?.group;
 
   useEffect(() => {
-    if (
-      currentGroupId &&
-      typeof currentGroupId === "string" &&
-      (currentGroupId.startsWith("A") || currentGroupId.startsWith("B"))
-    ) {
+    if (user && user.role === "FRESHY" && currentGroupId) {
       setActiveTab(currentGroupId);
-    } else if (!activeTab) {
-      setActiveTab("A1");
+    } else if (user && user.role !== "FRESHY" && !activeTab) {
+      setActiveTab("A1"); // Admin/Staff
     }
-  }, [currentGroupId, activeTab]);
+  }, [user, currentGroupId]); // Explicitly depend on user and currentGroupId
 
-  const schedule = getScheduleForGroup(activeTab);
+  const schedule = activeTab ? getScheduleForGroup(activeTab) : [];
 
   // Initial Page Load Animation
   useGSAP(
@@ -178,21 +174,31 @@ export default function Home() {
           )}
         </h2>
 
-        <>
-          <div className="gsap-item grid w-full grid-cols-5 gap-2 px-2 pb-2">
-            {[
-              { id: "1", nameA: "CHEETAH", nameB: "FENNEC FOX" },
-              { id: "2", nameA: "HORSE", nameB: "SLOTH" },
-              { id: "3", nameA: "SHEEP", nameB: "BEAVER" },
-              { id: "4", nameA: "SNAKE", nameB: "ARCTIC SHREW" },
-              { id: "5", nameA: "GAZELLE", nameB: "QUOKKA" },
-            ].map((grp) => {
-              const sessionPrefix =
-                user && ["ADMIN", "STAFF"].includes(user.role.toUpperCase())
-                  ? adminSessionView
-                  : currentGroupId && typeof currentGroupId === "string" && currentGroupId.startsWith("B")
-                    ? "B"
+        {(!user || !activeTab) ? (
+          <div className="gsap-item flex flex-col items-center justify-center p-12 text-zpd-500/50">
+            <div className="h-8 w-8 animate-spin rounded-full border-4 border-zpd-500 border-t-transparent" />
+          </div>
+        ) : (
+          <>
+            <div className="gsap-item grid w-full grid-cols-5 gap-2 px-2 pb-2">
+              {[
+                { id: "1", nameA: "CHEETAH", nameB: "FENNEC FOX" },
+                { id: "2", nameA: "HORSE", nameB: "SLOTH" },
+                { id: "3", nameA: "SHEEP", nameB: "BEAVER" },
+                { id: "4", nameA: "SNAKE", nameB: "ARCTIC SHREW" },
+                { id: "5", nameA: "GAZELLE", nameB: "QUOKKA" },
+              ].map((grp) => {
+                const currentPrefix = activeTab
+                  ? activeTab.charAt(0)
+                  : currentGroupId && typeof currentGroupId === "string"
+                    ? currentGroupId.charAt(0)
                     : "A";
+                const sessionPrefix =
+                  user && ["ADMIN", "STAFF"].includes(user.role.toUpperCase())
+                    ? adminSessionView
+                    : currentPrefix === "B"
+                      ? "B"
+                      : "A";
               const groupId = `${sessionPrefix}${grp.id}`;
               const groupName = sessionPrefix === "B" ? grp.nameB : grp.nameA;
 
@@ -248,8 +254,9 @@ export default function Home() {
                 </div>
               </div>
             ))}
-          </div>
-        </>
+            </div>
+          </>
+        )}
       </section>
     </main>
   );
